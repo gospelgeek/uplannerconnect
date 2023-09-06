@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/uplannerconnect/db" VERSION="2023090343" COMMENT="XMLDB file for local/uplannerconnect">
+    <TABLES>
+        <TABLE NAME="uplannerconnect_course" COMMENT="Se Guardara la informacion generada por el evento">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" COMMENT="ID de la tabla" />
+                <FIELD NAME="id_curso" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="ID del curso" />
+                <FIELD NAME="id_student" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="ID del estudiante" />
+                <FIELD NAME="item_note" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="Nota del elemento" />
+                <FIELD NAME="note" TYPE="text" NOTNULL="true" COMMENT="Nota" />
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+            </KEYS>
+        </TABLE>
+    </TABLES>
+</XMLDB>
