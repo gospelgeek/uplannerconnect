@@ -1,13 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/uplannerconnect/db" VERSION="2023090343" COMMENT="XMLDB file for local/uplannerconnect">
+<XMLDB PATH="local/uplannerconnect/db" VERSION="2023090353" COMMENT="XMLDB file for local/uplannerconnect">
     <TABLES>
         <TABLE NAME="uplannerconnect_course" COMMENT="Se Guardara la informacion generada por el evento">
             <FIELDS>
-                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" COMMENT="ID de la tabla" />
-                <FIELD NAME="id_curso" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="ID del curso" />
-                <FIELD NAME="id_student" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="ID del estudiante" />
-                <FIELD NAME="item_note" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="Nota del elemento" />
-                <FIELD NAME="note" TYPE="text" NOTNULL="true" COMMENT="Nota" />
+               <FIELD NAME="id" SEQUENCE="true" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="ID de la tabla" />
+                <FIELD NAME="json" SEQUENCE="false" TYPE="text" NOTNULL="true" COMMENT="Datos en formato JSON" />
+                <FIELD NAME="success" SEQUENCE="false" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="Éxito (0 o 1)" />
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="uplannerconnect_notifi" COMMENT="Tabla para notificaciones">
+            <FIELDS>
+                <FIELD NAME="id" SEQUENCE="true" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="ID de la tabla" />
+                <FIELD NAME="json" SEQUENCE="false" TYPE="text" NOTNULL="true" COMMENT="Datos en formato JSON" />
+                <FIELD NAME="success" SEQUENCE="false" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="Éxito (0 o 1)" />
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="uplannerconnect_materials" COMMENT="Tabla para materiales">
+            <FIELDS>
+               <FIELD NAME="id" SEQUENCE="true" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="ID de la tabla" />
+                <FIELD NAME="json" SEQUENCE="false" TYPE="text" NOTNULL="true" COMMENT="Datos en formato JSON" />
+                <FIELD NAME="success" SEQUENCE="false" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="Éxito (0 o 1)" />
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" />
