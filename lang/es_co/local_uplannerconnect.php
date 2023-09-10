@@ -13,3 +13,14 @@ $string['uplannerconnect:index'] = 'uPlannerConnect';
 // lang/en/local_uplannerconnect.php
 $string['controllerpath'] = 'Ruta del controlador:';
 $string['controllerpathdesc'] = 'Especifica la ruta del controlador.';
+$string['courses_endpoint_heading'] = 'Configuración del endpoint de cursos';
+$string['courses_endpoint'] = 'URL del endpoint de cursos';
+$string['courses_endpoint_desc'] = 'Ingrese la URL del endpoint de cursos.';
+$string['notifications_endpoint_heading'] = 'Configuración del endpoint de notificaciones';
+$string['notifications_endpoint'] = 'URL del endpoint de notificaciones';
+$string['notifications_endpoint_desc'] = 'Ingrese la URL del endpoint de notificaciones.';
+$string['materials_endpoint_heading'] = 'Configuración del endpoint de materiales';
+$string['materials_endpoint'] = 'URL del endpoint de materiales';
+$string['materials_endpoint_desc'] = 'Ingrese la URL del endpoint de materiales.';
+$string['task_rutine_primary'] = 'Tiempo de ejecución de la tarea principal';
+$string['task_rutine_primary_desc'] = 'Ingrese el tiempo de ejecución en segundos para la tarea principal.';
