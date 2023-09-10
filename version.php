@@ -9,12 +9,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 //Variables globales
-require_once(__DIR__ . '/plugin_config/plugin_config.php');
+require_once(__DIR__ . '/classes/plugin_config/plugin_config.php');
 
 $pluginConfig = new plugin_config();
 
 
-$plugin->version = 2023090400; //año-mes-día-numeroVersion
+$plugin->version = 2023090410; //año-mes-día-numeroVersion
 $plugin->component = $pluginConfig->getPluginNameLocal();
 
 $plugin->requires = 2015030901; 

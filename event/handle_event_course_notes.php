@@ -10,6 +10,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+//Variables globales
+require_once(__DIR__ . '/../classes/ManagementEntityFactory.php');
+
 
 /**
  * @package uPlannerConnect
@@ -17,8 +20,17 @@ defined('MOODLE_INTERNAL') || die();
  * @description Lanza un handle cuando se actualiza un item de calificación
 */
 function grade_item_updated($event) {
-     error_log("Ha Funcionado");
-     print_r($event);
+
+     //instaciar la clase ManagementEntityFactory
+     $ManageEntity = new ManagementEntityFactory();
+
+     $ManageEntity->create([
+        "dataEvent" => $event,
+        "typeEvent" => "grade_item_updated",
+        "dispatch" => "update",
+        "EnumEtities" => 'course_notes'
+     ]);
+
 }
 
 
@@ -28,6 +40,15 @@ function grade_item_updated($event) {
  * @description Lanza un handle cuando se actualiza un item de calificación
 */
 function user_graded($event) {
-        error_log("Ha Funcionado");
-        print_r($event);
+
+     //instaciar la clase ManagementEntityFactory
+     $ManageEntity = new ManagementEntityFactory();
+
+     $ManageEntity->create([
+        "dataEvent" => $event,
+        "typeEvent" => "user_graded",
+        "dispatch" => "update",
+        "EnumEtities" => 'course_notes'
+     ]);
+
 }
