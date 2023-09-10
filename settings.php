@@ -1,7 +1,14 @@
 <?php
 defined('MOODLE_INTERNAL') || die();
 
-$pluginName = 'local_uplannerconnect';
+
+//Variables globales
+require_once(__DIR__ .'/plugin_config/plugin_config.php');
+
+$pluginConfig = new plugin_config();
+$pluginName = $pluginConfig->getPluginNameLocal();
+
+
 
 if ($ADMIN->fulltree) {
     // Página de configuración principal
