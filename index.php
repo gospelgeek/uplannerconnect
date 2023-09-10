@@ -8,7 +8,7 @@
 //Librerias
 require_once '../../config.php';
 //Variables globales
-require_once('./plugin_config/plugin_config.php');
+require_once('./classes/plugin_config/plugin_config.php');
 
 $context = context_system::instance();
 

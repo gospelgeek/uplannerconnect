@@ -3,7 +3,7 @@ defined('MOODLE_INTERNAL') || die();
 
 
 //Variables globales
-require_once(__DIR__ .'/plugin_config/plugin_config.php');
+require_once(__DIR__ .'/classes/plugin_config/plugin_config.php');
 
 $pluginConfig = new plugin_config();
 $pluginName = $pluginConfig->getPluginNameLocal();
