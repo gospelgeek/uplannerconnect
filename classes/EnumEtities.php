@@ -34,8 +34,17 @@ class EnumEtities {
      *               tipo de dato que se requiera
     */
     public function process(array $data) {
-        $class = $this->Types[$data['EnumEtities']];
-        $this->ManagementNotesEntiry = new $class();
+
+        try {
+            
+            $class = $this->Types[$data['EnumEtities']];
+            $newEntity = $this->ManagementNotesEntiry = new $class();
+            $newEntity->procces($data);
+            
+        } catch (Exception $e) {
+            echo 'Excepción capturada: ',  $e->getMessage(), "\n";
+        }
+        
     }
 
 }

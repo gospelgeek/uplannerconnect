@@ -14,10 +14,12 @@ class plugin_config {
 
     public $pluginNameLocal_;
     public $pluginName_ ;
+    public $tableCourseGrade_;
 
     public function __construct() {
         $this->pluginNameLocal_ = 'local_uplannerconnect';
         $this->pluginName_ = 'uplannerconnect';
+        $this->tableCourseGrade_ = 'uplanner_notes';
     }
 
 
@@ -40,5 +42,14 @@ class plugin_config {
         return $this->pluginNameLocal_;
     }
 
+
+    /**
+     * @package uPlannerConnect
+     * @description retorna el nombre de la tabla de notas
+     * @return string
+    */
+    public function getTableCourseGrade() {
+        return $this->tableCourseGrade_;
+    }
    
 }
