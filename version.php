@@ -14,7 +14,7 @@ require_once(__DIR__ . '/classes/plugin_config/plugin_config.php');
 $pluginConfig = new plugin_config();
 
 
-$plugin->version = 2023090424; //año-mes-día-numeroVersion
+$plugin->version = 2023090448; //año-mes-día-numeroVersion
 $plugin->component = $pluginConfig->getPluginNameLocal();
 
 $plugin->requires = 2015030901; 

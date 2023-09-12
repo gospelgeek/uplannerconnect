@@ -16,30 +16,49 @@ require_once(__DIR__ . '/../resource/CourseNotesResource.php');
 class CourseNotesRepository {
 
     private $CourseNotesResource;
+    private $typeEvent;
 
     public function __construct() {
 
         //Instancia de la clase CourseNotesResource
         $this->CourseNotesResource = new CourseNotesResource();
 
+        //Inicializar la variable typeEvent
+        $this->typeEvent = [
+            'user_graded' => 'ResourceUserGraded',
+        ];
+
     }
 
-
+    /**
+     * 
+    */
     public function getResource(array $data) {
-       
-        $event = $data['dataEvent'];
-        // $grade = $event->get_grade();
-        //sprint_r($grade . "\n" . $grade->get_grade_item() . "a");
-        //$gradeItem = $grade->get_grade_item();  
-        
-        return [
-            'grade' => '',
-            'gradeItem' => '',
-        ];
+        $typeEvent = $this->typeEvent[$data['typeEvent']];
+        return $this->$typeEvent($data);
     }
 
     public function saveResource(array $data) {
         $this->CourseNotesResource->saveDataBD($data);
+    }
+
+    private function ResourceUserGraded(array $data) {
+
+        $event = $data['dataEvent'];
+        $getData = $event->get_data();
+        $grade = $event->get_grade();
+        $gradeRecordData = $grade->get_record_data();
+        $gradeLoadItem = $grade->load_grade_item();
+
+        
+        return [
+            'get_data' => $getData,
+            'get_grade' => $grade,
+            'get_record_data' => $gradeRecordData,
+            'get_load_grade_item' => $gradeLoadItem,
+            'typeEvent' => 'user_graded',
+        ];
+
     }
 
 }

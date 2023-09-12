@@ -49,7 +49,7 @@ class CourseNotesResource {
           return $this->MoodleQueryHandler->ejecutarConsulta($query);
         }
         catch (Exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+          error_log('Excepción capturada: ' . $e->getMessage() . "\n");
         }
          
     }
@@ -70,11 +70,11 @@ class CourseNotesResource {
           ];
         
           $query = "INSERT INTO {$this->plugin_config->getTableCourseGrade()} (json, response, success) VALUES ('".json_encode($dataQuery['json'])."', '".$dataQuery['response']."', '".$dataQuery['success']."')";
-        
+         
           return $this->MoodleQueryHandler->ejecutarConsulta($query);
         }
         catch (Exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+          error_log('Excepción capturada: ' . $e->getMessage() . "\n");
         }
 
     }

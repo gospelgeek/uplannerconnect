@@ -13,46 +13,62 @@
 */
 class CourseNotesTrasnform {
 
+    private $typeTransform;
+
     public function __construct() {
+
+        //Inicializar la variable typeTransform
+        $this->typeTransform = [
+            'user_graded' => 'convertDataUserGrade',
+        ];
 
     }
 
 
     public function converDataJsonUplanner(array $data) {
+        $typeTransform = $this->typeTransform[$data['typeEvent']];
+        return $this->$typeTransform($data);
+    }
+    
 
-        // $gradeItem = $data['gradeItem'];
-        // $grade = $data['grade'];
+    /**
+     * @package uPlannerConnect
+     * @description Transforma la data del evento en el formato que requiere uPlanner
+    */
+    private function convertDataUserGrade(array $data) {
 
-        // //sacar la información del evento
-        // $dataSend = [
-        //     'sectionId' => $gradeItem->get_courseid(),
-        //     'studentCode' => $grade->get_userid(),
-        //     'finalGrade' => $grade->get_finalgrade(),
-        //     'finalGradeMessage' => $grade->get_feedback(),
-        //     'finalGradePercentage' => $grade->get_percentage(),
-        //     'evaluationGroups' => [
-        //         [
-        //             "evaluationGroupCode" => $gradeItem->get_itemmodule(),
-        //             "average" => $gradeItem->get_finalgrade(),
-        //             "grades" => [
-        //                 [
-        //                     "evaluationId" => $gradeItem->get_iteminstance(),
-        //                     "value" => $gradeItem->get_finalgrade(),
-        //                     "evaluationName" => $gradeItem->get_itemname(),
-        //                     "date" => $gradeItem->get_timemodified(),
-        //                     "isApproved" => $gradeItem->get_finalgrade() >= 3.0,
-        //                 ]
-        //             ]
-        //         ]
-        //     ],
-        //     "lastModifiedDate" => $gradeItem->get_timemodified()
-        // ];
+        //Traer la información
+        $getData = $data['get_data'];
+        $grade = $data['get_grade'];
+        $gradeRecordData = $data['get_record_data'];
+        $gradeLoadItem = $data['get_load_grade_item'];
 
+        //sacar la información del evento
         return [
-            'dataSend' => '',
-            'gradeItem' => '',
-            'grade' => '',
+            'sectionId' => $grade->grade_item->courseid,
+            'studentCode' => $grade->userid,
+            'finalGrade' => ($getData['other'])['finalgrade'],
+            'finalGradeMessage' => $grade->feedback,
+            'finalGradePercentage' => (100 / $grade->grade_item->grademax * $grade->rawgrade),
+            'evaluationGroups' => [
+                [
+                    "evaluationGroupCode" => $gradeLoadItem->categoryid,
+                    "average" => '',
+                    "grades" => [
+                        [
+                            "evaluationId" => $gradeLoadItem->itemtype,
+                            "value" => ($getData['other'])['finalgrade'],
+                            "evaluationName" => $gradeLoadItem->itemname,
+                            "date" => $gradeLoadItem->timecreated,
+                            "isApproved" => '',
+                        ]
+                    ]
+                ]
+            ],
+            "lastModifiedDate" => $gradeLoadItem->timemodified,
+            "action" => 'create'
         ];
     }
+
 
 }
