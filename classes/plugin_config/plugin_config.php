@@ -19,7 +19,7 @@ class plugin_config {
     public function __construct() {
         $this->pluginNameLocal_ = 'local_uplannerconnect';
         $this->pluginName_ = 'uplannerconnect';
-        $this->tableCourseGrade_ = 'uplanner_notes';
+        $this->tableCourseGrade_ = 'mdl_uplanner_notes';
     }
 
 
