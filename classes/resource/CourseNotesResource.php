@@ -16,9 +16,11 @@ require_once(__DIR__ . '/../plugin_config/plugin_config.php');
 */
 class CourseNotesResource {
 
+    //Atributos
     private $MoodleQueryHandler;
     private $plugin_config;
 
+    //Constructor
     public function __construct() {
 
         //Instancia de la clase MoodleQueryHandler
