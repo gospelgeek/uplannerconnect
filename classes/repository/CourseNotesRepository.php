@@ -15,9 +15,11 @@ require_once(__DIR__ . '/../resource/CourseNotesResource.php');
 */
 class CourseNotesRepository {
 
+    //Atributos
     private $CourseNotesResource;
     private $typeEvent;
 
+    //Constructor
     public function __construct() {
 
         //Instancia de la clase CourseNotesResource
@@ -31,17 +33,31 @@ class CourseNotesRepository {
     }
 
     /**
-     * 
+     * @package uPlannerConnect
+     * @description Retorna la data acorde al evento que se requiera
+     * @return array
     */
     public function getResource(array $data) {
         $typeEvent = $this->typeEvent[$data['typeEvent']];
         return $this->$typeEvent($data);
     }
 
+
+    /**
+     * @package uPlannerConnect
+     * @description Guarda la data en la base de datos
+     * @return void 
+    */
     public function saveResource(array $data) {
         $this->CourseNotesResource->saveDataBD($data);
     }
 
+
+    /**
+     *  @package uPlannerConnect
+     *  @description Retorna la data del evento user_graded
+     *  @return array
+    */
     private function ResourceUserGraded(array $data) {
 
         $event = $data['dataEvent'];

@@ -13,8 +13,10 @@
 */
 class CourseNotesTrasnform {
 
+    //Atributos
     private $typeTransform;
 
+    //Constructor
     public function __construct() {
 
         //Inicializar la variable typeTransform
@@ -24,7 +26,11 @@ class CourseNotesTrasnform {
 
     }
 
-
+    /**
+     * @package uPlannerConnect
+     * @description Convierte la data acorde al evento que se requiera
+     * @return array
+    */
     public function converDataJsonUplanner(array $data) {
         $typeTransform = $this->typeTransform[$data['typeEvent']];
         return $this->$typeTransform($data);
@@ -34,6 +40,7 @@ class CourseNotesTrasnform {
     /**
      * @package uPlannerConnect
      * @description Transforma la data del evento en el formato que requiere uPlanner
+     * @return array
     */
     private function convertDataUserGrade(array $data) {
 
