@@ -16,9 +16,17 @@ require_once(__DIR__ . '/../plugin_config/plugin_config.php');
 */
 class CourseNotesResource {
 
+    //Constantes
+    const STATE_DEFAULT = 0;  //Estado por defecto
+    const STATE_SEND = 1;     //Estado de envío
+    const STATE_ERROR = 2;    //Estado de error
+  
+    //Atributos
     private $MoodleQueryHandler;
     private $plugin_config;
 
+
+    //Constructor
     public function __construct() {
 
         //Instancia de la clase MoodleQueryHandler
@@ -49,7 +57,7 @@ class CourseNotesResource {
           return $this->MoodleQueryHandler->ejecutarConsulta($query);
         }
         catch (Exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+          error_log('Excepción capturada: ' . $e->getMessage() . "\n");
         }
          
     }
@@ -70,11 +78,30 @@ class CourseNotesResource {
           ];
         
           $query = "INSERT INTO {$this->plugin_config->getTableCourseGrade()} (json, response, success) VALUES ('".json_encode($dataQuery['json'])."', '".$dataQuery['response']."', '".$dataQuery['success']."')";
-        
+         
           return $this->MoodleQueryHandler->ejecutarConsulta($query);
         }
         catch (Exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+          error_log('Excepción capturada: ' . $e->getMessage() . "\n");
+        }
+
+    }
+
+
+    /**
+     * @package uPlannerConnect
+     * @description Obtiene la data en la base de datos
+     * @return void 
+    */
+    public function getDataBD($state = self::STATE_DEFAULT) {
+
+        try {
+          $query = "SELECT * FROM %s WHERE success = %s LIMIT 100";
+          $query =  sprintf($query, $this->plugin_config->getTableCourseGrade(), $state);
+          return $this->MoodleQueryHandler->ejecutarConsulta($query);
+        }
+        catch (Exception $e) {
+          error_log('Excepción capturada: ' . $e->getMessage() . "\n");
         }
 
     }

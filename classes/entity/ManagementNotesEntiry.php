@@ -35,8 +35,8 @@ class ManagementNotesEntiry {
         //Transformar la data en el formato que requiere uPlanner
         $dataTrasnform = $this->CourseNotesTrasnform->converDataJsonUplanner($dataRepository);
         //Enviar la data a uPlanner
-        $send =$this->CourseNotesRepository->saveResource($dataTrasnform);
-        
+        $this->CourseNotesRepository->saveResource($dataTrasnform);
+
     }
 
 }
