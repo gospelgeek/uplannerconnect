@@ -9,8 +9,6 @@ defined('MOODLE_INTERNAL') || die();
 //Variables globales
 require_once(__DIR__ .'/../classes/plugin_config/plugin_config.php');
 
-$pluginConfig = new plugin_config();
-
 
 /**
  * @param $capabilities
@@ -19,7 +17,7 @@ $pluginConfig = new plugin_config();
  * @desc Defines capabilities for the plugin
 */
 $capabilities = array(
-    'local/'.$pluginConfig->getPluginName().':index' => array(
+    'local/'.plugin_config::PLUGIN_NAME.':index' => array(
         'riskbitmask' => 1,
         'contextlevel' => CONTEXT_SYSTEM,
         'captype' => 'write',
