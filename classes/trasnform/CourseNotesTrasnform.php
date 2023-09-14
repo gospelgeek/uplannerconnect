@@ -55,7 +55,7 @@ class CourseNotesTrasnform {
             'sectionId' => $grade->grade_item->courseid,
             'studentCode' => $grade->userid,
             'finalGrade' => ($getData['other'])['finalgrade'],
-            'finalGradeMessage' => $grade->feedback,
+            'finalGradeMessage' => '',
             'finalGradePercentage' => (100 / $grade->grade_item->grademax * $grade->rawgrade),
             'evaluationGroups' => [
                 [

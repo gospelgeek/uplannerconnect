@@ -52,8 +52,8 @@ class CourseNotesResource {
             'success' => $data['success'],
           ];
         
-          $query = "UPDATE {$this->plugin_config->getTableCourseGrade()} SET json = '".json_encode($dataQuery['json'])."', response = '".json_encode($dataQuery['response'])."', success = '".$dataQuery['success']."' WHERE id = 1";
-        
+          $query =  "UPDATE %s SET json = '%s', response = '%s', success = '%s' WHERE id = 1";
+          $query =  sprintf($query, plugin_config::TABLE_COURSE_GRADE, json_encode($dataQuery['json']), $dataQuery['response'], $dataQuery['success']);
           return $this->MoodleQueryHandler->ejecutarConsulta($query);
         }
         catch (Exception $e) {
@@ -77,8 +77,9 @@ class CourseNotesResource {
             'success' => 0,
           ];
         
-          $query = "INSERT INTO {$this->plugin_config->getTableCourseGrade()} (json, response, success) VALUES ('".json_encode($dataQuery['json'])."', '".$dataQuery['response']."', '".$dataQuery['success']."')";
-         
+          $query =  "INSERT INTO %s (json, response, success) VALUES ('%s', '%s', '%s')";
+          $query =  sprintf($query, plugin_config::TABLE_COURSE_GRADE, json_encode($dataQuery['json']), $dataQuery['response'], $dataQuery['success']);
+    
           return $this->MoodleQueryHandler->ejecutarConsulta($query);
         }
         catch (Exception $e) {
@@ -97,7 +98,7 @@ class CourseNotesResource {
 
         try {
           $query = "SELECT * FROM %s WHERE success = %s LIMIT 100";
-          $query =  sprintf($query, $this->plugin_config->getTableCourseGrade(), $state);
+          $query =  sprintf($query, plugin_config::TABLE_COURSE_GRADE, $state);
           return $this->MoodleQueryHandler->ejecutarConsulta($query);
         }
         catch (Exception $e) {
