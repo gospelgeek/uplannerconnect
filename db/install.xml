@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/uplannerconnect/db" VERSION="2023090393" COMMENT="XMLDB file for local/uplannerconnect">
+<XMLDB PATH="local/uplannerconnect/db" VERSION="2023090401" COMMENT="XMLDB file for local/uplannerconnect">
     <TABLES>
         <TABLE NAME="uplanner_notes" COMMENT="Se Guardara la informacion generada por el evento">
             <FIELDS>

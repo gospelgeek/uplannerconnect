@@ -16,9 +16,17 @@ require_once(__DIR__ . '/../plugin_config/plugin_config.php');
 */
 class CourseNotesResource {
 
+    //Constantes
+    const STATE_DEFAULT = 0;  //Estado por defecto
+    const STATE_SEND = 1;     //Estado de envío
+    const STATE_ERROR = 2;    //Estado de error
+  
+    //Atributos
     private $MoodleQueryHandler;
     private $plugin_config;
 
+
+    //Constructor
     public function __construct() {
 
         //Instancia de la clase MoodleQueryHandler
@@ -44,8 +52,8 @@ class CourseNotesResource {
             'success' => $data['success'],
           ];
         
-          $query = "UPDATE {$this->plugin_config->getTableCourseGrade()} SET json = '".json_encode($dataQuery['json'])."', response = '".json_encode($dataQuery['response'])."', success = '".$dataQuery['success']."' WHERE id = 1";
-        
+          $query =  "UPDATE %s SET json = '%s', response = '%s', success = '%s' WHERE id = 1";
+          $query =  sprintf($query, plugin_config::TABLE_COURSE_GRADE, json_encode($dataQuery['json']), $dataQuery['response'], $dataQuery['success']);
           return $this->MoodleQueryHandler->ejecutarConsulta($query);
         }
         catch (Exception $e) {
@@ -69,8 +77,28 @@ class CourseNotesResource {
             'success' => 0,
           ];
         
-          $query = "INSERT INTO {$this->plugin_config->getTableCourseGrade()} (json, response, success) VALUES ('".json_encode($dataQuery['json'])."', '".$dataQuery['response']."', '".$dataQuery['success']."')";
-         
+          $query =  "INSERT INTO %s (json, response, success) VALUES ('%s', '%s', '%s')";
+          $query =  sprintf($query, plugin_config::TABLE_COURSE_GRADE, json_encode($dataQuery['json']), $dataQuery['response'], $dataQuery['success']);
+    
+          return $this->MoodleQueryHandler->ejecutarConsulta($query);
+        }
+        catch (Exception $e) {
+          error_log('Excepción capturada: ' . $e->getMessage() . "\n");
+        }
+
+    }
+
+
+    /**
+     * @package uPlannerConnect
+     * @description Obtiene la data en la base de datos
+     * @return void 
+    */
+    public function getDataBD($state = self::STATE_DEFAULT) {
+
+        try {
+          $query = "SELECT * FROM %s WHERE success = %s LIMIT 100";
+          $query =  sprintf($query, plugin_config::TABLE_COURSE_GRADE, $state);
           return $this->MoodleQueryHandler->ejecutarConsulta($query);
         }
         catch (Exception $e) {
