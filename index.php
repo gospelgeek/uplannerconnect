@@ -12,18 +12,16 @@ require_once('./classes/plugin_config/plugin_config.php');
 
 $context = context_system::instance();
 
-// Crea una instancia de la clase plugin_config
-$pluginConfig = new plugin_config();
 
 //Revision de permisos
-require_capability('local/'.$pluginConfig->getPluginName().':index', $context);
+require_capability('local/'.plugin_config::PLUGIN_NAME.':index', $context);
 
 //Revisa esta logueado
 require_login();
 
 
 //Variables
-$url = new moodle_url('/local/'.$pluginConfig->getPluginName().'/index.php');
+$url = new moodle_url('/local/'.plugin_config::PLUGIN_NAME.'/index.php');
 $PAGE->set_context($context);
 $PAGE->set_url($url);
 $PAGE->set_pagelayout('admin');
@@ -33,8 +31,8 @@ $PAGE->set_pagelayout('admin');
 echo $OUTPUT->header();
 
 //Contenido
-echo $OUTPUT->heading(get_string('title', $pluginConfig->getPluginNameLocal()));
-$PAGE->requires->js_call_amd(''.$pluginConfig->getPluginNameLocal().'/main', 'init');
+echo $OUTPUT->heading(get_string('title', plugin_config::PLUGIN_NAME_LOCAL));
+$PAGE->requires->js_call_amd(''.plugin_config::PLUGIN_NAME_LOCAL.'/main', 'init');
 
 //Pie de página
 echo $OUTPUT->footer();
