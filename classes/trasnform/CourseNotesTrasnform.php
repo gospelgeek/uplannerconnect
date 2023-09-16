@@ -22,6 +22,8 @@ class CourseNotesTrasnform {
         //Inicializar la variable typeTransform
         $this->typeTransform = [
             'user_graded' => 'convertDataUserGrade',
+            'grade_item_updated' => 'convertDataGradeItemUpdated',
+            'grade_deleted' => 'convertDataUserGrade',
         ];
 
     }
@@ -75,6 +77,85 @@ class CourseNotesTrasnform {
             "lastModifiedDate" => $gradeLoadItem->timemodified,
             "action" => 'create'
         ];
+    }
+
+
+    /**
+     * @package uPlannerConnect
+     * @description Transforma la data del evento en el formato que requiere uPlanner
+     * @return array 
+    */
+    private function convertDataGradeItemUpdated(array $data) {
+
+
+        //Traer la información
+        $getData = $data['get_data'];
+
+        //sacar la información del evento
+        return [
+            'sectionId' => $getData->courseid,
+            'studentCode' => '',
+            'finalGrade' => '',
+            'finalGradeMessage' => '',
+            'finalGradePercentage' => '',
+            'evaluationGroups' => [
+                [
+                    "evaluationGroupCode" => $getData->categoryid,
+                    "average" => '',
+                    "grades" => [
+                        [
+                            "evaluationId" => '',
+                            "value" => '',
+                            "evaluationName" => '',
+                            "date" => $getData->timecreated,
+                            "isApproved" => '',
+                        ]
+                    ]
+                ]
+            ],
+            "lastModifiedDate" => $getData->timemodified,
+            "action" => 'update'
+        ];
+
+    }
+
+
+    /**
+     * @package uPlannerConnect
+     * @description Transforma la data del evento en el formato que requiere uPlanner
+     * @return array 
+    */
+    private function convertDataGradeDeleted(array $data) {
+
+        //Traer la información
+        $getData = $data['get_data'];
+
+        //sacar la información del evento
+        return [
+            'sectionId' => '',
+            'studentCode' => '',
+            'finalGrade' => '',
+            'finalGradeMessage' => '',
+            'finalGradePercentage' => '',
+            'evaluationGroups' => [
+                [
+                    "evaluationGroupCode" => '',
+                    "average" => '',
+                    "grades" => [
+                        [
+                            "evaluationId" => '',
+                            "value" => '',
+                            "evaluationName" => '',
+                            "date" => '',
+                            "isApproved" => '',
+                        ]
+                    ]
+                ]
+            ],
+            "lastModifiedDate" => '',
+            "action" => 'delete'
+        ];
+
     }
 
 
