@@ -14,6 +14,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/../classes/ManagementEntityFactory.php');
 
 
+
 /**
  * @package uPlannerConnect
  * @todo Se deja comentado por que esta por definirse si se va a utilizar
@@ -24,16 +25,16 @@ require_once(__DIR__ . '/../classes/ManagementEntityFactory.php');
 function grade_item_updated($event) {
 
    try {
-     //instaciar la clase ManagementEntityFactory
-   //   $ManageEntity = new ManagementEntityFactory();
+      //instaciar la clase ManagementEntityFactory
+      $ManageEntity = new ManagementEntityFactory();
 
-   //   $ManageEntity->create([
-   //      "dataEvent" => $event,
-   //      "typeEvent" => "grade_item_updated",
-   //      "dispatch" => "update",
-   //      "EnumEtities" => 'course_notes'
-   //   ]);
-
+      $ManageEntity->create([
+         "dataEvent" => $event,
+         "typeEvent" => "grade_item_updated",
+         "dispatch" => "update",
+         "EnumEtities" => 'course_notes'
+      ]);
+     
    }
    catch (Exception $e) {
        error_log('Excepción capturada: ',  $e->getMessage(), "\n");
@@ -49,9 +50,9 @@ function grade_item_updated($event) {
 function user_graded($event) {
 
    try {
-     //instaciar la clase ManagementEntityFactory
+     //instaciar la clase ManagementEntityFactory 
      $ManageEntity = new ManagementEntityFactory();
-     
+
      $ManageEntity->create([
         "dataEvent" => $event,
         "typeEvent" => "user_graded",
@@ -71,10 +72,20 @@ function user_graded($event) {
  * @package uPlannerConnect
  * @description Lanza un handle cuando se borra una calificación
 */
-function grade_deleted() {
+function grade_deleted($event) {
    
    try {
-      print_r("grade_deleted");
+      
+      //instaciar la clase ManagementEntityFactory
+      $ManageEntity = new ManagementEntityFactory();
+
+      $ManageEntity->create([
+         "dataEvent" => $event,
+         "typeEvent" => "grade_deleted",
+         "dispatch" => "delete",
+         "EnumEtities" => 'course_notes'
+      ]);
+
    } 
    catch (Exception $e) {
       error_log('Excepción capturada: ',  $e->getMessage(), "\n");
@@ -90,7 +101,7 @@ function grade_deleted() {
  * @description Lanza un handle cuando se crea un item de calificación
  * 
 */
-function grade_item_created() {
+function grade_item_created($event) {
          
    try {
       print_r("grade_item_created");
@@ -107,7 +118,7 @@ function grade_item_created() {
  *    Mi idea del evento global
  * @description Lanza un handle cuando se borra un item de calificación 
 */
-function grade_item_deleted() {
+function grade_item_deleted($event) {
       
    try {
       print_r("grade_item_deleted");
@@ -125,7 +136,7 @@ function grade_item_deleted() {
  *   Mi idea del evento global
  * @description Lanza un handle cuando se crea una letra de calificación 
 */
-function grade_letter_created() {
+function grade_letter_created($event) {
             
    try {
       print_r("grade_letter_created");
@@ -142,7 +153,7 @@ function grade_letter_created() {
  *  Mi idea del evento global
  * @description Lanza un handle cuando se borra una letra de calificación
 */
-function grade_letter_deleted() {
+function grade_letter_deleted($event) {
                
    try {
       print_r("grade_letter_deleted");
@@ -159,7 +170,7 @@ function grade_letter_deleted() {
  * @description Lanza un handle cuando se actualiza una letra de calificación
  * 
 */
-function grade_letter_updated() {
+function grade_letter_updated($event) {
                   
    try {
       print_r("grade_letter_updated");
