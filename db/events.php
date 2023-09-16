@@ -5,23 +5,25 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
+defined('MOODLE_INTERNAL') || die();
 
-$pluginName = '\local_uplannerconnect';
+require_once(__DIR__ . '/../classes/plugin_config/plugin_config.php');
+
+$observers = [];
 
 /**
  * @package uPlannerConnect
  * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
  * @description Instancia un evento para el manejo de notas de un curso
 */
-$observers = array(
-    array(
-        'eventname' => '\core\event\grade_item_updated',
-        'includefile' => '/local/uplannerconnect/event/handle_event_course_notes.php',
-        'callback' => 'grade_item_updated',
-    ),
-    array(
-        'eventname' => '\core\event\user_graded',
-        'includefile' => '/local/uplannerconnect/event/handle_event_course_notes.php',
-        'callback' => 'user_graded',
-    )
-);
+foreach (plugin_config::EVENTS_OBSERVERS as $eventData) {
+    
+    $callback = preg_replace('/^\\\\core\\\\event\\\\/', '', $eventData['eventname']);
+   
+    $observers[] = [
+        'eventname' => $eventData['eventname'],
+        'includefile' => $eventData['includefile'],
+        'callback' =>  $callback,
+    ];
+    
+}

@@ -28,6 +28,8 @@ class CourseNotesRepository {
         //Inicializar la variable typeEvent
         $this->typeEvent = [
             'user_graded' => 'ResourceUserGraded',
+            'grade_item_updated' => 'ResourceGradeItemUpdated',
+            'grade_deleted' => 'ResourceGradeDeleted',
         ];
 
     }
@@ -59,21 +61,82 @@ class CourseNotesRepository {
      *  @return array
     */
     private function ResourceUserGraded(array $data) {
-
-        $event = $data['dataEvent'];
-        $getData = $event->get_data();
-        $grade = $event->get_grade();
-        $gradeRecordData = $grade->get_record_data();
-        $gradeLoadItem = $grade->load_grade_item();
-
         
-        return [
-            'get_data' => $getData,
-            'get_grade' => $grade,
-            'get_record_data' => $gradeRecordData,
-            'get_load_grade_item' => $gradeLoadItem,
-            'typeEvent' => 'user_graded',
-        ];
+       try {
+
+            $event = $data['dataEvent'];
+            $getData = $event->get_data();
+            $grade = $event->get_grade();
+            $gradeRecordData = $grade->get_record_data();
+            $gradeLoadItem = $grade->load_grade_item();
+
+            
+            return [
+                'get_data' => $getData,
+                'get_grade' => $grade,
+                'get_record_data' => $gradeRecordData,
+                'get_load_grade_item' => $gradeLoadItem,
+                'typeEvent' => 'user_graded',
+            ];
+
+      } catch (Exception $e) {
+          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+      }
+
+    }
+
+
+    /**
+     * @package uPlannerConnect
+     * @description Retorna la data del evento grade_item_updated
+     * @return array
+    */
+    private function ResourceGradeItemUpdated(array $data) {
+
+        try {
+            $event = $data['dataEvent'];
+            $GradeItem = $event->get_grade_item();
+            
+
+            return [
+                'get_data' => $GradeItem,
+                'typeEvent' => 'grade_item_updated',
+            ];
+
+
+        } catch (Exception $e) {
+            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+        }
+
+    }
+
+
+    /**
+     * @package uPlannerConnect
+     * @description Retorna la data del evento grade_deleted
+     * @return array 
+    */
+    private function ResourceGradeDeleted(array $data) {
+
+        try {
+            $event = $data['dataEvent'];
+            $getData = $event->get_data();
+            $grade = $event->get_grade();
+            $gradeRecordData = $grade->get_record_data();
+            $gradeLoadItem = $grade->get_record_data();
+
+            return [
+                'get_data' => $getData,
+                'get_grade' => $grade,
+                'get_record_data' => $gradeRecordData,
+                'get_load_grade_item' => $gradeLoadItem,
+                'typeEvent' => 'grade_deleted',
+            ];
+
+        } catch (Exception $e) {
+
+            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+        }
 
     }
 

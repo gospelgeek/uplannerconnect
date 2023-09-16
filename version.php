@@ -11,11 +11,9 @@ defined('MOODLE_INTERNAL') || die();
 //Variables globales
 require_once(__DIR__ . '/classes/plugin_config/plugin_config.php');
 
-$pluginConfig = new plugin_config();
-
 
 $plugin->version = 2023090400; //año-mes-día-numeroVersion
-$plugin->component = $pluginConfig->getPluginNameLocal();
+$plugin->component = plugin_config::PLUGIN_NAME_LOCAL;
 
 $plugin->requires = 2015030901; 
 $plugin->maturity = MATURITY_ALPHA;

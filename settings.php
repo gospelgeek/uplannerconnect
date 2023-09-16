@@ -5,9 +5,7 @@ defined('MOODLE_INTERNAL') || die();
 //Variables globales
 require_once(__DIR__ .'/classes/plugin_config/plugin_config.php');
 
-$pluginConfig = new plugin_config();
-$pluginName = $pluginConfig->getPluginNameLocal();
-
+$pluginName = plugin_config::PLUGIN_NAME_LOCAL;
 
 
 if ($ADMIN->fulltree) {
