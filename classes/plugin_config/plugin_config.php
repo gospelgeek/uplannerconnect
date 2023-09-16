@@ -8,7 +8,7 @@
 /**
  * @package uPlannerConnect
  * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
- * @description variables globales para el plugin
+ * @description Variables globales para el plugin
 */
 class plugin_config {
 

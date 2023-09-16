@@ -22,19 +22,19 @@ class ManagementNotesEntiry {
     private $CourseNotesRepository;
 
     public function __construct() {
-        //instanciar la clase de transformacion
+        //Instanciar la clase de transformacion
         $this->CourseNotesTrasnform = new CourseNotesTrasnform();
-        //instanciar la clase de repositorio
+        //Instanciar la clase de repositorio
         $this->CourseNotesRepository = new CourseNotesRepository();
     }
 
 
     public function procces(array $data) {
-        //Trear la informacion necesaria con la data del evento
+        //Trear la informacion necesaria con los datos del evento
         $dataRepository = $this->CourseNotesRepository->getResource($data);
-        //Transformar la data en el formato que requiere uPlanner
+        //Transformar los datos en el formato que requiere uPlanner
         $dataTrasnform = $this->CourseNotesTrasnform->converDataJsonUplanner($dataRepository);
-        //Enviar la data a uPlanner
+        //Enviar los datos a uPlanner
         $this->CourseNotesRepository->saveResource($dataTrasnform);
 
     }

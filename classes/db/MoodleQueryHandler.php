@@ -1,7 +1,7 @@
 <?php
 /**
  * @package     uPlannerConnect
- * @copyright   cristian machado mosquera <cristian.machado@correounivalle.edu.co>
+ * @copyright   cristian machado mosquera <cristian.machado@correounivalle.edu.co> 
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
@@ -20,9 +20,9 @@ class MoodleQueryHandler {
 
     /**
      *  @author Cristian machado <cristian.machado@correounivalle.edu.co>
-     *  @des Ejecuta una consulta sql y retorna el resultado
+     *  @description Ejecuta una consulta sql y retorna el resultado
     */
-    public function ejecutarConsulta($sql) {
+    public function executeQuery($sql) {
         return $this->db->get_records_sql($sql);
     }
 }

@@ -25,7 +25,7 @@ require_once(__DIR__ . '/../classes/ManagementEntityFactory.php');
 function grade_item_updated($event) {
 
    try {
-      //instaciar la clase ManagementEntityFactory
+      //Instanciar la clase ManagementEntityFactory
       $ManageEntity = new ManagementEntityFactory();
 
       $ManageEntity->create([
@@ -50,7 +50,7 @@ function grade_item_updated($event) {
 function user_graded($event) {
 
    try {
-     //instaciar la clase ManagementEntityFactory 
+     //Instanciar la clase ManagementEntityFactory 
      $ManageEntity = new ManagementEntityFactory();
 
      $ManageEntity->create([
@@ -76,7 +76,7 @@ function grade_deleted($event) {
    
    try {
       
-      //instaciar la clase ManagementEntityFactory
+      //Instanciar la clase ManagementEntityFactory
       $ManageEntity = new ManagementEntityFactory();
 
       $ManageEntity->create([

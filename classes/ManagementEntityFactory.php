@@ -22,7 +22,7 @@ class ManagementEntityFactory {
 
     /**
      * @package uPlannerConnect
-     * @description constructor de la clase
+     * @description Constructor de la clase
      * @return void
     */
     public function __construct() {
@@ -31,7 +31,7 @@ class ManagementEntityFactory {
 
     /**
      * @package uPlannerConnect
-     * @description retorna una instancia de la entidad de acuerdo al 
+     * @description Retorna una instancia de la entidad de acuerdo al 
      *              tipo de dato que se requiera
     */
     public function create(array $data) {
