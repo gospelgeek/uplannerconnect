@@ -68,6 +68,18 @@ class plugin_config {
         [
             'eventname' => '\core\event\scale_updated',
             'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\core\event\competency_created',
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\core\event\competency_deleted',
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\core\event\competency_updated',
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
         ]
     ];
 

@@ -166,7 +166,7 @@ function grade_item_deleted($event) {
 function grade_letter_created($event) {
             
    try {
-      print_r("grade_letter_created");
+      error_log("grade_letter_created");
    } 
    catch (Exception $e) {
       error_log('Excepción capturada: ',  $e->getMessage(), "\n");
@@ -181,7 +181,7 @@ function grade_letter_created($event) {
 function grade_letter_deleted($event) {
                
    try {
-      print_r("grade_letter_deleted");
+      error_log("grade_letter_deleted");
    } 
    catch (Exception $e) {
       error_log('Excepción capturada: ',  $e->getMessage(), "\n");
@@ -196,7 +196,7 @@ function grade_letter_deleted($event) {
 function grade_letter_updated($event) {
                   
    try {
-      print_r("grade_letter_updated");
+      error_log("grade_letter_updated");
    } 
    catch (Exception $e) {
       error_log('Excepción capturada: ',  $e->getMessage(), "\n");
@@ -212,7 +212,7 @@ function grade_letter_updated($event) {
 function scale_created($event) {         
 
    try {
-      print_r("scale_created");
+      error_log("scale_created");
    } 
    catch (Exception $e) {
       error_log('Excepción capturada: ',  $e->getMessage(), "\n");
@@ -228,7 +228,7 @@ function scale_created($event) {
 function scale_deleted($event) {         
 
    try {
-      print_r("scale_deleted");
+      error_log("scale_deleted");
    } 
    catch (Exception $e) {
       error_log('Excepción capturada: ',  $e->getMessage(), "\n");
@@ -244,10 +244,51 @@ function scale_deleted($event) {
 function scale_updated($event) {         
 
    try {
-      print_r("scale_updated");
+      error_log("scale_updated");
    } 
    catch (Exception $e) {
       error_log('Excepción capturada: ',  $e->getMessage(), "\n");
    }  
 
+}
+
+/**
+ *  @package uPlannerConnect
+ *  @description Lanza un handle cuando se crea una competencia
+*/
+function competency_created($event) {
+   try {
+      error_log("competency_created");
+   } 
+   catch (Exception $e) {
+      error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+   }  
+}
+
+
+/**
+ *  @package uPlannerConnect
+ *  @description Lanza un handle cuando se borra una competencia
+*/
+function competency_deleted($event) {
+   try {
+      error_log("competency_deleted");
+   } 
+   catch (Exception $e) {
+      error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+   }  
+}
+
+
+/**
+ *  @package uPlannerConnect
+ *  @description Lanza un handle cuando se actualiza una competencia
+*/
+function competency_updated($event) {
+   try {
+      error_log("competency_updated");
+   } 
+   catch (Exception $e) {
+      error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+   }  
 }
