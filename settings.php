@@ -51,6 +51,6 @@ if ($ADMIN->fulltree) {
 
     // Agrega más configuraciones si es necesario
 
-    // Agregar la página de configuración al árbol
+    // Agrega la página de configuración al árbol
     $ADMIN->add('localplugins', $settings);
 }

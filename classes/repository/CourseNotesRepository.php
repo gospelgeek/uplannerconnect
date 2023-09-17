@@ -36,7 +36,7 @@ class CourseNotesRepository {
 
     /**
      * @package uPlannerConnect
-     * @description Retorna la data acorde al evento que se requiera
+     * @description Retorna los datos acorde al evento que se requiera
      * @return array
     */
     public function getResource(array $data) {
@@ -47,7 +47,7 @@ class CourseNotesRepository {
 
     /**
      * @package uPlannerConnect
-     * @description Guarda la data en la base de datos
+     * @description Guarda los datos en la base de datos
      * @return void 
     */
     public function saveResource(array $data) {
@@ -57,7 +57,7 @@ class CourseNotesRepository {
 
     /**
      *  @package uPlannerConnect
-     *  @description Retorna la data del evento user_graded
+     *  @description Retorna los datos del evento user_graded
      *  @return array
     */
     private function ResourceUserGraded(array $data) {
@@ -88,7 +88,7 @@ class CourseNotesRepository {
 
     /**
      * @package uPlannerConnect
-     * @description Retorna la data del evento grade_item_updated
+     * @description Retorna los datos del evento grade_item_updated
      * @return array
     */
     private function ResourceGradeItemUpdated(array $data) {
@@ -113,7 +113,7 @@ class CourseNotesRepository {
 
     /**
      * @package uPlannerConnect
-     * @description Retorna la data del evento grade_deleted
+     * @description Retorna los datos del evento grade_deleted
      * @return array 
     */
     private function ResourceGradeDeleted(array $data) {

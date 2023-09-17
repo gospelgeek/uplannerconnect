@@ -1,5 +1,5 @@
-<?php
 /**
+<?php
  * @package     uPlannerConnect
  * @copyright   cristian machado mosquera <cristian.machado@correounivalle.edu.co>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -30,7 +30,7 @@ class CourseNotesTrasnform {
 
     /**
      * @package uPlannerConnect
-     * @description Convierte la data acorde al evento que se requiera
+     * @description Convierte los datos acorde al evento que se requiera
      * @return array
     */
     public function converDataJsonUplanner(array $data) {
@@ -41,7 +41,7 @@ class CourseNotesTrasnform {
 
     /**
      * @package uPlannerConnect
-     * @description Transforma la data del evento en el formato que requiere uPlanner
+     * @description Transforma los datos del evento en el formato que requiere uPlanner
      * @return array
     */
     private function convertDataUserGrade(array $data) {
@@ -52,7 +52,7 @@ class CourseNotesTrasnform {
         $gradeRecordData = $data['get_record_data'];
         $gradeLoadItem = $data['get_load_grade_item'];
 
-        //sacar la información del evento
+        //Sacar la información del evento
         return [
             'sectionId' => $grade->grade_item->courseid,
             'studentCode' => $grade->userid,
@@ -82,7 +82,7 @@ class CourseNotesTrasnform {
 
     /**
      * @package uPlannerConnect
-     * @description Transforma la data del evento en el formato que requiere uPlanner
+     * @description Transforma los datos del evento en el formato que requiere uPlanner
      * @return array 
     */
     private function convertDataGradeItemUpdated(array $data) {
@@ -91,7 +91,7 @@ class CourseNotesTrasnform {
         //Traer la información
         $getData = $data['get_data'];
 
-        //sacar la información del evento
+        //Sacar la información del evento
         return [
             'sectionId' => $getData->courseid,
             'studentCode' => '',
@@ -122,7 +122,7 @@ class CourseNotesTrasnform {
 
     /**
      * @package uPlannerConnect
-     * @description Transforma la data del evento en el formato que requiere uPlanner
+     * @description Transforma los datos del evento en el formato que requiere uPlanner
      * @return array 
     */
     private function convertDataGradeDeleted(array $data) {
@@ -130,7 +130,7 @@ class CourseNotesTrasnform {
         //Traer la información
         $getData = $data['get_data'];
 
-        //sacar la información del evento
+        //Sacar la información del evento
         return [
             'sectionId' => '',
             'studentCode' => '',
