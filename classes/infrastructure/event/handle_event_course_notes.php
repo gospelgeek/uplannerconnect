@@ -100,7 +100,6 @@ function user_graded($event) {
 function grade_deleted($event) {
    
    try {
-     
       //Instanciar la clase ManagementFactory
       instantiateManagementFactory([
          "dataEvent" => $event,
@@ -151,7 +150,13 @@ function grade_item_created($event) {
 function grade_item_deleted($event) {
       
    try {
-      print_r("grade_item_deleted");
+       //Instanciar la clase ManagementFactory
+       instantiateManagementFactory([
+         "dataEvent" => $event,
+         "typeEvent" => "grade_item_deleted",
+         "dispatch" => "delete",
+         "EnumEtities" => 'course_notes'
+       ]);
    } 
    catch (Exception $e) {
       error_log('Excepción capturada: ',  $e->getMessage(), "\n");

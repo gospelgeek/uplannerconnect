@@ -25,6 +25,7 @@ class CourseTraslationData {
             'grade_item_updated' => 'convertDataGradeItemUpdated',
             'grade_deleted' => 'convertDataUserGrade',
             'grade_item_created' => 'convertDataItemCreated',
+            'grade_item_deleted' => 'convertDataItemDeleted',
         ];
 
     }
@@ -157,6 +158,51 @@ class CourseTraslationData {
             "action" => 'delete'
         ];
 
+    }
+
+
+    /**
+     * @package uPlannerConnect
+     * @description Transforma los datos del evento en el formato que requiere uPlanner
+     * @return array
+    */
+    private function convertDataItemDeleted(array $data) {
+
+            $event = $data['gradeItems'];
+            //  $courseId = $gradeItem->courseid;
+            //  $categoryid = $gradeItem->categoryid;
+            //  $itemName = $gradeItem->itemname;
+            //  $parentCategoryCourseId = $gradeItem->parent_category->courseid;
+            //  $parentCategoryFullname = $gradeItem->parent_category->fullname;
+            //  $gradetype = $gradeItem->gradetype;
+            //  $grademax = $gradeItem->grademax;
+            //  $grademin = $gradeItem->grademin;
+            
+            // Sacar la información del evento
+            return [
+                'sectionId' => isset($gradeItem->courseid) ? $gradeItem->courseid : '',
+                'studentCode' => '',
+                'finalGrade' => '',
+                'finalGradeMessage' => '',
+                'finalGradePercentage' => '',
+                'evaluationGroups' => [
+                    [
+                        "evaluationGroupCode" => '',
+                        "average" => '',
+                        "grades" => [
+                            [
+                                "evaluationId" => '',
+                                "value" => '',
+                                "evaluationName" => isset($gradeItem->itemname) ? $gradeItem->itemname : '',
+                                "date" => '',
+                                "isApproved" => '',
+                            ]
+                        ]
+                    ]
+                ],
+                "lastModifiedDate" => '',
+                "action" => 'delete'
+            ];
     }
 
 
