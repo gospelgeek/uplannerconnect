@@ -1,5 +1,5 @@
-/**
 <?php
+/**
  * @package     uPlannerConnect
  * @copyright   cristian machado mosquera <cristian.machado@correounivalle.edu.co>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -11,7 +11,7 @@
    * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
    * @description Instancia una entidad de acorde a la funcionalidad que se requiera
 */
-class CourseNotesTrasnform {
+class CourseTraslationData {
 
     //Atributos
     private $typeTransform;
@@ -52,31 +52,32 @@ class CourseNotesTrasnform {
         $gradeRecordData = $data['get_record_data'];
         $gradeLoadItem = $data['get_load_grade_item'];
 
-        //Sacar la información del evento
+        // Sacar la información del evento
         return [
-            'sectionId' => $grade->grade_item->courseid,
-            'studentCode' => $grade->userid,
-            'finalGrade' => ($getData['other'])['finalgrade'],
+            'sectionId' => isset($grade->grade_item->courseid) ? $grade->grade_item->courseid : '',
+            'studentCode' => isset($grade->userid) ? $grade->userid : '',
+            'finalGrade' => isset(($getData['other'])['finalgrade']) ? ($getData['other'])['finalgrade'] : '',
             'finalGradeMessage' => '',
-            'finalGradePercentage' => (100 / $grade->grade_item->grademax * $grade->rawgrade),
+            'finalGradePercentage' => isset($grade->grade_item->grademax, $grade->rawgrade) ? (100 / $grade->grade_item->grademax * $grade->rawgrade) : '',
             'evaluationGroups' => [
                 [
-                    "evaluationGroupCode" => $gradeLoadItem->categoryid,
+                    "evaluationGroupCode" => isset($gradeLoadItem->categoryid) ? $gradeLoadItem->categoryid : '',
                     "average" => '',
                     "grades" => [
                         [
-                            "evaluationId" => $gradeLoadItem->itemtype,
-                            "value" => ($getData['other'])['finalgrade'],
-                            "evaluationName" => $gradeLoadItem->itemname,
-                            "date" => $gradeLoadItem->timecreated,
+                            "evaluationId" => isset($gradeLoadItem->itemtype) ? $gradeLoadItem->itemtype : '',
+                            "value" => isset(($getData['other'])['finalgrade']) ? ($getData['other'])['finalgrade'] : '',
+                            "evaluationName" => isset($gradeLoadItem->itemname) ? $gradeLoadItem->itemname : '',
+                            "date" => isset($gradeLoadItem->timecreated) ? $gradeLoadItem->timecreated : '',
                             "isApproved" => '',
                         ]
                     ]
                 ]
             ],
-            "lastModifiedDate" => $gradeLoadItem->timemodified,
+            "lastModifiedDate" => isset($gradeLoadItem->timemodified) ? $gradeLoadItem->timemodified : '',
             "action" => 'create'
         ];
+
     }
 
 
@@ -91,29 +92,29 @@ class CourseNotesTrasnform {
         //Traer la información
         $getData = $data['get_data'];
 
-        //Sacar la información del evento
+        // Sacar la información del evento
         return [
-            'sectionId' => $getData->courseid,
+            'sectionId' => isset($getData->courseid) ? $getData->courseid : '',
             'studentCode' => '',
             'finalGrade' => '',
             'finalGradeMessage' => '',
             'finalGradePercentage' => '',
             'evaluationGroups' => [
                 [
-                    "evaluationGroupCode" => $getData->categoryid,
+                    "evaluationGroupCode" => isset($getData->categoryid) ? $getData->categoryid : '',
                     "average" => '',
                     "grades" => [
                         [
                             "evaluationId" => '',
                             "value" => '',
                             "evaluationName" => '',
-                            "date" => $getData->timecreated,
+                            "date" => isset($getData->timecreated) ? $getData->timecreated : '',
                             "isApproved" => '',
                         ]
                     ]
                 ]
             ],
-            "lastModifiedDate" => $getData->timemodified,
+            "lastModifiedDate" => isset($getData->timemodified) ? $getData->timemodified : '',
             "action" => 'update'
         ];
 

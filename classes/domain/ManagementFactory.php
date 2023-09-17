@@ -16,7 +16,7 @@ require_once(__DIR__ . '/EnumEtities.php');
    * @author Daniel Dorado <doradodaniel14@gmail.com>
    * @description Instancia una entidad de acorde a la funcionalidad que se requiera
 */
-class ManagementEntityFactory {
+class ManagementFactory {
 
     private $EnumEtities;
 

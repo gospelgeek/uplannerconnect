@@ -11,7 +11,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 //Variables globales
-require_once(__DIR__ . '/../classes/ManagementEntityFactory.php');
+require_once(__DIR__ . '/../../domain/ManagementFactory.php');
 
 
 
@@ -26,8 +26,8 @@ function grade_item_updated($event) {
 
    try {
       //Instanciar la clase ManagementEntityFactory
-      $ManageEntity = new ManagementEntityFactory();
-
+      $ManageEntity = new ManagementFactory();
+      
       $ManageEntity->create([
          "dataEvent" => $event,
          "typeEvent" => "grade_item_updated",
@@ -39,6 +39,7 @@ function grade_item_updated($event) {
    catch (Exception $e) {
        error_log('Excepción capturada: ',  $e->getMessage(), "\n");
    }
+
 }
 
 
@@ -50,8 +51,8 @@ function grade_item_updated($event) {
 function user_graded($event) {
 
    try {
-     //Instanciar la clase ManagementEntityFactory 
-     $ManageEntity = new ManagementEntityFactory();
+     //Instanciar la clase ManagementFactory
+     $ManageEntity = new ManagementFactory();
 
      $ManageEntity->create([
         "dataEvent" => $event,
@@ -76,8 +77,8 @@ function grade_deleted($event) {
    
    try {
       
-      //Instanciar la clase ManagementEntityFactory
-      $ManageEntity = new ManagementEntityFactory();
+      //Instanciar la clase ManagementFactory
+      $ManageEntity = new ManagementFactory();
 
       $ManageEntity->create([
          "dataEvent" => $event,

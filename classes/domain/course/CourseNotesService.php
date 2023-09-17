@@ -7,8 +7,8 @@
 */
 
 //Variables globales
-require_once(__DIR__ . '/../trasnform/CourseNotesTrasnform.php');
-require_once(__DIR__ . '/../repository/CourseNotesRepository.php');
+require_once(__DIR__ . '/CourseTraslationData.php');
+require_once(__DIR__ . '/../../application/course/CourseExtractionData.php');
 
 /**
    * @package uPlannerConnect
@@ -16,26 +16,26 @@ require_once(__DIR__ . '/../repository/CourseNotesRepository.php');
    * @author Daniel Dorado <doradodaniel14@gmail.com>
    * @description Instancia una entidad de acorde a la funcionalidad que se requiera
 */
-class ManagementNotesEntiry {
+class CourseNotesService {
 
     private $CourseNotesTrasnform;
     private $CourseNotesRepository;
 
     public function __construct() {
         //Instanciar la clase de transformacion
-        $this->CourseNotesTrasnform = new CourseNotesTrasnform();
+        $this->CourseTraslationData = new CourseTraslationData();
         //Instanciar la clase de repositorio
-        $this->CourseNotesRepository = new CourseNotesRepository();
+        $this->CourseExtractionData = new CourseExtractionData();
     }
 
 
-    public function procces(array $data) {
+    public function proccess(array $data) {
         //Trear la informacion necesaria con los datos del evento
-        $dataRepository = $this->CourseNotesRepository->getResource($data);
+        $dataRepository = $this->CourseExtractionData->getResource($data);
         //Transformar los datos en el formato que requiere uPlanner
-        $dataTrasnform = $this->CourseNotesTrasnform->converDataJsonUplanner($dataRepository);
+        $dataTrasnform = $this->CourseTraslationData->converDataJsonUplanner($dataRepository);
         //Enviar los datos a uPlanner
-        $this->CourseNotesRepository->saveResource($dataTrasnform);
+        $this->CourseExtractionData->saveResource($dataTrasnform);
 
     }
 

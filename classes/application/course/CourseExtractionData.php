@@ -6,14 +6,14 @@
 */
 
 
-require_once(__DIR__ . '/../resource/CourseNotesResource.php');
+require_once(__DIR__ . '/../repository/CourseNotesRepository.php');
 
 /**
    * @package uPlannerConnect
    * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
    * @description Instancia una entidad de acorde a la funcionalidad que se requiera
 */
-class CourseNotesRepository {
+class CourseExtractionData {
 
     //Atributos
     private $CourseNotesResource;
@@ -21,9 +21,9 @@ class CourseNotesRepository {
 
     //Constructor
     public function __construct() {
-
+ 
         //Instancia de la clase CourseNotesResource
-        $this->CourseNotesResource = new CourseNotesResource();
+        $this->CourseNotesRepository = new CourseNotesRepository();
 
         //Inicializar la variable typeEvent
         $this->typeEvent = [
@@ -51,7 +51,7 @@ class CourseNotesRepository {
      * @return void 
     */
     public function saveResource(array $data) {
-        $this->CourseNotesResource->saveDataBD($data);
+        $this->CourseNotesRepository->saveDataBD($data);
     }
 
 
