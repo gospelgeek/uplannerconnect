@@ -57,6 +57,18 @@ class plugin_config {
             'eventname' => '\core\event\grade_letter_updated',
             'includefile' =>  self::ROUTE_HANDLER_EVENT_1,
         ],
+        [
+            'eventname' => '\core\event\scale_created',
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\core\event\scale_deleted',
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\core\event\scale_updated',
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ]
     ];
 
     //Conultas a la base de datos

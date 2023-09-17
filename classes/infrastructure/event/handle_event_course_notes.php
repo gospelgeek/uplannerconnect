@@ -45,8 +45,6 @@ function instantiateManagementFactory(array $data) {
 
 /**
  * @package uPlannerConnect
- * @todo Se deja comentado por que esta por definirse si se va a utilizar
- *       Mi idea del evento global
  * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
  * @description Lanza un handle cuando se actualiza un item de calificación
 */
@@ -118,8 +116,6 @@ function grade_deleted($event) {
 
 /**
  * @package uPlannerConnect
- * @todo Se deja comentado por que esta por definirse si se va a utilizar
- *     Mi idea del evento global
  * @description Lanza un handle cuando se crea un item de calificación
  * 
 */
@@ -143,8 +139,6 @@ function grade_item_created($event) {
 
 /**
  * @package uPlannerConnect
- * @todo Se deja comentado por que esta por definirse si se va a utilizar
- *    Mi idea del evento global
  * @description Lanza un handle cuando se borra un item de calificación 
 */
 function grade_item_deleted($event) {
@@ -167,8 +161,6 @@ function grade_item_deleted($event) {
 
 /**
  * @package uPlannerConnect
- * @todo Se deja comentado por que esta por definirse si se va a utilizar
- *   Mi idea del evento global
  * @description Lanza un handle cuando se crea una letra de calificación 
 */
 function grade_letter_created($event) {
@@ -184,8 +176,6 @@ function grade_letter_created($event) {
 
 /**
  *  @package uPlannerConnect
- *  @todo Se deja comentado por que esta por definirse si se va a utilizar
- *  Mi idea del evento global
  * @description Lanza un handle cuando se borra una letra de calificación
 */
 function grade_letter_deleted($event) {
@@ -200,8 +190,6 @@ function grade_letter_deleted($event) {
 
 /**
  * @package uPlannerConnect
- * @todo Se deja comentado por que esta por definirse si se va a utilizar
- *  Mi idea del evento global
  * @description Lanza un handle cuando se actualiza una letra de calificación
  * 
 */
@@ -213,5 +201,53 @@ function grade_letter_updated($event) {
    catch (Exception $e) {
       error_log('Excepción capturada: ',  $e->getMessage(), "\n");
    }
+
+}
+
+
+/**
+ *  @package uPlannerConnect
+ *  @description Lanza un handle cuando se crea una escala de calificación
+*/
+function scale_created($event) {         
+
+   try {
+      print_r("scale_created");
+   } 
+   catch (Exception $e) {
+      error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+   }  
+
+}  
+
+
+/**
+ *  @package uPlannerConnect
+ * @description Lanza un handle cuando se borra una escala de calificación
+*/
+function scale_deleted($event) {         
+
+   try {
+      print_r("scale_deleted");
+   } 
+   catch (Exception $e) {
+      error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+   }  
+
+}
+
+
+/**
+ *  @package uPlannerConnect
+ *  @description Lanza un handle cuando se actualiza una escala de calificación
+*/
+function scale_updated($event) {         
+
+   try {
+      print_r("scale_updated");
+   } 
+   catch (Exception $e) {
+      error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+   }  
 
 }
