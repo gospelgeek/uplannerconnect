@@ -6,14 +6,14 @@
 */
 
 
-require_once(__DIR__ . '/../resource/CourseNotesResource.php');
+require_once(__DIR__ . '/../repository/CourseNotesRepository.php');
 
 /**
    * @package uPlannerConnect
    * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
    * @description Instancia una entidad de acorde a la funcionalidad que se requiera
 */
-class CourseNotesRepository {
+class CourseExtractionData {
 
     //Atributos
     private $CourseNotesResource;
@@ -21,22 +21,24 @@ class CourseNotesRepository {
 
     //Constructor
     public function __construct() {
-
+ 
         //Instancia de la clase CourseNotesResource
-        $this->CourseNotesResource = new CourseNotesResource();
+        $this->CourseNotesRepository = new CourseNotesRepository();
 
         //Inicializar la variable typeEvent
         $this->typeEvent = [
             'user_graded' => 'ResourceUserGraded',
             'grade_item_updated' => 'ResourceGradeItemUpdated',
             'grade_deleted' => 'ResourceGradeDeleted',
+            'grade_item_created' => 'ResourceGradeItemCreated',
+            'grade_item_deleted' => 'ResourceGradeItemDeleted',
         ];
 
     }
 
     /**
      * @package uPlannerConnect
-     * @description Retorna la data acorde al evento que se requiera
+     * @description Retorna los datos acorde al evento que se requiera
      * @return array
     */
     public function getResource(array $data) {
@@ -47,17 +49,17 @@ class CourseNotesRepository {
 
     /**
      * @package uPlannerConnect
-     * @description Guarda la data en la base de datos
+     * @description Guarda los datos en la base de datos
      * @return void 
     */
     public function saveResource(array $data) {
-        $this->CourseNotesResource->saveDataBD($data);
+        $this->CourseNotesRepository->saveDataBD($data);
     }
 
 
     /**
      *  @package uPlannerConnect
-     *  @description Retorna la data del evento user_graded
+     *  @description Retorna los datos del evento user_graded
      *  @return array
     */
     private function ResourceUserGraded(array $data) {
@@ -88,7 +90,7 @@ class CourseNotesRepository {
 
     /**
      * @package uPlannerConnect
-     * @description Retorna la data del evento grade_item_updated
+     * @description Retorna los datos del evento grade_item_updated
      * @return array
     */
     private function ResourceGradeItemUpdated(array $data) {
@@ -113,7 +115,7 @@ class CourseNotesRepository {
 
     /**
      * @package uPlannerConnect
-     * @description Retorna la data del evento grade_deleted
+     * @description Retorna los datos del evento grade_deleted
      * @return array 
     */
     private function ResourceGradeDeleted(array $data) {
@@ -138,6 +140,50 @@ class CourseNotesRepository {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
 
+    }
+
+    /**
+     *  @package uPlannerConnect
+     *  @description Retorna los datos del evento grade_item_created
+     *  @return array
+    */
+    private function ResourceGradeItemCreated(array $data) {
+
+        try {
+            $event = $data['dataEvent'];
+            $get_grade_item = $event->get_grade_item();
+
+            return [
+                'get_grade_item' => $get_grade_item,
+                'typeEvent' => 'grade_item_created',
+            ];
+
+        } catch (Exception $e) {
+            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+        }
+
+    }
+
+    
+    /**
+     *  @package uPlannerConnect
+     *  @description Retorna los datos del evento grade_item_deleted
+     *  @return array
+    */
+    private function ResourceGradeItemDeleted(array $data) {
+            
+            try {
+                $event = $data['dataEvent'];
+                $gradeItem = $event->get_grade_item();
+               
+                return [
+                    'gradeItem' => $gradeItem,
+                    'typeEvent' => 'grade_item_deleted',
+                ];
+    
+            } catch (Exception $e) {
+                error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+            }
     }
 
 }

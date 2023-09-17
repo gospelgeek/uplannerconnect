@@ -7,7 +7,7 @@
 */
 
 //Variables globales
-require_once(__DIR__ . '/entity/ManagementNotesEntiry.php');
+require_once(__DIR__ . '/course/CourseNotesService.php');
 
 /**
    * @package uPlannerConnect
@@ -23,7 +23,7 @@ class EnumEtities {
     public function __construct() {
 
         $this->Types = [
-            'course_notes' => 'ManagementNotesEntiry',
+            'course_notes' => 'CourseNotesService',
         ];
 
     }
@@ -39,7 +39,7 @@ class EnumEtities {
             
             $class = $this->Types[$data['EnumEtities']];
             $newEntity = $this->ManagementNotesEntiry = new $class();
-            $newEntity->procces($data);
+            $newEntity->proccess($data);
             
         } catch (Exception $e) {
             echo 'Excepción capturada: ',  $e->getMessage(), "\n";
