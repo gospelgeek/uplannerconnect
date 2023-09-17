@@ -24,6 +24,7 @@ class CourseTraslationData {
             'user_graded' => 'convertDataUserGrade',
             'grade_item_updated' => 'convertDataGradeItemUpdated',
             'grade_deleted' => 'convertDataUserGrade',
+            'grade_item_created' => 'convertDataItemCreated',
         ];
 
     }
@@ -126,34 +127,33 @@ class CourseTraslationData {
      * @description Transforma los datos del evento en el formato que requiere uPlanner
      * @return array 
     */
-    private function convertDataGradeDeleted(array $data) {
+    private function convertDataItemCreated(array $data) {
 
-        //Traer la información
-        $getData = $data['get_data'];
-
-        //Sacar la información del evento
+        $get_grade_item = $data['get_grade_item'];
+        
+        // Sacar la información del evento
         return [
-            'sectionId' => '',
+            'sectionId' => isset($get_grade_item->courseid) ? $get_grade_item->courseid : '',
             'studentCode' => '',
             'finalGrade' => '',
             'finalGradeMessage' => '',
             'finalGradePercentage' => '',
             'evaluationGroups' => [
                 [
-                    "evaluationGroupCode" => '',
+                    "evaluationGroupCode" => isset($get_grade_item->courseid) ? $get_grade_item->courseid : '',
                     "average" => '',
                     "grades" => [
                         [
-                            "evaluationId" => '',
+                            "evaluationId" => isset($get_grade_item->courseid) ? $get_grade_item->courseid : '',
                             "value" => '',
-                            "evaluationName" => '',
-                            "date" => '',
+                            "evaluationName" => isset($get_grade_item->itemname) ? $get_grade_item->itemname : '',
+                            "date" => isset($get_grade_item->timecreated) ? $get_grade_item->timecreated : '',
                             "isApproved" => '',
                         ]
                     ]
                 ]
             ],
-            "lastModifiedDate" => '',
+            "lastModifiedDate" => isset($get_grade_item->timemodified) ? $get_grade_item->timemodified : '',
             "action" => 'delete'
         ];
 

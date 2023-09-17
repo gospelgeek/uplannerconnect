@@ -15,6 +15,34 @@ require_once(__DIR__ . '/../../domain/ManagementFactory.php');
 
 
 
+
+/** 
+  * @package uPlannerConnect 
+  * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
+  * @description Instancia el factory
+*/
+function instantiateManagementFactory(array $data) {
+
+   try {
+      //Instanciar la clase ManagementFactory
+      $ManageEntity = new ManagementFactory();
+
+      $ManageEntity->create([
+               "dataEvent" => $data['dataEvent'],
+               "typeEvent" => $data['typeEvent'],
+               "dispatch" => $data['dispatch'],
+               "EnumEtities" => $data['EnumEtities']
+      ]);
+
+   } 
+   catch (Exception $e) {
+      error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+   }
+
+}
+
+
+
 /**
  * @package uPlannerConnect
  * @todo Se deja comentado por que esta por definirse si se va a utilizar
@@ -26,9 +54,7 @@ function grade_item_updated($event) {
 
    try {
       //Instanciar la clase ManagementEntityFactory
-      $ManageEntity = new ManagementFactory();
-      
-      $ManageEntity->create([
+      instantiateManagementFactory([
          "dataEvent" => $event,
          "typeEvent" => "grade_item_updated",
          "dispatch" => "update",
@@ -52,9 +78,7 @@ function user_graded($event) {
 
    try {
      //Instanciar la clase ManagementFactory
-     $ManageEntity = new ManagementFactory();
-
-     $ManageEntity->create([
+     instantiateManagementFactory([
         "dataEvent" => $event,
         "typeEvent" => "user_graded",
         "dispatch" => "update",
@@ -76,11 +100,9 @@ function user_graded($event) {
 function grade_deleted($event) {
    
    try {
-      
+     
       //Instanciar la clase ManagementFactory
-      $ManageEntity = new ManagementFactory();
-
-      $ManageEntity->create([
+      instantiateManagementFactory([
          "dataEvent" => $event,
          "typeEvent" => "grade_deleted",
          "dispatch" => "delete",
@@ -105,7 +127,14 @@ function grade_deleted($event) {
 function grade_item_created($event) {
          
    try {
-      print_r("grade_item_created");
+      //Instanciar la clase ManagementFactory
+      instantiateManagementFactory([
+         "dataEvent" => $event,
+         "typeEvent" => "grade_item_created",
+         "dispatch" => "create",
+         "EnumEtities" => 'course_notes'
+      ]);
+      
    } 
    catch (Exception $e) {
       error_log('Excepción capturada: ',  $e->getMessage(), "\n");
