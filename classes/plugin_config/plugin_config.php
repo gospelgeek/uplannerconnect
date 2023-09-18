@@ -88,4 +88,25 @@ class plugin_config {
     CONST QUERY_UPDATE_COURSE_GRADES = "UPDATE %s SET json = '%s', response = '%s', success = '%s' WHERE id = 1";
     CONST QUERY_SELECT_COURSE_GRADES = "SELECT * FROM %s WHERE success = %s LIMIT 100";
 
+
+    //Estruturas de datos uPlanner
+    CONST UPLANNER_GRADES = [
+        ['name' => 'sectionId', 'type' => 'string'],
+        ['name' => 'studentCode', 'type' => 'string'],
+        ['name' => 'finalGrade', 'type' => 'string'],
+        ['name' => 'finalGradeMessage', 'type' => 'string'],
+        ['name' => 'finalGradeMessage', 'type' => 'string'],
+        ['name' => 'finalGradePercentage', 'type' => 'string'],
+        ['name' => 'evaluationGroupCode', 'type' => 'string'],
+        ['name' => 'grades', 'type' => 'string'],
+        ['name' => 'evaluationId', 'type' => 'string'],
+        ['name' => 'value', 'type' => 'string'],
+        ['name' => 'evaluationName', 'type' => 'string'],
+        ['name' => 'date', 'type' => 'string'],
+        ['name' => 'isApproved', 'type' => 'string'],
+        ['name' => 'average', 'type' => 'string'],
+        ['name' => 'lastModifiedDate', 'type' => 'string'],
+        ['name' => 'action', 'type' => 'string'],
+    ];
+
 }

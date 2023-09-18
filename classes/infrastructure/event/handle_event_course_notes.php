@@ -6,7 +6,6 @@
 */
 
 
-// namespace local\uplannerconnect\events;
 
 defined('MOODLE_INTERNAL') || die();
 
