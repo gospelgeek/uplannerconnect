@@ -7,7 +7,7 @@
  */
 
 require_once(__DIR__ . '/factory/UplannerClientFactory.php');
-require_once(__DIR__ . '/../../application/RepositoryType.php');
+require_once(__DIR__ . '/../../application/repository/RepositoryType.php');
 
 /**
  * @package uPlannerConnect
