@@ -36,13 +36,25 @@ class EnumEtities {
     public function process(array $data) {
 
         try {
-            
+            //Saca el nombre de la clase
             $class = $this->Types[$data['EnumEtities']];
-            $newEntity = $this->ManagementNotesEntiry = new $class();
-            $newEntity->proccess($data);
-            
+        
+            if (array_key_exists($data['EnumEtities'], $this->Types)) {
+
+                $newEntity = $this->ManagementNotesEntiry = new $class();
+                if (!method_exists($newEntity, 'proccess')) {
+                    error_log('La clase ' . $class . ' no tiene el método process.');
+                    return;
+                }
+
+                $newEntity->proccess($data);
+
+            } else {
+               error_log('La clase ' . $class . ' no existe o no tiene el método process.');
+            }
+
         } catch (Exception $e) {
-            echo 'Excepción capturada: ',  $e->getMessage(), "\n";
+            error_log('Excepción capturada: ' . $e->getMessage() . "\n");
         }
         
     }

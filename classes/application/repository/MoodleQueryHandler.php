@@ -23,6 +23,12 @@ class MoodleQueryHandler {
      *  @description Ejecuta una consulta sql y retorna el resultado
     */
     public function executeQuery($sql) {
+
+        if (empty($sql) || !isset($sql)) {
+            error_log('Excepción capturada: ' . 'No hay consulta sql' . "\n");
+            return;
+        }
+
         return $this->db->get_records_sql($sql);
     }
 }

@@ -91,22 +91,32 @@ class plugin_config {
 
     //Estruturas de datos uPlanner
     CONST UPLANNER_GRADES = [
-        ['name' => 'sectionId', 'type' => 'string'],
-        ['name' => 'studentCode', 'type' => 'string'],
-        ['name' => 'finalGrade', 'type' => 'string'],
+        ['name' => 'sectionId', 'type' => 'numeric'],
+        ['name' => 'studentCode', 'type' => 'numeric'],
+        ['name' => 'finalGrade', 'type' => 'numeric'],
         ['name' => 'finalGradeMessage', 'type' => 'string'],
         ['name' => 'finalGradeMessage', 'type' => 'string'],
-        ['name' => 'finalGradePercentage', 'type' => 'string'],
-        ['name' => 'evaluationGroupCode', 'type' => 'string'],
-        ['name' => 'grades', 'type' => 'string'],
-        ['name' => 'evaluationId', 'type' => 'string'],
-        ['name' => 'value', 'type' => 'string'],
+        ['name' => 'finalGradePercentage', 'type' => 'numeric'],
+        ['name' => 'evaluationGroupCode', 'type' => 'numeric'],
+        ['name' => 'grades', 'type' => 'numeric'],
+        ['name' => 'evaluationId', 'type' => 'numeric'],
+        ['name' => 'value', 'type' => 'numeric'],
         ['name' => 'evaluationName', 'type' => 'string'],
         ['name' => 'date', 'type' => 'string'],
-        ['name' => 'isApproved', 'type' => 'string'],
-        ['name' => 'average', 'type' => 'string'],
+        ['name' => 'isApproved', 'type' => 'bool'],
+        ['name' => 'average', 'type' => 'numeric'],
         ['name' => 'lastModifiedDate', 'type' => 'string'],
         ['name' => 'action', 'type' => 'string'],
+    ];
+
+
+    //Estructuras de datos para la creacion
+    //De un Evento
+    CONST CREATE_EVENT_DATA = [
+        ['name' => 'dataEvent' , 'type' => 'object'],
+        ['name' => 'typeEvent' , 'type' => 'string'],
+        ['name' => 'dispatch' , 'type' => 'string'],
+        ['name' => 'EnumEtities' , 'type' => 'string'],
     ];
 
 }

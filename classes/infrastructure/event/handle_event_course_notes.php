@@ -14,31 +14,44 @@ require_once(__DIR__ . '/../../domain/ManagementFactory.php');
 
 
 
-
 /** 
   * @package uPlannerConnect 
   * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
   * @description Instancia el factory
 */
 function instantiateManagementFactory(array $data) {
-
    try {
-      //Instanciar la clase ManagementFactory
-      $ManageEntity = new ManagementFactory();
 
-      $ManageEntity->create([
+       // Verificar si se proporcionan datos válidos
+       if (empty($data['dataEvent']) || empty($data['typeEvent']) || 
+           empty($data['dispatch'])  || empty($data['EnumEtities'])) 
+       {
+           error_log("Error en los datos proporcionados: algunos campos están vacíos.");
+           return;
+       }
+
+       // Instanciar la clase ManagementFactory
+       $ManageEntity = new ManagementFactory();
+
+       // Verificar si existe el método
+       if (method_exists($ManageEntity, 'create')) {
+           // Llamar al método create
+           $ManageEntity->create([
                "dataEvent" => $data['dataEvent'],
                "typeEvent" => $data['typeEvent'],
                "dispatch" => $data['dispatch'],
                "EnumEtities" => $data['EnumEtities']
-      ]);
+           ]);
+       } else {
+           error_log("El método 'create' no existe en la clase ManagementFactory.");
+       }
 
-   } 
-   catch (Exception $e) {
-      error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+   } catch (Exception $e) {
+       error_log('Excepción capturada: ' . $e->getMessage() . "\n");
    }
 
 }
+
 
 
 

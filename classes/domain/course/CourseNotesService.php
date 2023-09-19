@@ -30,13 +30,17 @@ class CourseNotesService {
 
 
     public function proccess(array $data) {
-        //Trear la informacion necesaria con los datos del evento
-        $dataRepository = $this->CourseExtractionData->getResource($data);
-        //Transformar los datos en el formato que requiere uPlanner
-        $dataTrasnform = $this->CourseTraslationData->converDataJsonUplanner($dataRepository);
-        //Enviar los datos a uPlanner
-        $this->CourseExtractionData->saveResource($dataTrasnform);
-
+        try {
+            //Trear la informacion necesaria con los datos del evento
+            $dataRepository = $this->CourseExtractionData->getResource($data);
+            //Transformar los datos en el formato que requiere uPlanner
+            $dataTrasnform = $this->CourseTraslationData->converDataJsonUplanner($dataRepository);
+            //Enviar los datos a uPlanner
+            $this->CourseExtractionData->saveResource($dataTrasnform);
+        }
+        catch (Exception $e) {
+            error_log('Excepción capturada: ' . $e->getMessage() . "\n");
+        }
     }
 
 }
