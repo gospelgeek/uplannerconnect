@@ -1,4 +1,12 @@
 <?php
+/**
+ * @package     uPlannerConnect
+ * @copyright   cristian machado mosquera <cristian.machado@correounivalle.edu.co>
+ * @copyright   Daniel Dorado <doradodaniel14@gmail.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+*/
+
+
 defined('MOODLE_INTERNAL') || die();
 
 
@@ -51,6 +59,6 @@ if ($ADMIN->fulltree) {
 
     // Agrega más configuraciones si es necesario
 
-    // Agregar la página de configuración al árbol
+    // Agrega la página de configuración al árbol
     $ADMIN->add('localplugins', $settings);
 }
