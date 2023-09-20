@@ -14,7 +14,7 @@ require_once(__DIR__ .'/../classes/plugin_config/plugin_config.php');
  * @param $capabilities
  * @TODO: Revisar cuando nos den la base de datos los tipos de riesgos definidos en
  * @TODO:  en el campus real!!!! por ahora se deja en 1
- * @desc Defines capabilities for the plugin
+ * @description Define las capacidades para el plugin
 */
 $capabilities = array(
     'local/'.plugin_config::PLUGIN_NAME.':index' => array(
