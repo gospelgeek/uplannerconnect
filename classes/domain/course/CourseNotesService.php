@@ -37,6 +37,7 @@ class CourseNotesService {
             $dataTrasnform = $this->CourseTraslationData->converDataJsonUplanner($dataRepository);
             //Enviar los datos a uPlanner
             $this->CourseExtractionData->saveResource($dataTrasnform);
+            error_log('UplannerConnect: Successful event registration -'. $data['typeEvent']. "\n");
         }
         catch (Exception $e) {
             error_log('Excepción capturada: ' . $e->getMessage() . "\n");

@@ -14,24 +14,24 @@ defined('MOODLE_INTERNAL') || die();
  *              información de los cursos a uPlanner
  */
 $tasks = [
-    [
-        'classname' => 'local_uplannerconnect\task\HandleInitUplannerTask.php',
-        'blocking' => 0,
-        'minute' => '*/5',
-        'hour' => '*',
-        'day' => '*',
-        'month' => '*',
-        'dayofweek' => '*',
-        'disabled' => 0
-    ],
-    [
-        'classname' => 'local_uplannerconnect\task\HandleErrorUplannerTask.php',
-        'blocking' => 0,
-        'minute' => 0,
-        'hour' => 0,
-        'day' => '*',
-        'month' => '*',
-        'dayofweek' => '*',
-        'disabled' => 0
-    ]
+    // [
+    //     'classname' => 'local_uplannerconnect\task\HandleInitUplannerTask.php',
+    //     'blocking' => 0,
+    //     'minute' => '*/5',
+    //     'hour' => '*',
+    //     'day' => '*',
+    //     'month' => '*',
+    //     'dayofweek' => '*',
+    //     'disabled' => 0
+    // ],
+    // [
+    //     'classname' => 'local_uplannerconnect\task\HandleErrorUplannerTask.php',
+    //     'blocking' => 0,
+    //     'minute' => 0,
+    //     'hour' => 0,
+    //     'day' => '*',
+    //     'month' => '*',
+    //     'dayofweek' => '*',
+    //     'disabled' => 0
+    // ]
 ];
