@@ -6,15 +6,15 @@
 */
 
 
-require_once(__DIR__ . '/../db/MoodleQueryHandler.php');
-require_once(__DIR__ . '/../plugin_config/plugin_config.php');
+require_once(__DIR__ . '/MoodleQueryHandler.php');
+require_once(__DIR__ . '/../../plugin_config/plugin_config.php');
 
 /**
    * @package uPlannerConnect
    * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
    * @description Instancia una entidad de acorde a la funcionalidad que se requiera
 */
-class CourseNotesResource {
+class CourseNotesRepository {
 
     //Constantes
     const STATE_DEFAULT = 0;  //Estado por defecto
@@ -46,14 +46,26 @@ class CourseNotesResource {
 
         try {
 
+          if (empty($data)) {
+             error_log('Excepción capturada: ' . 'No hay datos para actualizar' . "\n");
+              return; 
+          }
+
           $dataQuery = [
             'json' => $data['json'], 
             'response' => $data['response'],
             'success' => $data['success'],
           ];
         
-          $query =  "UPDATE %s SET json = '%s', response = '%s', success = '%s' WHERE id = 1";
-          $query =  sprintf($query, plugin_config::TABLE_COURSE_GRADE, json_encode($dataQuery['json']), $dataQuery['response'], $dataQuery['success']);
+          //insertar datos en la base de datos
+          $query =  sprintf(
+            plugin_config::QUERY_UPDATE_COURSE_GRADES, 
+            plugin_config::TABLE_COURSE_GRADE, 
+            json_encode($dataQuery['json']), 
+            $dataQuery['response'], 
+            $dataQuery['success']
+          );
+
           return $this->MoodleQueryHandler->executeQuery($query);
         }
         catch (Exception $e) {
@@ -71,16 +83,29 @@ class CourseNotesResource {
 
         try {
           
+          if (empty($data)) {
+             error_log('Excepción capturada: ' . 'No hay datos para guardar' . "\n");
+              return; 
+          }
+
+          //data
           $dataQuery = [
             'json' => $data, 
             'response' => '{"status": "Default response"}',
             'success' => 0,
           ];
-        
-          $query =  "INSERT INTO %s (json, response, success) VALUES ('%s', '%s', '%s')";
-          $query =  sprintf($query, plugin_config::TABLE_COURSE_GRADE, json_encode($dataQuery['json']), $dataQuery['response'], $dataQuery['success']);
-    
+
+          //Insertar datos en la base de datos
+          $query =  sprintf(
+            plugin_config::QUERY_INSERT_COURSE_GRADES,
+            plugin_config::TABLE_COURSE_GRADE,
+            json_encode($dataQuery['json']),
+            $dataQuery['response'],
+            intval($dataQuery['success']) 
+          );
+
           return $this->MoodleQueryHandler->executeQuery($query);
+
         }
         catch (Exception $e) {
           error_log('Excepción capturada: ' . $e->getMessage() . "\n");
@@ -97,9 +122,16 @@ class CourseNotesResource {
     public function getDataBD($state = self::STATE_DEFAULT) {
 
         try {
-          $query = "SELECT * FROM %s WHERE success = %s LIMIT 100";
-          $query =  sprintf($query, plugin_config::TABLE_COURSE_GRADE, $state);
+
+          if (!is_numeric($state)) {
+             error_log('Excepción capturada: ' . 'El estado debe ser un número' . "\n");
+              return; 
+          }
+
+          //Obtener datos en la base de datos
+          $query =  sprintf(plugin_config::QUERY_SELECT_COURSE_GRADES, plugin_config::TABLE_COURSE_GRADE, $state);
           return $this->MoodleQueryHandler->executeQuery($query);
+
         }
         catch (Exception $e) {
           error_log('Excepción capturada: ' . $e->getMessage() . "\n");

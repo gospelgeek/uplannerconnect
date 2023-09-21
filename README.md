@@ -25,3 +25,4 @@ En desarrollo <br>
 - Samuel Ramirez - samuel.ramirez@correounivalle.edu.co 
 - Cristian Machado Mosquera - cristian.machado@correounivalle.edu.co
 - Daniel dorado - doradodaniel14@gmail.com
+- Isabela Rosero Obando - isabela.rosero@correounivalle.edu.co

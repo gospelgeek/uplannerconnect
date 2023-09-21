@@ -21,8 +21,8 @@ $plugin->maturity = MATURITY_ALPHA;
 
 $plugin->release = '1.0.0';
 $plugin->release = '1.0 (Build: 2023090300)';
-$plugin->author = 'Samuel Ramirez & Cristian Machado Mosquera & Daniel dorado';
-$plugin->authorcontact = 'samuel.ramirez@correounivalle.edu.co & cristian.machado@correounivalle.edu.co & doradodaniel14@gmail.com';
+$plugin->author = 'Samuel Ramirez & Cristian Machado Mosquera & Daniel dorado & Isabela Rosero Obando';
+$plugin->authorcontact = 'samuel.ramirez@correounivalle.edu.co & cristian.machado@correounivalle.edu.co & doradodaniel14@gmail.com & isabela.rosero@correounivalle.edu.co';
 
 
 $plugin->license = 'GNU GPL v3 or later';

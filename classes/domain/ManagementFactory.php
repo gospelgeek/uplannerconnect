@@ -16,8 +16,9 @@ require_once(__DIR__ . '/EnumEtities.php');
    * @author Daniel Dorado <doradodaniel14@gmail.com>
    * @description Instancia una entidad de acorde a la funcionalidad que se requiera
 */
-class ManagementEntityFactory {
+class ManagementFactory {
 
+    //Atributos
     private $EnumEtities;
 
     /**
@@ -34,8 +35,17 @@ class ManagementEntityFactory {
      * @description Retorna una instancia de la entidad de acuerdo al 
      *              tipo de dato que se requiera
     */
-    public function create(array $data) {
-        $this->EnumEtities->process($data);
+    public function create(array $data) : void {
+        try {
+            if (method_exists($this->EnumEtities, 'process') && is_array($data)) {
+                $this->EnumEtities->process($data);
+            } 
+            else {
+                error_log("El método 'process' no existe en la clase EnumEtities.");
+            }
+        } catch (Exception $e) {
+            error_log('Excepción capturada: ' . $e->getMessage() . "\n");
+        }
     }
 
 }
