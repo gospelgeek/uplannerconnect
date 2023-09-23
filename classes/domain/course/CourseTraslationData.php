@@ -79,7 +79,7 @@ class CourseTraslationData {
         try {
 
             //Traer la información
-            $getData = $data['get_data'];
+            $getData = $data['data'];
 
             //return data traslate
             return $this->createCommonDataArray($getData);
@@ -100,9 +100,9 @@ class CourseTraslationData {
 
         try {
             
-            $dataSend = $this->validator->verificateArrayKeyExist([ 
+            $dataSend = $this->validator->verifyArrayKeyExist([ 
                 'array_verification' => $this->typeDefStructure,
-                'get_data' => $data 
+                'data' => $data 
             ]);
             
             //Sacar la información del evento

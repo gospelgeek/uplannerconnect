@@ -6,8 +6,7 @@
 */
 
 
-require_once(__DIR__ . '/../repository/CourseNotesRepository.php');
-require_once(__DIR__ . '/../service/DataValidator.php');
+require_once(__DIR__ . '/../../application/service/DataValidator.php');
 require_once(__DIR__ . '/../../plugin_config/plugin_config.php');
 
 
@@ -19,16 +18,12 @@ require_once(__DIR__ . '/../../plugin_config/plugin_config.php');
 class CourseExtractionData {
 
     //Atributos
-    private $CourseNotesResource;
     private $typeEvent;
     private $validator;
 
     //Constructor
     public function __construct() {
  
-        //Instancia de la clase CourseNotesResource
-        $this->CourseNotesRepository = new CourseNotesRepository();
-
         //Inicializar la variable typeEvent
         $this->typeEvent = [
             'user_graded' => 'ResourceUserGraded',
@@ -59,7 +54,7 @@ class CourseExtractionData {
                return $this->$typeEvent($data);
            }
            else {
-             error_log('Falta algun tipo de informcion del evento');
+             error_log('Falta algun tipo de informacion del evento');
              return [];
            }
       }
@@ -67,22 +62,6 @@ class CourseExtractionData {
          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
       }
 
-    }
-
-
-    /**
-     * @package uPlannerConnect
-     * @description Guarda los datos en la base de datos
-     * @return void 
-    */
-    public function saveResource(array $data) : void {
-        //matar el proceso si no llega la información
-        if (empty($data)) {
-            error_log('No le llego la información del evento');
-            return;
-        }
-
-        $this->CourseNotesRepository->saveDataBD($data);
     }
 
 
@@ -109,7 +88,7 @@ class CourseExtractionData {
             $gradeLoadItem = $this->validator->isObjectData($grade->load_grade_item());
         
             //información a guardar
-            $saveData = [
+            $dataToSave = [
                 'sectionId' => $this->validator->isIsset($grade->grade_item->courseid),
                 'studentCode' => $this->validator->isIsset($grade->userid),
                 'finalGrade' => $this->validator->isIsset((($getData['other'])['finalgrade'])),
@@ -124,7 +103,7 @@ class CourseExtractionData {
             ];
             
             return [
-                'get_data' => $saveData,
+                'data' => $dataToSave,
                 'typeEvent' => $data['typeEvent'],
             ];
 
@@ -154,7 +133,7 @@ class CourseExtractionData {
             $GradeItem = $this->validator->isObjectData($event->get_grade_item());
             
             //información a guardar
-            $saveData = [
+            $dataToSave = [
                 'sectionId' => $this->validator->isIsset($GradeItem->courseid),
                 'evaluationGroupCode' => $this->validator->isIsset($GradeItem->categoryid),
                 'date' => $this->validator->isIsset($GradeItem->timecreated),
@@ -163,7 +142,7 @@ class CourseExtractionData {
             ];
 
             return [
-                'get_data' => $saveData,
+                'data' => $dataToSave,
                 'typeEvent' => 'grade_item_updated',
             ];
 
@@ -193,7 +172,7 @@ class CourseExtractionData {
             $event = $data['dataEvent'];
             $get_grade_item = $this->validator->isObjectData($event->get_grade_item());
 
-            $saveData = [
+            $dataToSave = [
                 'sectionId' => $this->validator->isIsset($get_grade_item->courseid),
                 'evaluationGroupCode' => $this->validator->isIsset($get_grade_item->courseid),
                 'evaluationId' => $this->validator->isIsset($get_grade_item->courseid),
@@ -204,7 +183,7 @@ class CourseExtractionData {
             ];
 
             return [
-                'get_data' => $saveData,
+                'data' => $dataToSave,
                 'typeEvent' => 'grade_item_created',
             ];
 
@@ -233,14 +212,14 @@ class CourseExtractionData {
             $event = $data['dataEvent'];
             $gradeItem = $this->validator->isObjectData($event->get_grade_item());
 
-            $saveData = [
+            $dataToSave = [
                 'sectionId' => $this->validator->isIsset($gradeItem->courseid),
                 'evaluationName' => $this->validator->isIsset($gradeItem->itemname),
                 'action' => 'delete'
             ];
             
             return [
-                'get_data' => $saveData,
+                'data' => $dataToSave,
                 'typeEvent' => 'grade_item_deleted',
             ];
 

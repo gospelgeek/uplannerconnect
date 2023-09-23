@@ -7,7 +7,7 @@
 */
 
 //Variables globales
-require_once(__DIR__ . '/course/CourseNotesService.php');
+require_once(__DIR__ . '/../application/course/CourseNotesService.php');
 
 /**
    * @package uPlannerConnect
