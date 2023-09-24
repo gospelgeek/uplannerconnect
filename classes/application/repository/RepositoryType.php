@@ -6,7 +6,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(__DIR__ . '/repository/CourseNotesRepository.php');
+require_once(__DIR__ . '/CourseNotesRepository.php');
 
 /**
  * @package uPlannerConnect
@@ -14,7 +14,7 @@ require_once(__DIR__ . '/repository/CourseNotesRepository.php');
  * @author Daniel Dorado <doradodaniel14@gmail.com>
  * @description Contiene los tipos de repositorios existentes, el key en ACTIVE_REPOSITORY_TYPES
  * debe coincidir con el de los tipos de cliente en UplannerClientType
- */
+*/
 class RepositoryType
 {
     const GRADE = 'grade';

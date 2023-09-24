@@ -17,7 +17,7 @@ class plugin_config {
     CONST PLUGIN_NAME_LOCAL = 'local_uplannerconnect';
 
     //Nombre de las tablas
-    CONST TABLE_COURSE_GRADE = 'mdl_uplanner_notes';
+    CONST TABLE_COURSE_GRADE = 'mdl_uplanner_grades';
 
     //Rutas de los eventos
     CONST ROUTE_HANDLER_EVENT_1 = '/local/uplannerconnect/classes/infrastructure/event/handle_event_course_notes.php';
@@ -84,7 +84,7 @@ class plugin_config {
     ];
 
     //Conultas a la base de datos
-    CONST QUERY_INSERT_COURSE_GRADES = "INSERT INTO %s (json, response, success) VALUES ('%s', '%s', '%s')";
+    CONST QUERY_INSERT_COURSE_GRADES = "INSERT INTO %s (json, response, success , request_type) VALUES ('%s', '%s', '%s' , '%s')";
     CONST QUERY_UPDATE_COURSE_GRADES = "UPDATE %s SET json = '%s', response = '%s', success = '%s' WHERE id = 1";
     CONST QUERY_SELECT_COURSE_GRADES = "SELECT * FROM %s WHERE success = %s LIMIT 100";
 
