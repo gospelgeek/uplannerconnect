@@ -46,6 +46,11 @@ class CourseNotesRepository {
 
         try {
 
+          if (empty($data)) {
+             error_log('Excepción capturada: ' . 'No hay datos para actualizar' . "\n");
+              return; 
+          }
+
           $dataQuery = [
             'json' => $data['json'], 
             'response' => $data['response'],
@@ -78,11 +83,17 @@ class CourseNotesRepository {
 
         try {
           
+          if (empty($data)) {
+             error_log('Excepción capturada: ' . 'No hay datos para guardar' . "\n");
+              return; 
+          }
+
           //data
           $dataQuery = [
             'json' => $data, 
             'response' => '{"status": "Default response"}',
             'success' => 0,
+            'action' => $data['action']
           ];
 
           //Insertar datos en la base de datos
@@ -91,7 +102,8 @@ class CourseNotesRepository {
             plugin_config::TABLE_COURSE_GRADE,
             json_encode($dataQuery['json']),
             $dataQuery['response'],
-            intval($dataQuery['success']) 
+            intval($dataQuery['success']),
+            $dataQuery['action']
           );
 
           return $this->MoodleQueryHandler->executeQuery($query);
@@ -112,8 +124,16 @@ class CourseNotesRepository {
     public function getDataBD($state = self::STATE_DEFAULT) {
 
         try {
+
+          if (!is_numeric($state)) {
+             error_log('Excepción capturada: ' . 'El estado debe ser un número' . "\n");
+              return; 
+          }
+
+          //Obtener datos en la base de datos
           $query =  sprintf(plugin_config::QUERY_SELECT_COURSE_GRADES, plugin_config::TABLE_COURSE_GRADE, $state);
           return $this->MoodleQueryHandler->executeQuery($query);
+
         }
         catch (Exception $e) {
           error_log('Excepción capturada: ' . $e->getMessage() . "\n");

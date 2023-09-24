@@ -6,6 +6,11 @@
 */
 
 
+//Variables globales
+require_once(__DIR__ . '/../../plugin_config/plugin_config.php');
+require_once(__DIR__ . '/../../application/service/DataValidator.php');
+
+
 /**
    * @package uPlannerConnect
    * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
@@ -15,19 +20,26 @@ class CourseTraslationData {
 
     //Atributos
     private $typeTransform;
+    private $typeDefStructure;
+    private $validator;
 
     //Constructor
     public function __construct() {
 
         //Inicializar la variable typeTransform
         $this->typeTransform = [
-            'user_graded' => 'convertDataUserGrade',
-            'grade_item_updated' => 'convertDataGradeItemUpdated',
-            'grade_deleted' => 'convertDataUserGrade',
-            'grade_item_created' => 'convertDataItemCreated',
-            'grade_item_deleted' => 'convertDataItemDeleted',
+            'user_graded' => 'convertDataGrade',
+            'grade_item_updated' => 'convertDataGrade',
+            'grade_deleted' => 'convertDataGrade',
+            'grade_item_created' => 'convertDataGrade',
+            'grade_item_deleted' => 'convertDataGrade',
         ];
 
+        //Inicializar la variable typeDefStructure
+        $this->typeDefStructure = plugin_config::UPLANNER_GRADES;
+        //instancia la clase DataValidator
+        $this->validator = new DataValidator();
+        
     }
 
     /**
@@ -36,8 +48,24 @@ class CourseTraslationData {
      * @return array
     */
     public function converDataJsonUplanner(array $data) {
-        $typeTransform = $this->typeTransform[$data['typeEvent']];
-        return $this->$typeTransform($data);
+
+        try {
+
+            //verifica el parámetro es un array
+
+            //Traer la información
+            $typeTransform = $this->typeTransform[$data['typeEvent']];
+            //verificar si existe el método
+            if (method_exists($this, $typeTransform)) {
+                return $this->$typeTransform($data);
+            }
+            return [];
+
+        }
+        catch (Exception $e) {
+            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+        }
+
     }
     
 
@@ -46,164 +74,68 @@ class CourseTraslationData {
      * @description Transforma los datos del evento en el formato que requiere uPlanner
      * @return array
     */
-    private function convertDataUserGrade(array $data) {
+    private function convertDataGrade(array $data) : array {
 
-        //Traer la información
-        $getData = $data['get_data'];
-        $grade = $data['get_grade'];
-        $gradeRecordData = $data['get_record_data'];
-        $gradeLoadItem = $data['get_load_grade_item'];
+        try {
 
-        // Sacar la información del evento
-        return [
-            'sectionId' => isset($grade->grade_item->courseid) ? $grade->grade_item->courseid : '',
-            'studentCode' => isset($grade->userid) ? $grade->userid : '',
-            'finalGrade' => isset(($getData['other'])['finalgrade']) ? ($getData['other'])['finalgrade'] : '',
-            'finalGradeMessage' => '',
-            'finalGradePercentage' => isset($grade->grade_item->grademax, $grade->rawgrade) ? (100 / $grade->grade_item->grademax * $grade->rawgrade) : '',
-            'evaluationGroups' => [
-                [
-                    "evaluationGroupCode" => isset($gradeLoadItem->categoryid) ? $gradeLoadItem->categoryid : '',
-                    "average" => '',
-                    "grades" => [
-                        [
-                            "evaluationId" => isset($gradeLoadItem->itemtype) ? $gradeLoadItem->itemtype : '',
-                            "value" => isset(($getData['other'])['finalgrade']) ? ($getData['other'])['finalgrade'] : '',
-                            "evaluationName" => isset($gradeLoadItem->itemname) ? $gradeLoadItem->itemname : '',
-                            "date" => isset($gradeLoadItem->timecreated) ? $gradeLoadItem->timecreated : '',
-                            "isApproved" => '',
-                        ]
-                    ]
-                ]
-            ],
-            "lastModifiedDate" => isset($gradeLoadItem->timemodified) ? $gradeLoadItem->timemodified : '',
-            "action" => 'create'
-        ];
+            //Traer la información
+            $getData = $data['data'];
+
+            //return data traslate
+            return $this->createCommonDataArray($getData);
+
+       }
+       catch (Exception $e) {
+                error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+       }
 
     }
 
 
     /**
-     * @package uPlannerConnect
-     * @description Transforma los datos del evento en el formato que requiere uPlanner
-     * @return array 
+     *  @package uPlannerConnect
+     *  @description Crea un array con la estructura que requiere uPlanner
     */
-    private function convertDataGradeItemUpdated(array $data) {
+    private function createCommonDataArray(array $data) : array {
 
-
-        //Traer la información
-        $getData = $data['get_data'];
-
-        // Sacar la información del evento
-        return [
-            'sectionId' => isset($getData->courseid) ? $getData->courseid : '',
-            'studentCode' => '',
-            'finalGrade' => '',
-            'finalGradeMessage' => '',
-            'finalGradePercentage' => '',
-            'evaluationGroups' => [
-                [
-                    "evaluationGroupCode" => isset($getData->categoryid) ? $getData->categoryid : '',
-                    "average" => '',
-                    "grades" => [
-                        [
-                            "evaluationId" => '',
-                            "value" => '',
-                            "evaluationName" => '',
-                            "date" => isset($getData->timecreated) ? $getData->timecreated : '',
-                            "isApproved" => '',
-                        ]
-                    ]
-                ]
-            ],
-            "lastModifiedDate" => isset($getData->timemodified) ? $getData->timemodified : '',
-            "action" => 'update'
-        ];
-
-    }
-
-
-    /**
-     * @package uPlannerConnect
-     * @description Transforma los datos del evento en el formato que requiere uPlanner
-     * @return array 
-    */
-    private function convertDataItemCreated(array $data) {
-
-        $get_grade_item = $data['get_grade_item'];
-        
-        // Sacar la información del evento
-        return [
-            'sectionId' => isset($get_grade_item->courseid) ? $get_grade_item->courseid : '',
-            'studentCode' => '',
-            'finalGrade' => '',
-            'finalGradeMessage' => '',
-            'finalGradePercentage' => '',
-            'evaluationGroups' => [
-                [
-                    "evaluationGroupCode" => isset($get_grade_item->courseid) ? $get_grade_item->courseid : '',
-                    "average" => '',
-                    "grades" => [
-                        [
-                            "evaluationId" => isset($get_grade_item->courseid) ? $get_grade_item->courseid : '',
-                            "value" => '',
-                            "evaluationName" => isset($get_grade_item->itemname) ? $get_grade_item->itemname : '',
-                            "date" => isset($get_grade_item->timecreated) ? $get_grade_item->timecreated : '',
-                            "isApproved" => '',
-                        ]
-                    ]
-                ]
-            ],
-            "lastModifiedDate" => isset($get_grade_item->timemodified) ? $get_grade_item->timemodified : '',
-            "action" => 'delete'
-        ];
-
-    }
-
-
-    /**
-     * @package uPlannerConnect
-     * @description Transforma los datos del evento en el formato que requiere uPlanner
-     * @return array
-    */
-    private function convertDataItemDeleted(array $data) {
-
-            $event = $data['gradeItems'];
-            //  $courseId = $gradeItem->courseid;
-            //  $categoryid = $gradeItem->categoryid;
-            //  $itemName = $gradeItem->itemname;
-            //  $parentCategoryCourseId = $gradeItem->parent_category->courseid;
-            //  $parentCategoryFullname = $gradeItem->parent_category->fullname;
-            //  $gradetype = $gradeItem->gradetype;
-            //  $grademax = $gradeItem->grademax;
-            //  $grademin = $gradeItem->grademin;
+        try {
             
-            // Sacar la información del evento
+            $dataSend = $this->validator->verifyArrayKeyExist([ 
+                'array_verification' => $this->typeDefStructure,
+                'data' => $data 
+            ]);
+            
+            //Sacar la información del evento
             return [
-                'sectionId' => isset($gradeItem->courseid) ? $gradeItem->courseid : '',
-                'studentCode' => '',
-                'finalGrade' => '',
-                'finalGradeMessage' => '',
-                'finalGradePercentage' => '',
+                'sectionId' => $dataSend['sectionId'],
+                'studentCode' => $dataSend['studentCode'],
+                'finalGrade' =>  $dataSend['finalGrade'],
+                'finalGradeMessage' => $dataSend['finalGradeMessage'],
+                'finalGradePercentage' => $dataSend['finalGradePercentage'],
                 'evaluationGroups' => [
                     [
-                        "evaluationGroupCode" => '',
-                        "average" => '',
+                        "evaluationGroupCode" => $dataSend['evaluationGroupCode'],
+                        "average" => $dataSend['average'],
                         "grades" => [
                             [
-                                "evaluationId" => '',
-                                "value" => '',
-                                "evaluationName" => isset($gradeItem->itemname) ? $gradeItem->itemname : '',
-                                "date" => '',
-                                "isApproved" => '',
+                                "evaluationId" => $dataSend['evaluationId'],
+                                "value" => $dataSend['value'],
+                                "evaluationName" => $dataSend['evaluationName'],
+                                "date" => $dataSend['date'],
+                                "isApproved" => $dataSend['isApproved'],
                             ]
                         ]
                     ]
                 ],
-                "lastModifiedDate" => '',
-                "action" => 'delete'
+                "lastModifiedDate" => $dataSend['lastModifiedDate'],
+                "action" =>  $dataSend['action']
             ];
-    }
 
+      }
+      catch (Exception $e) {
+           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+      }
+
+    }
 
 }

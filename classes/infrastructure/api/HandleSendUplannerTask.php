@@ -4,10 +4,15 @@
  * @copyright   Cristian Machado Mosquera <cristian.machado@correounivalle.edu.co>
  * @copyright   daniel eduardo dorado <doradodaniel14@gmail.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+*/
+
+
+namespace local_uplannerconnect;
+
+defined('MOODLE_INTERNAL') || die;
 
 require_once(__DIR__ . '/factory/UplannerClientFactory.php');
-require_once(__DIR__ . '/../../application/RepositoryType.php');
+require_once(__DIR__ . '/../../application/repository/RepositoryType.php');
 
 /**
  * @package uPlannerConnect
