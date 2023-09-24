@@ -5,6 +5,16 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
+// Plugin Settings.
+$string['manage'] = 'Settings for the uPlannerConnect plugin';
+$string['generalsettingsheading'] = 'General settings';
+$string['generalsettingsheading_desc'] = 'General settings for the plugin';
+
+
+// Tasks.
+$string['syncinituplannertask'] = 'Sync uPlanner Task';
+
+
 $string['pluginname'] = 'uPlannerConnect';
 $string['welcome'] = 'Bienvenido';
 $string['description'] = 'Tiene como objectivo extraer informacion del campus y enviarla a uPlaner.';
