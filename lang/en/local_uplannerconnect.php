@@ -15,6 +15,7 @@ $string['reports'] = 'Reports for the UplannerConnect plugin';
 
 // Tasks.
 $string['syncinituplannertask'] = 'Sync uPlanner Task';
+$string['syncerroruplannertask'] = 'Sync Error uPlanner Task';
 
 $string['pluginname'] = 'uPlannerConnect';
 $string['welcome'] = 'Welcome';

@@ -14,26 +14,18 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ .'/classes/plugin_config/plugin_config.php');
 
 $pluginName = plugin_config::PLUGIN_NAME_LOCAL;
+$pluginNameLocal = plugin_config::PLUGIN_NAME;
 
 if ($hassiteconfig) {
 
     $ADMIN->add('localplugins',
                 new admin_category('local_uplannerconnect_settings',
                 new lang_string('pluginname', 'local_uplannerconnect')));
-    $settings = new admin_settingpage('managelocaluplannerconnect', new lang_string('manage', 'local_uplannerconnect'));
+    $settings = new admin_settingpage('managelocaluplannerconnect', 
+                new lang_string('manage', 'local_uplannerconnect'));
 
 
     if ($ADMIN->fulltree) {
-        // Página de configuración principal
-        //$settings = new admin_settingpage(''.$pluginName.'_settings', get_string('pluginname', $pluginName));
-
-        // Configuración para el endpoint de cursos
-        // $settings->add(new admin_setting_heading(
-        //     ''.$pluginName.'_courses', 
-        //     get_string('courses_endpoint_heading', 
-        //     $pluginName), 
-        //     ''
-        // ));
 
         $settings->add(new admin_setting_heading(
             'generalsettingsheading',
@@ -94,14 +86,14 @@ if ($hassiteconfig) {
     $ADMIN->add('localplugins', $settings);
 
     $ADMIN->add('reports', 
-      new admin_category('uplannerconnect', 
-      new lang_string('pluginname', 'local_uplannerconnect')));
+      new admin_category($pluginNameLocal, 
+      new lang_string('pluginname', $pluginName)));
 
-    // $ADMIN->add('uplannerconnect',
-    //     new admin_externalpage('index', new lang_string('reports', 'local_uplannerconnect'),
-    //         new moodle_url('/local/uplannerconnect/index.php'), 'moodle/site:configview'
-    //     )
-    // );
+    $ADMIN->add($pluginNameLocal,
+        new admin_externalpage('uplanerIndex', new lang_string('reports', $pluginName),
+            new moodle_url('/local/'.$pluginNameLocal.'/index.php'), 'moodle/site:configview'
+        )
+    );
     
     
 }

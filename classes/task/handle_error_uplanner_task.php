@@ -1,4 +1,4 @@
-<?php 
+<?php
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,50 +16,44 @@
 
 
 /**
- * @package     local_uplannerconnect
+ * @package     uPlannerConnect
  * @copyright   Cristian Machado Mosquera <cristian.machado@correounivalle.edu.co>
  * @copyright   daniel eduardo dorado <doradodaniel14@gmail.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ */
 
 namespace local_uplannerconnect\task;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- *  Handle init uPlanner task
- * 
- * @package local_uplannerconnect
+ * @package uPlannerConnect
  * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
  * @author Daniel Dorado <doradodaniel14@gmail.com>
- * 
-*/
-class test_task extends \core\task\scheduled_task
+ * @description TODO:
+ */
+class handle_error_uplanner_task extends \core\task\scheduled_task
 {
     /**
      * @inerhitdoc
      */
     public function get_name()
     {
-        return get_string('syncinituplannertask', 'local_uplannerconnect');
+        return get_string('syncerroruplannertask', 'local_uplannerconnect');
     }
 
     /**
      * @inerhitdoc
      */
     public function execute() {
-
-        $timenow = time();
-        $starttime = microtime();
-
-        mtrace("Update cron started at: " . date('r', $timenow) . "\n");
-
-        print_r("Funcione porfavor ");
-
-        // Taks completed.
-        mtrace("\n" . 'Cron completado a las: ' . date('r', time()) . "\n");
-        mtrace('Memoria utilizada: ' . display_size(memory_get_usage())."\n");
-        $difftime = microtime_diff($starttime, microtime());
-                    mtrace("Tarea programada tardó " . $difftime . " segundos para finalizar.\n");
+        global $CFG;
+        require_once(__DIR__ . '/../infrastructure/api/HandleSendUplannerTask.php');
+        try {
+            mtrace("Test");
+            //$handleUplannerTask = new HandleSendUplannerTask();
+            //$handleUplannerTask->procces(2, 5); // 2 is state error
+        } catch (Exception $e) {
+            //TODO: current log
+        }
     }
 }

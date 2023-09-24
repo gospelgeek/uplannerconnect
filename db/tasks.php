@@ -23,13 +23,22 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-
 $tasks = [
     [
-        'classname' => 'local_uplannerconnect\task\test_task.php',
+        'classname' => 'local_uplannerconnect\task\handle_init_uplanner_task',
         'blocking' => 0,
-        'minute' => '*',
+        'minute' => '*/5',
         'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+        'disabled' => 0
+    ],
+    [
+        'classname' => 'local_uplannerconnect\task\handle_error_uplanner_task',
+        'blocking' => 0,
+        'minute' => 0,
+        'hour' => 0,
         'day' => '*',
         'month' => '*',
         'dayofweek' => '*',

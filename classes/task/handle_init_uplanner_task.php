@@ -38,7 +38,7 @@ class handle_init_uplanner_task extends \core\task\scheduled_task
 {
     /**
      * @inerhitdoc
-     */
+    */
     public function get_name()
     {
         return get_string('syncinituplannertask', 'local_uplannerconnect');
@@ -48,22 +48,21 @@ class handle_init_uplanner_task extends \core\task\scheduled_task
      * @inerhitdoc
      */
     public function execute() {
-        //global $CFG;
-        //require_once($CFG->dirroot . '/../infrastructure/api/HandleSendUplannerTask.php');
+        global $CFG;
+        require_once(__DIR__. '/../infrastructure/api/HandleSendUplannerTask.php');
 
         $timenow = time();
         $starttime = microtime();
 
         mtrace("Update cron started at: " . date('r', $timenow) . "\n");
 
-        // try {
-        //     error_log("Cron started at: " . date('r', $timenow) . "\n");
-        //    // $handleUplannerTask = new HandleSendUplannerTask();
-        //     //$handleUplannerTask->procces(0); // 0 is state default
-        // } catch (Exception $e) {
-        //     //TODO: current log
-        // }
-        print_r("Funcione porfavor ");
+        try {
+        mtrace("Test");
+        // $handleUplannerTask = new HandleSendUplannerTask();
+        //$handleUplannerTask->procces(0); // 0 is state default
+        } catch (Exception $e) {
+            //TODO: current log
+        }
 
         // Taks completed.
         mtrace("\n" . 'Cron completado a las: ' . date('r', time()) . "\n");
