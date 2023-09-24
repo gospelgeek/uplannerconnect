@@ -93,6 +93,7 @@ class CourseNotesRepository {
             'json' => $data, 
             'response' => '{"status": "Default response"}',
             'success' => 0,
+            'action' => $data['action']
           ];
 
           //Insertar datos en la base de datos
@@ -101,7 +102,8 @@ class CourseNotesRepository {
             plugin_config::TABLE_COURSE_GRADE,
             json_encode($dataQuery['json']),
             $dataQuery['response'],
-            intval($dataQuery['success']) 
+            intval($dataQuery['success']),
+            $dataQuery['action']
           );
 
           return $this->MoodleQueryHandler->executeQuery($query);
