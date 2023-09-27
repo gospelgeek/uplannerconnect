@@ -6,13 +6,10 @@
 */
 
 
-//Variables globales
-//require_once(__DIR__ . '/../../plugin_config/plugin_config.php');
-
 /**
- *  @package  uPlannerConnect
- *  @author Cristian Machado <cristian.machado@correounivalle.edu.co>
- *  @author Daniel Eduardo Dorado <doradodaniel14@gmail.com>
+ *  @package local_uplannerconnect
+ *  @author  Cristian Machado <cristian.machado@correounivalle.edu.co>
+ *  @author  Daniel Eduardo Dorado <doradodaniel14@gmail.com>
  * @description Encargada de tener todas las validaciones
 */
 class DataValidator {

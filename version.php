@@ -12,7 +12,7 @@ defined('MOODLE_INTERNAL') || die();
 //require_once(__DIR__ . '/classes/plugin_config/plugin_config.php');
 
 
-$plugin->version = 2023092302; //año-mes-día-numeroVersion
+$plugin->version = 2023092704; //año-mes-día-numeroVersion
 $plugin->component = 'local_uplannerconnect';
 
 $plugin->requires = 2015030901; 

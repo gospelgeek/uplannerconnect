@@ -12,15 +12,17 @@ require_once(__DIR__ . '/../../application/service/DataValidator.php');
 
 
 /**
-   * @package uPlannerConnect
+   * 
+   * Instancia una entidad de acorde a la funcionalidad que se requiera
+   * 
+   * @package local_uplannerconnect
    * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
-   * @description Instancia una entidad de acorde a la funcionalidad que se requiera
+   *  
 */
 class CourseTraslationData {
 
     //Atributos
     private $typeTransform;
-    private $typeDefStructure;
     private $validator;
 
     //Constructor
@@ -31,20 +33,19 @@ class CourseTraslationData {
             'user_graded' => 'convertDataGrade',
             'grade_item_updated' => 'convertDataGrade',
             'grade_deleted' => 'convertDataGrade',
-            'grade_item_created' => 'convertDataGrade',
+            'grade_item_created' => 'convertDataEvaluation',
             'grade_item_deleted' => 'convertDataGrade',
         ];
 
-        //Inicializar la variable typeDefStructure
-        $this->typeDefStructure = plugin_config::UPLANNER_GRADES;
         //instancia la clase DataValidator
         $this->validator = new DataValidator();
         
     }
 
     /**
+     * Convierte los datos acorde al evento que se requiera
+     * 
      * @package uPlannerConnect
-     * @description Convierte los datos acorde al evento que se requiera
      * @return array
     */
     public function converDataJsonUplanner(array $data) {
@@ -70,8 +71,9 @@ class CourseTraslationData {
     
 
     /**
-     * @package uPlannerConnect
-     * @description Transforma los datos del evento en el formato que requiere uPlanner
+     * Transforma los datos del evento en el formato que requiere uPlanner
+     * 
+     * @package local_uplannerconnect
      * @return array
     */
     private function convertDataGrade(array $data) : array {
@@ -93,15 +95,42 @@ class CourseTraslationData {
 
 
     /**
-     *  @package uPlannerConnect
-     *  @description Crea un array con la estructura que requiere uPlanner
+     * Transforma los datos del evento en el formato que requiere uPlanner
+     * 
+     * @package local_uplannerconnect
+     * @todo Aqui es evidente que se puede optimizar el código
+     * @return array
+    */
+    private function convertDataEvaluation(array $data) : array {
+
+        try {
+
+            //Traer la información
+            $getData = $data['data'];
+
+            //return data traslate
+            return $this->createCommonDataEvaluation($getData);
+
+       }
+       catch (Exception $e) {
+                error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+       }
+
+    }
+
+
+    /**
+     *  Crea un array con la estructura que requiere uPlanner
+     * 
+     *  @package local_uplannerconnect
+     *  @return array
     */
     private function createCommonDataArray(array $data) : array {
 
         try {
             
             $dataSend = $this->validator->verifyArrayKeyExist([ 
-                'array_verification' => $this->typeDefStructure,
+                'array_verification' => plugin_config::UPLANNER_GRADES,
                 'data' => $data 
             ]);
             
@@ -133,8 +162,53 @@ class CourseTraslationData {
 
       }
       catch (Exception $e) {
+           return [];
            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
       }
+
+    }
+
+
+    /**
+     * Crea un array con la estructura que requiere uPlanner
+     *  
+     * @package local_uplannerconnect
+     * @return array
+    */
+    private function createCommonDataEvaluation(array $data) : array {
+
+        try {
+
+            //extraer la información
+            $dataSend = $this->validator->verifyArrayKeyExist([ 
+                'array_verification' => plugin_config::UPLANNER_EVALUATION_ESTRUTURE,
+                'data' => $data 
+            ]);
+
+            //Estructura de la evaluación
+            return [        
+                "sectionId" => $dataSend['sectionId'],
+                "evaluationGroups" => [
+                  [
+                    "evaluationGroupCode" => $dataSend['evaluationGroupCode'],
+                    "evaluationGroupName" => $dataSend['evaluationGroupName'],
+                    "evaluations" => [
+                      [
+                        "evaluationId" => $dataSend['evaluationId'],
+                        "evaluationName" => $dataSend['evaluationName'],
+                        "weight" => $dataSend['weight']
+                      ]
+                    ]
+                  ]
+                ],
+                "action" => $dataSend['action']
+            ];
+
+        }
+        catch (Exception $e) {
+           return [];
+           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+        }       
 
     }
 

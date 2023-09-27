@@ -174,12 +174,10 @@ class CourseExtractionData {
 
             $dataToSave = [
                 'sectionId' => $this->validator->isIsset($get_grade_item->courseid),
-                'evaluationGroupCode' => $this->validator->isIsset($get_grade_item->courseid),
+                'evaluationGroupCode' => $this->validator->isIsset($get_grade_item->categoryid),
                 'evaluationId' => $this->validator->isIsset($get_grade_item->courseid),
                 'evaluationName' => $this->validator->isIsset($get_grade_item->itemname),
-                'date' => $this->validator->isIsset($get_grade_item->timecreated),
-                'lastModifiedDate' =>$this->validator->isIsset($get_grade_item->timemodified),
-                'action' => 'delete'
+                'action' => 'create'
             ];
 
             return [
