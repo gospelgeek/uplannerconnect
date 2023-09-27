@@ -23,7 +23,7 @@ foreach (plugin_config::EVENTS_OBSERVERS as $eventData) {
     $observers[] = [
         'eventname' => $eventData['eventname'],
         'includefile' => $eventData['includefile'],
-        'callback' =>  $callback,
+        'callback' => $callback,
     ];
     
 }
