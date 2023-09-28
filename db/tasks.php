@@ -1,37 +1,47 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * @package     uPlannerConnect
- * @copyright   cristian machado mosquera <cristian.machado@correounivalle.edu.co>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package local_uplannerconnect
+ * @author Cristian Machado <cristin.machado@correounivalle.edu.co>
+ * @description Instancia una task que va estar enviado por un intervalo de tiempo
+ *              información de los cursos a uPlanner
 */
 
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * @package uPlannerConnect
- * @author Cristian Machado <cristin.machado@correounivalle.edu.co>
- * @description Instancia una task que va estar enviado por un intervalo de tiempo
- *              información de los cursos a uPlanner
- */
 $tasks = [
-    // [
-    //     'classname' => 'local_uplannerconnect\task\HandleInitUplannerTask.php',
-    //     'blocking' => 0,
-    //     'minute' => '*/5',
-    //     'hour' => '*',
-    //     'day' => '*',
-    //     'month' => '*',
-    //     'dayofweek' => '*',
-    //     'disabled' => 0
-    // ],
-    // [
-    //     'classname' => 'local_uplannerconnect\task\HandleErrorUplannerTask.php',
-    //     'blocking' => 0,
-    //     'minute' => 0,
-    //     'hour' => 0,
-    //     'day' => '*',
-    //     'month' => '*',
-    //     'dayofweek' => '*',
-    //     'disabled' => 0
-    // ]
+    [
+        'classname' => 'local_uplannerconnect\task\handle_init_uplanner_task',
+        'blocking' => 0,
+        'minute' => '*/5',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+        'disabled' => 0
+    ],
+    [
+        'classname' => 'local_uplannerconnect\task\handle_error_uplanner_task',
+        'blocking' => 0,
+        'minute' => 0,
+        'hour' => 0,
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+        'disabled' => 0
+    ]
 ];

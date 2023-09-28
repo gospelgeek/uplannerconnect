@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/uplannerconnect/db" VERSION="2023090401" COMMENT="XMLDB file for local/uplannerconnect">
+<XMLDB PATH="local/uplannerconnect/db" VERSION="2023092801" COMMENT="XMLDB file for local/uplannerconnect">
     <TABLES>
-        <TABLE NAME="uplanner_notes" COMMENT="Se Guardará la información generada por el evento">
+        <TABLE NAME="uplanner_grades" COMMENT="Se Guardará la información generada por el evento">
             <FIELDS>
                <FIELD NAME="id" SEQUENCE="true" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="ID de la tabla" />
                 <FIELD NAME="json" SEQUENCE="false" TYPE="text" NOTNULL="true" COMMENT="Datos en formato JSON" />
                 <FIELD NAME="response" SEQUENCE="false" TYPE="text" NOTNULL="true" COMMENT="Datos en formato JSON" />
+                <FIELD NAME="request_type" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="success" SEQUENCE="false" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="Éxito (0 o 1)" />
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="uplanner_evaluation" COMMENT="Tabla para guardar la informacion de las evaluaciones">
+            <FIELDS>
+               <FIELD NAME="id" SEQUENCE="true" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="ID de la tabla" />
+                <FIELD NAME="json" SEQUENCE="false" TYPE="text" NOTNULL="true" COMMENT="Datos en formato JSON" />
+                <FIELD NAME="response" SEQUENCE="false" TYPE="text" NOTNULL="true" COMMENT="Datos en formato JSON" />
+                <FIELD NAME="request_type" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="success" SEQUENCE="false" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="Éxito (0 o 1)" />
             </FIELDS>
             <KEYS>

@@ -8,14 +8,13 @@
 namespace local_uplannerconnect\application\repository;
 
 use local_uplannerconnect\plugin_config\plugin_config;
-use moodle_exception;
 
 /**
    * @package uPlannerConnect
    * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
    * @description Instancia una entidad de acorde a la funcionalidad que se requiera
 */
-class CourseNotesRepository {
+class course_evaluation_structure_repository {
 
     //Constantes
     const STATE_DEFAULT = 0;  //Estado por defecto
@@ -24,17 +23,12 @@ class CourseNotesRepository {
   
     //Atributos
     private $MoodleQueryHandler;
-    private $plugin_config;
 
 
     //Constructor
     public function __construct() {
-
         //Instancia de la clase MoodleQueryHandler
         $this->MoodleQueryHandler = new MoodleQueryHandler();
-        //Instancia de la clase plugin_config
-        $this->plugin_config = new plugin_config();
-
     }
 
 
@@ -55,7 +49,7 @@ class CourseNotesRepository {
             //insertar datos en la base de datos
           $query =  sprintf(
             plugin_config::QUERY_UPDATE_COURSE_GRADES, 
-            plugin_config::TABLE_COURSE_GRADE, 
+            plugin_config::TABLE_COURSE_EVALUATION, 
             json_encode($data['json']),
             json_encode($data['response']),
             $data['success'],
@@ -95,7 +89,7 @@ class CourseNotesRepository {
           //Insertar datos en la base de datos
           $query =  sprintf(
             plugin_config::QUERY_INSERT_COURSE_GRADES,
-            plugin_config::TABLE_COURSE_GRADE,
+            plugin_config::TABLE_COURSE_EVALUATION,
             json_encode($dataQuery['json']),
             $dataQuery['response'],
             intval($dataQuery['success']),
@@ -128,7 +122,7 @@ class CourseNotesRepository {
           //Obtener datos en la base de datos
           $query =  sprintf(
               plugin_config::QUERY_SELECT_COURSE_GRADES,
-            plugin_config::TABLE_COURSE_GRADE,
+            plugin_config::TABLE_COURSE_EVALUATION,
               $data['state'],
               $data['limit'],
               $data['offset']
@@ -142,24 +136,4 @@ class CourseNotesRepository {
 
     }
 
-    /**
-     * Delete registers by field state
-     *
-     * @param $state
-     * @return bool
-     */
-    public function delete_data_bd($state): bool
-    {
-        $result = false;
-        try {
-            $result = $this->MoodleQueryHandler->delete_records(
-                'uplanner_grades',
-                ['success' => $state]
-            );
-        } catch (moodle_exception $e) {
-            error_log('delete_data_bd: ' . $e->getMessage() . "\n");
-        }
-
-        return $result;
-    }
 }

@@ -6,8 +6,10 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-//Variables globales
-require_once(__DIR__ . '/course/CourseNotesService.php');
+namespace local_uplannerconnect\domain;
+
+use local_uplannerconnect\application\course\course_grades_service;
+use local_uplannerconnect\application\course\course_evaluation_structure;
 
 /**
    * @package uPlannerConnect
@@ -18,12 +20,12 @@ require_once(__DIR__ . '/course/CourseNotesService.php');
 class EnumEtities {
 
     private $Types;
-    private $ManagementNotesEntiry;
 
     public function __construct() {
 
         $this->Types = [
-            'course_notes' => 'CourseNotesService',
+            'course_notes' => course_grades_service::class,
+            'evaluation_structure' => course_evaluation_structure::class,
         ];
 
     }
@@ -41,7 +43,7 @@ class EnumEtities {
         
             if (array_key_exists($data['EnumEtities'], $this->Types)) {
 
-                $newEntity = $this->ManagementNotesEntiry = new $class();
+                $newEntity = new $class();
                 if (!method_exists($newEntity, 'proccess')) {
                     error_log('La clase ' . $class . ' no tiene el método process.');
                     return;
@@ -53,7 +55,7 @@ class EnumEtities {
                error_log('La clase ' . $class . ' no existe o no tiene el método process.');
             }
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('Excepción capturada: ' . $e->getMessage() . "\n");
         }
         
