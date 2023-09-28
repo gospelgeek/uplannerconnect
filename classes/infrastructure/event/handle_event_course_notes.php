@@ -51,6 +51,10 @@ class handle_event_course_notes {
             $agregationState =  $grade->get_aggregationstatus();
 
             if (!($agregationState === 'unknown')) {
+
+               //valida si la facultad tiene acceso
+               if (!validateAccesFaculty($event)) { return; }
+
                   //Instanciar la clase ManagementFactory
                   instantiateManagementFactory([
                      "dataEvent" => $event,
@@ -114,7 +118,10 @@ class handle_event_course_notes {
             "key" => "eventname",
             "methodName" => "get_data"
          ])) {
-         
+
+         //valida si la facultad tiene acceso
+         if (!validateAccesFaculty($event)) { return; }
+
          //Instanciar la clase ManagementFactory
          instantiateManagementFactory([
             "dataEvent" => $event,
@@ -167,7 +174,7 @@ class handle_event_course_notes {
 */
 function instantiateManagementFactory(array $data) {
    try {
-
+      
       // Verificar si se proporcionan datos válidos
       if (empty($data['dataEvent']) || empty($data['typeEvent']) || 
           empty($data['dispatch'])  || empty($data['EnumEtities'])) 
@@ -215,4 +222,32 @@ function validateAccessTypeEvent(array $data) : bool {
    catch (\Exception $e) {
       error_log('Excepción capturada: ',  $e->getMessage(), "\n");
    }
+}
+
+
+/**
+ *  Valida si la facultad tiene acceso
+ * 
+ *  @package local_uplannerconnect
+ *  @author Cristian Machado <cristian.machado@correounivalle.edu.co>
+ *  @return bool 
+*/
+function validateAccesFaculty($data) : bool {
+   try {
+      //Instanciar la clase EventAccesValidator
+      $eventAccesValidator = new EventAccesValidator();
+      //Obtener los datos del evento
+      $eventData = $data->get_data();
+      
+      //validar si el evento tiene el campo courseid
+      if (!array_key_exists('courseid', $eventData)) { return false; }
+     
+      //validar si la facultad tiene acceso
+      return $eventAccesValidator->validateAccessByFaculty($eventData['courseid']);
+
+   }
+   catch (\Exception $e) {
+      error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+   }
+   return false;
 }

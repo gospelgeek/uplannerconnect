@@ -8,6 +8,9 @@
 
 namespace local_uplannerconnect\application\service;
 
+
+use local_uplannerconnect\application\repository\course_data_repository;
+
 /**
  *  
  *  Validaciones de los eventos
@@ -21,12 +24,16 @@ class EventAccesValidator {
     const EVENT_METHOD_NAME = 'methodName';
     const DATA_VERIFY_EVENT = 'typeEvent';
 
+    // Facultade a evaluar
+    const FACULTY_ACTIVE = '4';
+
     //Atributos
-    // private $validator;
+    private $courseDataRepository;
 
     //constructor
     public function __construct() {
-        // $this->validator = new DataValidator();
+        //Instanciar la clase course_data_repository
+        $this->courseDataRepository = new course_data_repository();
     }
 
 
@@ -63,5 +70,35 @@ class EventAccesValidator {
         catch (\Exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
+    }
+
+    /**
+     *  Valida si la facultad puede usar el evento
+     * 
+     *  @param data $data
+     * 
+     *  @return bool
+    */
+    public function validateAccessByFaculty($courseid) : bool {
+
+        //Inicia por defecto
+        $result = false;
+
+        try {
+            
+            //valida si el id del curso llega vacío
+            if (empty($courseid)) { return $result; }
+            //Obtener el shortname del curso  
+            $shortname = $this->courseDataRepository->getCourseShortname($courseid);
+            //verifica si tiene algun dato en la posición 4
+            if (!isset($shortname[3])) { return $result; }
+          
+            return ($shortname[3] === self::FACULTY_ACTIVE);
+
+        }
+        catch (\Exception $e) {
+          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+        }
+        return $result;
     }
 }
