@@ -6,12 +6,9 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-
 defined('MOODLE_INTERNAL') || die();
 
-
-//Variables globales
-require_once(__DIR__ .'/classes/plugin_config/plugin_config.php');
+use local_uplannerconnect\plugin_config\plugin_config;
 
 $pluginName = plugin_config::PLUGIN_NAME_LOCAL;
 $pluginNameLocal = plugin_config::PLUGIN_NAME;

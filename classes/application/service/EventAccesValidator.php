@@ -6,8 +6,6 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-// require_once(__DIR__ . '/DataValidator.php');
-
 /**
  *  
  *  Validaciones de los eventos
@@ -64,7 +62,4 @@ class EventAccesValidator {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
     }
-
-
-
 }

@@ -6,11 +6,11 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-//Variables globales
-require_once(__DIR__ . '/../../domain/course/CourseTraslationData.php');
-require_once(__DIR__ . '/../../domain/course/CourseExtractionData.php');
-require_once(__DIR__ . '/../repository/CourseNotesRepository.php');
+namespace local_uplannerconnect\application\course;
 
+use local_uplannerconnect\domain\course\CourseTraslationData;
+use local_uplannerconnect\domain\course\CourseExtractionData;
+use local_uplannerconnect\application\repository\CourseNotesRepository;
 
 /**
    * @package uPlannerConnect

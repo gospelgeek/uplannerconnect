@@ -1,13 +1,13 @@
 <?php
 /**
  * @package     uPlannerConnect
- * @copyright   cristian machado mosquera <cristian.machado@correounivalle.edu.co>
+ * @copyright   Cristian Machado Mosquera <cristian.machado@correounivalle.edu.co>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
+namespace local_uplannerconnect\application\repository;
 
-require_once(__DIR__ . '/MoodleQueryHandler.php');
-require_once(__DIR__ . '/../../plugin_config/plugin_config.php');
+use local_uplannerconnect\plugin_config\plugin_config;
 
 /**
    * @package uPlannerConnect
@@ -51,21 +51,14 @@ class CourseNotesRepository {
               return; 
           }
 
-          $dataQuery = [
-            'json' => $data['json'], 
-            'response' => $data['response'],
-            'success' => $data['success'],
-            'id' => $data['id'],
-          ];
-        
-          //insertar datos en la base de datos
+            //insertar datos en la base de datos
           $query =  sprintf(
             plugin_config::QUERY_UPDATE_COURSE_GRADES, 
             plugin_config::TABLE_COURSE_GRADE, 
-            json_encode($dataQuery['json']), 
-            json_encode($dataQuery['response']), 
-            $dataQuery['success'],
-            $dataQuery['id']
+            json_encode($data['json']),
+            json_encode($data['response']),
+            $data['success'],
+            $data['id']
           );
 
           return $this->MoodleQueryHandler->executeQuery($query);
@@ -123,32 +116,24 @@ class CourseNotesRepository {
      * @description Obtiene los datos en la base de datos
      * @return void 
     */
-    public function getDataBD(array $data) {
+    public function getDataBD(array $data = null) {
 
         try {
-
           if (empty($data)) {
              error_log('Excepción capturada: ' . 'El estado debe ser un número' . "\n");
               return; 
           }
 
-          $dataQuery = [
-            'state' => self::STATE_DEFAULT,
-            'limit' => $data['limit'] || 100,
-            'offset' => $data['offset'] || 0,
-          ];
-
           //Obtener datos en la base de datos
           $query =  sprintf(
-            plugin_config::QUERY_SELECT_COURSE_GRADES, 
-            plugin_config::TABLE_COURSE_GRADE, 
-            $dataQuery['state'],
-            $dataQuery['limit'],
-            $dataQuery['offset']
+              plugin_config::QUERY_SELECT_COURSE_GRADES,
+            plugin_config::TABLE_COURSE_GRADE,
+              $data['state'],
+              $data['limit'],
+              $data['offset']
           );
 
           return $this->MoodleQueryHandler->executeQuery($query);
-
         }
         catch (Exception $e) {
           error_log('Excepción capturada: ' . $e->getMessage() . "\n");
