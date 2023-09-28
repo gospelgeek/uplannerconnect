@@ -6,7 +6,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(__DIR__ . '/CourseNotesRepository.php');
+namespace local_uplannerconnect\application\repository;
 
 /**
  * @package uPlannerConnect
@@ -17,6 +17,9 @@ require_once(__DIR__ . '/CourseNotesRepository.php');
 */
 class RepositoryType
 {
+    const STATE_DEFAULT = 0;  //Estado por defecto
+    const STATE_SEND = 1;     //Estado de envío
+    const STATE_ERROR = 2;    //Estado de error
     const GRADE = 'grade';
 
     const ACTIVE_REPOSITORY_TYPES = [

@@ -24,6 +24,9 @@
 
 namespace local_uplannerconnect\task;
 
+use local_uplannerconnect\infrastructure\api\handle_remove_success_uplanner_task;
+
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -47,13 +50,13 @@ class handle_error_uplanner_task extends \core\task\scheduled_task
      */
     public function execute() {
         global $CFG;
-        require_once(__DIR__ . '/../infrastructure/api/HandleSendUplannerTask.php');
+        require_once(__DIR__ . '/../infrastructure/api/handle_send_uplanner_task.php');
         try {
             mtrace("Test");
-            //$handleUplannerTask = new HandleSendUplannerTask();
-            //$handleUplannerTask->procces(2, 5); // 2 is state error
+            $handle_task = new handle_remove_success_uplanner_task();
+            $handle_task->process();
         } catch (Exception $e) {
-            //TODO: current log
+            error_log('handle_error_uplanner_task - execute: ' . $e->getMessage() . "\n");
         }
     }
 }

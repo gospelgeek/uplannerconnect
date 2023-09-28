@@ -6,13 +6,15 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_uplannerconnect\infrastructure\api;
+
 /**
  * @package uPlannerConnect
  * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
  * @author Daniel Dorado <doradodaniel14@gmail.com>
  * @description Implementation of curl wrapper
  */
-class CurlWrapper
+class curl_wrapper
 {
     /**
      * @var false|resource
@@ -33,12 +35,13 @@ class CurlWrapper
      *
      * @param $url
      * @return bool|string
-     * @throws Exception
+     * @throws \Exception
      */
     public function get($url)
     {
         curl_setopt($this->ch, CURLOPT_URL, $url);
         curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, 'GET');
+
         return $this->execute();
     }
 
@@ -48,13 +51,14 @@ class CurlWrapper
      * @param $url
      * @param $data
      * @return bool|string
-     * @throws Exception
+     * @throws \Exception
      */
     public function post($url, $data)
     {
         curl_setopt($this->ch, CURLOPT_URL, $url);
         curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($this->ch, CURLOPT_POSTFIELDS, json_encode($data));
+
         return $this->execute();
     }
 
@@ -64,13 +68,14 @@ class CurlWrapper
      * @param $url
      * @param $data
      * @return bool|string
-     * @throws Exception
+     * @throws \Exception
      */
     public function put($url, $data)
     {
         curl_setopt($this->ch, CURLOPT_URL, $url);
         curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, 'PUT');
         curl_setopt($this->ch, CURLOPT_POSTFIELDS, json_encode($data));
+
         return $this->execute();
     }
 
@@ -79,12 +84,13 @@ class CurlWrapper
      *
      * @param $url
      * @return bool|string
-     * @throws Exception
+     * @throws \Exception
      */
     public function delete($url)
     {
         curl_setopt($this->ch, CURLOPT_URL, $url);
         curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+
         return $this->execute();
     }
 
@@ -94,9 +100,10 @@ class CurlWrapper
      * @param $header
      * @return $this
      */
-    public function setHeader($header)
+    public function set_header($header)
     {
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $header);
+
         return $this;
     }
 
@@ -108,10 +115,11 @@ class CurlWrapper
      * @param $password
      * @return $this
      */
-    public function setBasicAuth($username, $password)
+    public function set_basic_auth($username, $password)
     {
         curl_setopt($this->ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
         curl_setopt($this->ch, CURLOPT_USERPWD, "$username:$password");
+
         return $this;
     }
 
@@ -122,9 +130,10 @@ class CurlWrapper
      * @param $value
      * @return $this
      */
-    public function addOption($option, $value)
+    public function add_option($option, $value)
     {
         curl_setopt($this->ch, $option, $value);
+
         return $this;
     }
 
@@ -133,7 +142,7 @@ class CurlWrapper
      *
      * @return mixed
      */
-    public function getCode()
+    public function get_code()
     {
         return curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
     }
@@ -143,7 +152,7 @@ class CurlWrapper
      *
      * @return string
      */
-    public function getError()
+    public function get_error()
     {
         return curl_error($this->ch);
     }
@@ -152,14 +161,15 @@ class CurlWrapper
      * Send request
      *
      * @return bool|string
-     * @throws Exception
+     * @throws \Exception
      */
     private function execute()
     {
         $response = curl_exec($this->ch);
         if ($response === false) {
-            throw new Exception(curl_error($this->ch));
+            throw new \Exception(curl_error($this->ch));
         }
+
         return $response;
     }
 

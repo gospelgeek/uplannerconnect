@@ -6,20 +6,25 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(__DIR__ . '/AbstractUplannerClient.php');
+namespace local_uplannerconnect\infrastructure\api\client;
 
 /**
  * @package uPlannerConnect
  * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
  * @author Daniel Dorado <doradodaniel14@gmail.com>
- * @description Cliente para consumir los métodos expuestos de materiales en Uplanner
+ * @description Cliente para consumir los métodos expuestos de notas en Uplanner
  */
-class UplannerClientMaterial extends AbstractUplannerClient
+class uplanner_client_grade extends abstract_uplanner_client
 {
-    const ENDPOINT_MATERIAL = '/integration/materials';
+    const ENDPOINT_MATERIAL = '/integration/grades';
 
     /**
-     * Get material in Uplanner
+     * @inerhitdoc
+     */
+    protected string $name_file = 'uplanner_client_grade.csv';
+
+    /**
+     * Get grade in Uplanner
      *
      * @param null $data
      * @return array|bool|mixed|string
@@ -28,22 +33,22 @@ class UplannerClientMaterial extends AbstractUplannerClient
     public function get($data = null)
     {
         $response = [];
-        if (!$this->getToken()) {
+        if (!$this->get_token()) {
             return $response;
         }
-        $endpoint = $this->getEndpoint(self::ENDPOINT_MATERIAL);
-        $response = $this->curlWrapper->get($endpoint);
-        if ($this->curlWrapper->getCode() === 200) {
+        $endpoint = $this->get_endpoint(self::ENDPOINT_MATERIAL);
+        $response = $this->curl_wrapper->get($endpoint);
+        if ($this->curl_wrapper->get_code() === 200) {
             $response = json_decode($response, true);
         } else {
-            $response['error'] = $this->curlWrapper->getError();
+            $response['error'] = $this->curl_wrapper->get_error();
         }
 
         return $response;
     }
 
     /**
-     * Update material in Uplanner
+     * Update grade in Uplanner
      *
      * @param $data
      * @return array
@@ -52,22 +57,22 @@ class UplannerClientMaterial extends AbstractUplannerClient
     public function update($data): array
     {
         $response = [];
-        if (!$this->getToken()) {
+        if (!$this->get_token()) {
             return $response;
         }
-        $endpoint = $this->getEndpoint(self::ENDPOINT_MATERIAL);
-        $response = $this->curlWrapper->put($endpoint, $data);
-        if ($this->curlWrapper->getCode() === 200) {
+        $endpoint = $this->get_endpoint(self::ENDPOINT_MATERIAL);
+        $response = $this->curl_wrapper->put($endpoint, $data);
+        if ($this->curl_wrapper->get_code() === 200) {
             $response = json_decode($response, true);
         } else {
-            $response['error'] = $this->curlWrapper->getError();
+            $response['error'] = $this->curl_wrapper->get_error();
         }
 
         return $response;
     }
 
     /**
-     * Create material in Uplanner
+     * Create grade in Uplanner
      *
      * @param $data
      * @return array
@@ -76,22 +81,22 @@ class UplannerClientMaterial extends AbstractUplannerClient
     public function create($data): array
     {
         $response = [];
-        if (!$this->getToken()) {
+        if (!$this->get_token()) {
             return $response;
         }
-        $endpoint = $this->getEndpoint(self::ENDPOINT_MATERIAL);
-        $response = $this->curlWrapper->post($endpoint, $data);
-        if ($this->curlWrapper->getCode() === 200) {
+        $endpoint = $this->get_endpoint(self::ENDPOINT_MATERIAL);
+        $response = $this->curl_wrapper->post($endpoint, $data);
+        if ($this->curl_wrapper->get_code() === 200) {
             $response = json_decode($response, true);
         } else {
-            $response['error'] = $this->curlWrapper->getError();
+            $response['error'] = $this->curl_wrapper->get_error();
         }
 
         return $response;
     }
 
     /**
-     * Delete material in Uplanner
+     * Delete grade in Uplanner
      *
      * @param $data
      * @return array
@@ -100,15 +105,15 @@ class UplannerClientMaterial extends AbstractUplannerClient
     public function delete($data = null): array
     {
         $response = [];
-        if (!$this->getToken()) {
+        if (!$this->get_token()) {
             return $response;
         }
-        $endpoint = $this->getEndpoint(self::ENDPOINT_MATERIAL);
-        $response = $this->curlWrapper->delete($endpoint);
-        if ($this->curlWrapper->getCode() === 200) {
+        $endpoint = $this->get_endpoint(self::ENDPOINT_MATERIAL);
+        $response = $this->curl_wrapper->delete($endpoint);
+        if ($this->curl_wrapper->get_code() === 200) {
             $response = json_decode($response, true);
         } else {
-            $response['error'] = $this->curlWrapper->getError();
+            $response['error'] = $this->curl_wrapper->get_error();
         }
 
         return $response;

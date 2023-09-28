@@ -7,8 +7,8 @@
 
 //Librerias
 require_once '../../config.php';
-//Variables globales
-require_once('./classes/plugin_config/plugin_config.php');
+
+use local_uplannerconnect\plugin_config\plugin_config;
 
 $context = context_system::instance();
 

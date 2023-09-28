@@ -5,10 +5,10 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
+namespace local_uplannerconnect\domain\course;
 
-require_once(__DIR__ . '/../../application/service/DataValidator.php');
-require_once(__DIR__ . '/../../plugin_config/plugin_config.php');
-
+use local_uplannerconnect\application\service\DataValidator;
+use local_uplannerconnect\plugin_config\plugin_config;
 
 /**
    * @package uPlannerConnect

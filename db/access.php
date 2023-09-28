@@ -6,9 +6,7 @@
 */
 defined('MOODLE_INTERNAL') || die();
 
-//Variables globales
-require_once(__DIR__ .'/../classes/plugin_config/plugin_config.php');
-
+use local_uplannerconnect\plugin_config\plugin_config;
 
 /**
  * @param $capabilities
@@ -17,7 +15,7 @@ require_once(__DIR__ .'/../classes/plugin_config/plugin_config.php');
  * @description Define las capacidades para el plugin
 */
 $capabilities = array(
-    'local/'.plugin_config::PLUGIN_NAME.':index' => array(
+    plugin_config::PLUGIN_NAME.':index' => array(
         'riskbitmask' => 1,
         'contextlevel' => CONTEXT_SYSTEM,
         'captype' => 'write',

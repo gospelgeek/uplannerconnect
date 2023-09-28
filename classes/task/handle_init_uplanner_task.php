@@ -24,6 +24,8 @@
 
 namespace local_uplannerconnect\task;
 
+use local_uplannerconnect\infrastructure\api\handle_send_uplanner_task;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -48,26 +50,18 @@ class handle_init_uplanner_task extends \core\task\scheduled_task
      * @inerhitdoc
      */
     public function execute() {
-        global $CFG;
-        require_once(__DIR__. '/../infrastructure/api/HandleSendUplannerTask.php');
-
-        $timenow = time();
-        $starttime = microtime();
-
-        mtrace("Update cron started at: " . date('r', $timenow) . "\n");
-
+        $time_now = time();
+        $start_time = microtime();
+        mtrace("Update cron started at: " . date('r', $time_now) . "\n");
         try {
-        mtrace("Test");
-        // $handleUplannerTask = new HandleSendUplannerTask();
-        //$handleUplannerTask->procces(0); // 0 is state default
-        } catch (Exception $e) {
-            //TODO: current log
+            $handle_task = new handle_send_uplanner_task();
+            $handle_task->process(0, 1, 100, true);  // 0 is state default
+        } catch (\Exception $e) {
+            error_log('handle_init_uplanner_task - execute: ' . $e->getMessage() . "\n");
         }
-
-        // Taks completed.
-        mtrace("\n" . 'Cron completado a las: ' . date('r', time()) . "\n");
-        mtrace('Memoria utilizada: ' . display_size(memory_get_usage())."\n");
-        $difftime = microtime_diff($starttime, microtime());
-                    mtrace("Tarea programada tardó " . $difftime . " segundos para finalizar.\n");
+        mtrace("\n" . 'Cron completed at: ' . date('r', time()) . "\n");
+        mtrace('Memory used: ' . display_size(memory_get_usage())."\n");
+        $diff_time = microtime_diff($start_time, microtime());
+        mtrace("Scheduled task late " . $diff_time . " seconds to finish.\n");
     }
 }

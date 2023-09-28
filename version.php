@@ -8,10 +8,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-//Variables globales
-//require_once(__DIR__ . '/classes/plugin_config/plugin_config.php');
-
-
 $plugin->version = 2023092704; //año-mes-día-numeroVersion
 $plugin->component = 'local_uplannerconnect';
 
@@ -21,7 +17,7 @@ $plugin->maturity = MATURITY_ALPHA;
 
 $plugin->release = '1.0.0';
 $plugin->release = '1.0 (Build: 2023090300)';
-$plugin->author = 'Samuel Ramirez & Cristian Machado Mosquera & Daniel dorado & Isabela Rosero Obando';
+$plugin->author = 'Samuel Ramirez & Cristian Machado Mosquera & Daniel Dorado & Isabela Rosero Obando';
 $plugin->authorcontact = 'samuel.ramirez@correounivalle.edu.co & cristian.machado@correounivalle.edu.co & doradodaniel14@gmail.com & isabela.rosero@correounivalle.edu.co';
 
 

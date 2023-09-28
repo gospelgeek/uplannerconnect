@@ -6,9 +6,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-
-//Variables globales
-require_once(__DIR__ . '/EnumEtities.php');
+namespace local_uplannerconnect\domain;
 
 /**
    * @package uPlannerConnect

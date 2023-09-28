@@ -7,7 +7,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once(__DIR__ . '/../classes/plugin_config/plugin_config.php');
+use local_uplannerconnect\plugin_config\plugin_config;
 
 $observers = [];
 

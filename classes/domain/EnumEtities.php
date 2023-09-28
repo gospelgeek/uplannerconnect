@@ -6,9 +6,9 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-//Variables globales
-require_once(__DIR__ . '/../application/course/CourseNotesService.php');
-require_once(__DIR__ . '/../application/course/course_evaluation_structure.php');
+namespace local_uplannerconnect\domain;
+
+use local_uplannerconnect\application\course\CourseNotesService;
 
 /**
    * @package uPlannerConnect
@@ -24,7 +24,7 @@ class EnumEtities {
     public function __construct() {
 
         $this->Types = [
-            'course_notes' => 'CourseNotesService',
+            'course_notes' => CourseNotesService::class,
             'evaluation_structure' => 'course_evaluation_structure',
         ];
 

@@ -5,6 +5,8 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
+namespace local_uplannerconnect\plugin_config;
+
 /**
  * @package uPlannerConnect
  * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
@@ -45,8 +47,8 @@ class plugin_config {
 
     // Conultas a la base de datos.
     CONST QUERY_INSERT_COURSE_GRADES = "INSERT INTO %s (json, response, success , request_type) VALUES ('%s', '%s', '%s' , '%s')";
-    CONST QUERY_UPDATE_COURSE_GRADES = "UPDATE %s SET json = '%s', response = '%s', success = '%s' WHERE id = %s";
-    CONST QUERY_SELECT_COURSE_GRADES = "SELECT * FROM %s WHERE success = %s LIMIT %s OFFSET %s";
+    CONST QUERY_UPDATE_COURSE_GRADES = "UPDATE %s SET json = '%s', response = '%s', success = '%s' WHERE id = '%s'";
+    CONST QUERY_SELECT_COURSE_GRADES = "SELECT * FROM %s WHERE success = '%s' LIMIT '%s' OFFSET '%s'";
 
 
     // Estruturas de datos uPlanner.

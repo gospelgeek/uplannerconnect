@@ -5,6 +5,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
+namespace local_uplannerconnect\application\service;
 
 /**
  *  @package local_uplannerconnect
@@ -38,22 +39,23 @@ class DataValidator {
       *
       * @return bool 
     */
-    public function executeVerification(array $data) : bool {
+    public function executeVerification(array $data): bool
+    {
+        $result = false;
         try {
             // Verifica si el tipo de verificación es válido
             if (isset(self::TYPE_VERIFICATION[$data['type_verification']])) {
                 // Obtiene el nombre del método
                 $method = self::TYPE_VERIFICATION[$data['type_verification']];
                 // Llama al método de validación y devuelve el resultado
-                return $this->$method($data['value']);
-            } else {
-                // Tipo de verificación no válido
-                return false;
+                $result = $this->$method($data['value']);
             }
         }
         catch (Exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
+
+        return $result;
     }
 
 
@@ -65,12 +67,11 @@ class DataValidator {
       *
       * @return array
     */
-    public function verifyArrayKeyExist(array $data) : array {
-
+    public function verifyArrayKeyExist(array $data): array
+    {
+        //array a devolver
+        $arraySend = [];
         try {
-            //array a devolver
-            $arraySend = [];
-            
             //Verifica si tiene la key o asigna un valor por defecto
             foreach ($data['array_verification'] as $item) {
                 if (array_key_exists($item['name'], $data['data'])) {
@@ -89,13 +90,12 @@ class DataValidator {
                     $arraySend[$item['name']] = '';
                 }
             }
-        
-            return $arraySend;
        }
        catch (Exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
        }
 
+        return $arraySend;
     }
 
 
