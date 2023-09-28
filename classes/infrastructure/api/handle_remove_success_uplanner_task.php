@@ -31,6 +31,8 @@ class handle_remove_success_uplanner_task
             try {
                 $repository = new $repository_class($type);
                 $repository->delete_data_bd(RepositoryType::STATE_SEND);
+                $repository->delete_data_bd(RepositoryType::STATE_ERROR);
+                $repository->delete_data_bd(RepositoryType::STATE_DEFAULT);
             } catch (moodle_exception $e) {
                 error_log('handle_remove_success_uplanner_task - process: ' . $e->getMessage() . "\n");
             }

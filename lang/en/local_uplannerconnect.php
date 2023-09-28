@@ -18,7 +18,7 @@ $string['upllaner_email_subject'] = 'uPlanner information';
 
 // Tasks.
 $string['syncinituplannertask'] = 'Sync uPlanner Task';
-$string['syncerroruplannertask'] = 'Sync Error uPlanner Task';
+$string['syncerroruplannertask'] = 'Sync Log uPlanner Task';
 
 $string['pluginname'] = 'uPlannerConnect';
 $string['welcome'] = 'Welcome';
