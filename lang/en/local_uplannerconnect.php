@@ -13,6 +13,9 @@ $string['generalsettingsheading_desc'] = 'General settings for the plugin';
 // Access.
 $string['reports'] = 'Reports for the UplannerConnect plugin';
 
+// Email
+$string['upllaner_email_subject'] = 'uPlanner information';
+
 // Tasks.
 $string['syncinituplannertask'] = 'Sync uPlanner Task';
 $string['syncerroruplannertask'] = 'Sync Error uPlanner Task';

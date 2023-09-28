@@ -28,14 +28,16 @@ class email
         $user = new \stdClass();
         $user->email = $recipient_email;
         $admin = get_admin();
-        $subject = get_string('uPlanner information');
+        
+        $subject = get_string('upllaner_email_subject', 'local_uplannerconnect');
+    
         $body = 'Dear administrator,
 
         We are attaching information regarding the changes towards uPlanner.
 
         Best regards,
         Univalle';
-
+    
         return email_to_user(
             $admin,
             $user,

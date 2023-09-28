@@ -15,6 +15,9 @@ $string['generalsettingsheading_desc'] = 'General settings for the plugin';
 $string['syncinituplannertask'] = 'Sync uPlanner Task';
 $string['syncerroruplannertask'] = 'Sync Error uPlanner Task';
 
+// Email
+$string['upllaner_email_subject'] = 'uPlanner information';
+
 $string['pluginname'] = 'uPlannerConnect';
 $string['welcome'] = 'Bienvenido';
 $string['description'] = 'Tiene como objectivo extraer informacion del campus y enviarla a uPlaner.';
