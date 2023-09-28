@@ -8,6 +8,7 @@
 
 //Variables globales
 require_once(__DIR__ . '/../application/course/CourseNotesService.php');
+require_once(__DIR__ . '/../application/course/course_evaluation_structure.php');
 
 /**
    * @package uPlannerConnect
@@ -24,6 +25,7 @@ class EnumEtities {
 
         $this->Types = [
             'course_notes' => 'CourseNotesService',
+            'evaluation_structure' => 'course_evaluation_structure',
         ];
 
     }

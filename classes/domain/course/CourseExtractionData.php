@@ -29,7 +29,6 @@ class CourseExtractionData {
             'user_graded' => 'ResourceUserGraded',
             'grade_item_updated' => 'ResourceGradeItemUpdated',
             'grade_deleted' => 'ResourceUserGraded',
-            'grade_item_created' => 'ResourceGradeItemCreated',
             'grade_item_deleted' => 'ResourceGradeItemDeleted',
         ];
 
@@ -146,46 +145,6 @@ class CourseExtractionData {
                 'typeEvent' => 'grade_item_updated',
             ];
 
-
-        } catch (Exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
-        }
-
-    }
-
-
-    /**
-     *  @package uPlannerConnect
-     *  @description Retorna los datos del evento grade_item_created
-     *  @return array
-    */
-    private function ResourceGradeItemCreated(array $data) : array {
-
-        try {
-
-            //matar el proceso si no llega la información
-            if (empty($data['dataEvent'])) {
-                error_log('No le llego la información del evento grade_item_created');
-                return [];
-            }
-
-            $event = $data['dataEvent'];
-            $get_grade_item = $this->validator->isObjectData($event->get_grade_item());
-
-            $dataToSave = [
-                'sectionId' => $this->validator->isIsset($get_grade_item->courseid),
-                'evaluationGroupCode' => $this->validator->isIsset($get_grade_item->courseid),
-                'evaluationId' => $this->validator->isIsset($get_grade_item->courseid),
-                'evaluationName' => $this->validator->isIsset($get_grade_item->itemname),
-                'date' => $this->validator->isIsset($get_grade_item->timecreated),
-                'lastModifiedDate' =>$this->validator->isIsset($get_grade_item->timemodified),
-                'action' => 'delete'
-            ];
-
-            return [
-                'data' => $dataToSave,
-                'typeEvent' => 'grade_item_created',
-            ];
 
         } catch (Exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");

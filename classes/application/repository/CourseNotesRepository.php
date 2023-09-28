@@ -55,6 +55,7 @@ class CourseNotesRepository {
             'json' => $data['json'], 
             'response' => $data['response'],
             'success' => $data['success'],
+            'id' => $data['id'],
           ];
         
           //insertar datos en la base de datos
@@ -62,8 +63,9 @@ class CourseNotesRepository {
             plugin_config::QUERY_UPDATE_COURSE_GRADES, 
             plugin_config::TABLE_COURSE_GRADE, 
             json_encode($dataQuery['json']), 
-            $dataQuery['response'], 
-            $dataQuery['success']
+            json_encode($dataQuery['response']), 
+            $dataQuery['success'],
+            $dataQuery['id']
           );
 
           return $this->MoodleQueryHandler->executeQuery($query);
@@ -121,17 +123,30 @@ class CourseNotesRepository {
      * @description Obtiene los datos en la base de datos
      * @return void 
     */
-    public function getDataBD($state = self::STATE_DEFAULT) {
+    public function getDataBD(array $data) {
 
         try {
 
-          if (!is_numeric($state)) {
+          if (empty($data)) {
              error_log('Excepción capturada: ' . 'El estado debe ser un número' . "\n");
               return; 
           }
 
+          $dataQuery = [
+            'state' => self::STATE_DEFAULT,
+            'limit' => $data['limit'] || 100,
+            'offset' => $data['offset'] || 0,
+          ];
+
           //Obtener datos en la base de datos
-          $query =  sprintf(plugin_config::QUERY_SELECT_COURSE_GRADES, plugin_config::TABLE_COURSE_GRADE, $state);
+          $query =  sprintf(
+            plugin_config::QUERY_SELECT_COURSE_GRADES, 
+            plugin_config::TABLE_COURSE_GRADE, 
+            $dataQuery['state'],
+            $dataQuery['limit'],
+            $dataQuery['offset']
+          );
+
           return $this->MoodleQueryHandler->executeQuery($query);
 
         }
