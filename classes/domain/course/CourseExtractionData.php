@@ -5,11 +5,10 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
+namespace local_uplannerconnect\domain\course;
 
-require_once(__DIR__ . '/../repository/CourseNotesRepository.php');
-require_once(__DIR__ . '/../service/DataValidator.php');
-require_once(__DIR__ . '/../../plugin_config/plugin_config.php');
-
+use local_uplannerconnect\application\service\DataValidator;
+use local_uplannerconnect\plugin_config\plugin_config;
 
 /**
    * @package uPlannerConnect
@@ -19,22 +18,17 @@ require_once(__DIR__ . '/../../plugin_config/plugin_config.php');
 class CourseExtractionData {
 
     //Atributos
-    private $CourseNotesResource;
     private $typeEvent;
     private $validator;
 
     //Constructor
     public function __construct() {
  
-        //Instancia de la clase CourseNotesResource
-        $this->CourseNotesRepository = new CourseNotesRepository();
-
         //Inicializar la variable typeEvent
         $this->typeEvent = [
             'user_graded' => 'ResourceUserGraded',
             'grade_item_updated' => 'ResourceGradeItemUpdated',
             'grade_deleted' => 'ResourceUserGraded',
-            'grade_item_created' => 'ResourceGradeItemCreated',
             'grade_item_deleted' => 'ResourceGradeItemDeleted',
         ];
 
@@ -59,30 +53,14 @@ class CourseExtractionData {
                return $this->$typeEvent($data);
            }
            else {
-             error_log('Falta algun tipo de informcion del evento');
+             error_log('Falta algun tipo de informacion del evento');
              return [];
            }
       }
-      catch (Exception $e) {
+      catch (\Exception $e) {
          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
       }
 
-    }
-
-
-    /**
-     * @package uPlannerConnect
-     * @description Guarda los datos en la base de datos
-     * @return void 
-    */
-    public function saveResource(array $data) : void {
-        //matar el proceso si no llega la información
-        if (empty($data)) {
-            error_log('No le llego la información del evento');
-            return;
-        }
-
-        $this->CourseNotesRepository->saveDataBD($data);
     }
 
 
@@ -109,7 +87,7 @@ class CourseExtractionData {
             $gradeLoadItem = $this->validator->isObjectData($grade->load_grade_item());
         
             //información a guardar
-            $saveData = [
+            $dataToSave = [
                 'sectionId' => $this->validator->isIsset($grade->grade_item->courseid),
                 'studentCode' => $this->validator->isIsset($grade->userid),
                 'finalGrade' => $this->validator->isIsset((($getData['other'])['finalgrade'])),
@@ -124,11 +102,11 @@ class CourseExtractionData {
             ];
             
             return [
-                'get_data' => $saveData,
+                'data' => $dataToSave,
                 'typeEvent' => $data['typeEvent'],
             ];
 
-      } catch (Exception $e) {
+      } catch (\Exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
       }
 
@@ -154,7 +132,7 @@ class CourseExtractionData {
             $GradeItem = $this->validator->isObjectData($event->get_grade_item());
             
             //información a guardar
-            $saveData = [
+            $dataToSave = [
                 'sectionId' => $this->validator->isIsset($GradeItem->courseid),
                 'evaluationGroupCode' => $this->validator->isIsset($GradeItem->categoryid),
                 'date' => $this->validator->isIsset($GradeItem->timecreated),
@@ -163,52 +141,12 @@ class CourseExtractionData {
             ];
 
             return [
-                'get_data' => $saveData,
+                'data' => $dataToSave,
                 'typeEvent' => 'grade_item_updated',
             ];
 
 
-        } catch (Exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
-        }
-
-    }
-
-
-    /**
-     *  @package uPlannerConnect
-     *  @description Retorna los datos del evento grade_item_created
-     *  @return array
-    */
-    private function ResourceGradeItemCreated(array $data) : array {
-
-        try {
-
-            //matar el proceso si no llega la información
-            if (empty($data['dataEvent'])) {
-                error_log('No le llego la información del evento grade_item_created');
-                return [];
-            }
-
-            $event = $data['dataEvent'];
-            $get_grade_item = $this->validator->isObjectData($event->get_grade_item());
-
-            $saveData = [
-                'sectionId' => $this->validator->isIsset($get_grade_item->courseid),
-                'evaluationGroupCode' => $this->validator->isIsset($get_grade_item->courseid),
-                'evaluationId' => $this->validator->isIsset($get_grade_item->courseid),
-                'evaluationName' => $this->validator->isIsset($get_grade_item->itemname),
-                'date' => $this->validator->isIsset($get_grade_item->timecreated),
-                'lastModifiedDate' =>$this->validator->isIsset($get_grade_item->timemodified),
-                'action' => 'delete'
-            ];
-
-            return [
-                'get_data' => $saveData,
-                'typeEvent' => 'grade_item_created',
-            ];
-
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
 
@@ -233,18 +171,18 @@ class CourseExtractionData {
             $event = $data['dataEvent'];
             $gradeItem = $this->validator->isObjectData($event->get_grade_item());
 
-            $saveData = [
+            $dataToSave = [
                 'sectionId' => $this->validator->isIsset($gradeItem->courseid),
                 'evaluationName' => $this->validator->isIsset($gradeItem->itemname),
                 'action' => 'delete'
             ];
             
             return [
-                'get_data' => $saveData,
+                'data' => $dataToSave,
                 'typeEvent' => 'grade_item_deleted',
             ];
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
     }

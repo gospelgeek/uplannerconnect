@@ -6,10 +6,12 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(__DIR__ . '/../client/UplannerClientAnnouncement.php');
-require_once(__DIR__ . '/../client/UplannerClientEvaluationStructure.php');
-require_once(__DIR__ . '/../client/UplannerClientGrade.php');
-require_once(__DIR__ . '/../client/UplannerClientMaterial.php');
+namespace local_uplannerconnect\infrastructure\api\factory;
+
+use local_uplannerconnect\infrastructure\api\client\uplanner_client_announcement;
+use local_uplannerconnect\infrastructure\api\client\uplanner_client_evaluation_structure;
+use local_uplannerconnect\infrastructure\api\client\uplanner_client_grade;
+use local_uplannerconnect\infrastructure\api\client\uplanner_client_material;
 
 /**
  * @package uPlannerConnect
@@ -17,7 +19,7 @@ require_once(__DIR__ . '/../client/UplannerClientMaterial.php');
  * @author Daniel Dorado <doradodaniel14@gmail.com>
  * @description Contiene los tipos de clientes en Uplanner
  */
-class UplannerClientType
+class uplanner_client_type
 {
     const MATERIAL = 'material';
     const GRADE = 'grade';
@@ -25,10 +27,10 @@ class UplannerClientType
     const EVALUATION_STRUCTURE = 'evaluation_structure';
 
     const CLIENT_TYPES = [
-        'material' => UplannerClientMaterial::class,
-        'grade' => UplannerClientGrade::class,
-        'announcement' => UplannerClientAnnouncement::class,
-        'evaluation_structure' => UplannerClientEvaluationStructure::class
+        'material' => uplanner_client_material::class,
+        'grade' => uplanner_client_grade::class,
+        'announcement' => uplanner_client_announcement::class,
+        'evaluation_structure' => uplanner_client_evaluation_structure::class
     ];
 
     /**
@@ -37,7 +39,7 @@ class UplannerClientType
      * @param $type
      * @return string
      */
-    public static function getClass($type): string
+    public static function get_class($type): string
     {
         return self::CLIENT_TYPES[$type];
     }

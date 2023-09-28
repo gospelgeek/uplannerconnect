@@ -6,9 +6,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-
-//Variables globales
-require_once(__DIR__ . '/EnumEtities.php');
+namespace local_uplannerconnect\domain;
 
 /**
    * @package uPlannerConnect
@@ -43,7 +41,7 @@ class ManagementFactory {
             else {
                 error_log("El método 'process' no existe en la clase EnumEtities.");
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('Excepción capturada: ' . $e->getMessage() . "\n");
         }
     }
