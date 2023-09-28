@@ -168,7 +168,7 @@ function grade_item_created($event) {
          "dataEvent" => $event,
          "typeEvent" => "grade_item_created",
          "dispatch" => "create",
-         "EnumEtities" => 'course_notes'
+         "EnumEtities" => 'evaluation_structure'
       ]);
 
       }
