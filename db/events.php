@@ -5,9 +5,14 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-defined('MOODLE_INTERNAL') || die();
+
+namespace local_uplannerconnect\infrastructure\event;
 
 use local_uplannerconnect\plugin_config\plugin_config;
+
+
+defined('MOODLE_INTERNAL') || die();
+
 
 $observers = [];
 
@@ -22,8 +27,7 @@ foreach (plugin_config::EVENTS_OBSERVERS as $eventData) {
    
     $observers[] = [
         'eventname' => $eventData['eventname'],
-        'includefile' => $eventData['includefile'],
-        'callback' => $callback,
+        'callback' => $eventData['includefile'].'::'.$callback,
     ];
     
 }

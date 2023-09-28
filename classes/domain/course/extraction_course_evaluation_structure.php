@@ -5,9 +5,10 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
+namespace local_uplannerconnect\domain\course;
 
-require_once(__DIR__ . '/../../application/service/DataValidator.php');
-require_once(__DIR__ . '/../../plugin_config/plugin_config.php');
+use local_uplannerconnect\application\service\DataValidator;
+use local_uplannerconnect\plugin_config\plugin_config;
 
 
 /**
@@ -54,7 +55,7 @@ class extraction_course_evaluation_structure {
              return [];
            }
       }
-      catch (Exception $e) {
+      catch (\Exception $e) {
          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
       }
 
@@ -91,7 +92,7 @@ class extraction_course_evaluation_structure {
                 'typeEvent' => 'grade_item_created',
             ];
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
 

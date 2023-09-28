@@ -8,11 +8,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2023092704; //año-mes-día-numeroVersion
+$plugin->version = 2023092800; //año-mes-día-numeroVersion
 $plugin->component = 'local_uplannerconnect';
 
 $plugin->requires = 2015030901; 
-$plugin->maturity = MATURITY_ALPHA;
+// $plugin->maturity = MATURITY_ALPHA;
 
 
 $plugin->release = '1.0.0';

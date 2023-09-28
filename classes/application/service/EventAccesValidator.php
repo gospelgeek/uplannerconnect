@@ -6,6 +6,8 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
+namespace local_uplannerconnect\application\service;
+
 /**
  *  
  *  Validaciones de los eventos
@@ -58,7 +60,7 @@ class EventAccesValidator {
             return ($eventExecute === $data[self::DATA_VERIFY_EVENT]);
             
         }
-        catch (Exception $e) {
+        catch (\Exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
     }

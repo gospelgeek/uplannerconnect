@@ -20,9 +20,10 @@ class plugin_config {
 
     // Nombre de las tablas.
     CONST TABLE_COURSE_GRADE = 'mdl_uplanner_grades';
+    CONST TABLE_COURSE_EVALUATION = 'mdl_uplanner_evaluation';
 
     // Rutas de los eventos.
-    CONST ROUTE_HANDLER_EVENT_1 = '/local/uplannerconnect/classes/infrastructure/event/handle_event_course_notes.php';
+    CONST ROUTE_HANDLER_EVENT_1 = 'local_uplannerconnect\infrastructure\event\handle_event_course_notes';
 
 
     // Configuración de los eventos. 
