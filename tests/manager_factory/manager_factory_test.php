@@ -10,7 +10,7 @@
 
 
 //Variables globales
-require_once(__DIR__ . '/../classes/domain/ManagementFactory.php');
+require_once(__DIR__ . '/../../classes/domain/ManagementFactory.php');
 
 //instantiateManagementFactory
 class manager_factory_test extends advanced_testcase {

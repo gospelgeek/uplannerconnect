@@ -9,7 +9,7 @@
 */
 
 //Variables globales
-require_once(__DIR__ . '/../classes/domain/course/CourseNotesService.php');
+require_once(__DIR__ . '/../../classes/domain/course/CourseNotesService.php');
 
 class traslation_course_test   extends advanced_testcase {
 

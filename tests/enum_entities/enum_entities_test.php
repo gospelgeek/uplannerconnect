@@ -5,7 +5,7 @@
  */
 
 // Incluir la clase a probar
-require_once(__DIR__ . '/../classes/domain/EnumEtities.php');
+require_once(__DIR__ . '/../../classes/domain/EnumEtities.php');
 
 class enum_entities_test extends advanced_testcase {
 
