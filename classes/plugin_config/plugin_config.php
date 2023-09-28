@@ -5,6 +5,8 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
+namespace local_uplannerconnect\plugin_config;
+
 /**
  * @package uPlannerConnect
  * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
@@ -12,84 +14,46 @@
 */
 class plugin_config {
 
-    //Variables globales
+    // Variables globales.
     CONST PLUGIN_NAME = 'uplannerconnect';
     CONST PLUGIN_NAME_LOCAL = 'local_uplannerconnect';
 
-    //Nombre de las tablas
-    CONST TABLE_COURSE_GRADE = 'mdl_uplanner_notes';
+    // Nombre de las tablas.
+    CONST TABLE_COURSE_GRADE = 'mdl_uplanner_grades';
+    CONST TABLE_COURSE_EVALUATION = 'mdl_uplanner_evaluation';
+    CONST TABLE_COURSE_MOODLE = 'mdl_course';
 
-    //Rutas de los eventos
-    CONST ROUTE_HANDLER_EVENT_1 = '/local/uplannerconnect/classes/infrastructure/event/handle_event_course_notes.php';
+    // Rutas de los eventos.
+    CONST ROUTE_HANDLER_EVENT_1 = 'local_uplannerconnect\infrastructure\event\handle_event_course_notes';
 
 
-    // Configuración de los eventos
+    // Configuración de los eventos. 
     CONST EVENTS_OBSERVERS = [
-        [
-            'eventname' => '\core\event\grade_item_updated',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
         [
             'eventname' => '\core\event\user_graded',
             'includefile' => self::ROUTE_HANDLER_EVENT_1,
         ],
-        [
-            'eventname' => '\core\event\grade_deleted',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
+        // [
+        //     'eventname' => '\core\event\grade_deleted',
+        //     'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        // ],
         [
             'eventname' => '\core\event\grade_item_created',
             'includefile' => self::ROUTE_HANDLER_EVENT_1,
         ],
-        [
-            'eventname' => '\core\event\grade_item_deleted',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\grade_letter_created',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\grade_letter_deleted',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\grade_letter_updated',
-            'includefile' =>  self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\scale_created',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\scale_deleted',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\scale_updated',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\competency_created',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\competency_deleted',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\competency_updated',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ]
+        // [
+        //     'eventname' => '\core\event\grade_item_deleted',
+        //     'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        // ]
     ];
 
-    //Conultas a la base de datos
-    CONST QUERY_INSERT_COURSE_GRADES = "INSERT INTO %s (json, response, success) VALUES ('%s', '%s', '%s')";
-    CONST QUERY_UPDATE_COURSE_GRADES = "UPDATE %s SET json = '%s', response = '%s', success = '%s' WHERE id = 1";
-    CONST QUERY_SELECT_COURSE_GRADES = "SELECT * FROM %s WHERE success = %s LIMIT 100";
+    // Conultas a la base de datos.
+    CONST QUERY_INSERT_COURSE_GRADES = "INSERT INTO %s (json, response, success , request_type) VALUES ('%s', '%s', '%s' , '%s')";
+    CONST QUERY_UPDATE_COURSE_GRADES = "UPDATE %s SET json = '%s', response = '%s', success = '%s' WHERE id = '%s'";
+    CONST QUERY_SELECT_COURSE_GRADES = "SELECT * FROM %s WHERE success = '%s' LIMIT '%s' OFFSET '%s'";
+    CONST QUERY_SHORNAME_COURSE_BY_ID = "SELECT shortname FROM %s WHERE id = '%s'";
 
-
-    //Estruturas de datos uPlanner
+    // Estruturas de datos uPlanner.
     CONST UPLANNER_GRADES = [
         ['name' => 'sectionId', 'type' => 'numeric'],
         ['name' => 'studentCode', 'type' => 'numeric'],
@@ -109,9 +73,19 @@ class plugin_config {
         ['name' => 'action', 'type' => 'string'],
     ];
 
+    // Estruturas de datos uPlanner.
+    CONST UPLANNER_EVALUATION_ESTRUTURE = [
+        ['name' => 'sectionId', 'type' => 'numeric'],
+        ['name' => 'evaluationGroupCode', 'type' => 'string'],
+        ['name' => 'evaluationGroupName', 'type' => 'string'],
+        ['name' => 'evaluationId', 'type' => 'numeric'],
+        ['name' => 'evaluationName', 'type' => 'string'],
+        ['name' => 'weight', 'type' => 'numeric'],
+        ['name' => 'action', 'type' => 'string'],
+    ];
 
-    //Estructuras de datos para la creacion
-    //De un Evento
+    // Estructuras de datos para la creacion.
+    // De un Evento.
     CONST CREATE_EVENT_DATA = [
         ['name' => 'dataEvent' , 'type' => 'object'],
         ['name' => 'typeEvent' , 'type' => 'string'],
