@@ -2,11 +2,17 @@
 /**
  * @package  local_uplanconnect
  * @group local_uplanconnect
- */
+*/
 
 // Incluir la clase a probar
-require_once(__DIR__ . '/../../classes/domain/EnumEtities.php');
+use local_uplannerconnect\domain\EnumEtities;
 
+/**
+ * Test case para la clase EnumEntities
+ * 
+ * @package  local_uplanconnect
+ * @author   Cristian Machado <cristian.machado@correounivalle.edu.co> 
+*/
 class enum_entities_test extends advanced_testcase {
 
     private $EnumEntities;
@@ -26,7 +32,7 @@ class enum_entities_test extends advanced_testcase {
             'EnumEntities' => 'course_notes',
         ];
 
-        $this->expectOutputString('CourseNotesService::proccess called');
+        $this->expectOutputString('course_grades_service::proccess called');
         $this->EnumEntities->process($data);
     }
 
@@ -52,7 +58,7 @@ class enum_entities_test extends advanced_testcase {
             'EnumEntities' => 'course_notes_invalid',
         ];
 
-        $this->expectOutputString("La clase CourseNotesServiceInvalid no tiene el método process.\n");
+        $this->expectOutputString("La clase course_grades_serviceInvalid no tiene el método process.\n");
         $this->EnumEntities->process($data);
     }
 
@@ -68,7 +74,7 @@ class enum_entities_test extends advanced_testcase {
         ];
 
         // V
-        $this->expectOutputString('CourseNotesService::proccess called with parameters: param1=value1, param2=value2');
+        $this->expectOutputString('course_grades_service::proccess called with parameters: param1=value1, param2=value2');
         $this->EnumEntities->process($data);
     }
 
@@ -112,7 +118,7 @@ class enum_entities_test extends advanced_testcase {
         ];
 
         // Verificar que se registra un mensaje de error en el log
-        $this->expectOutputString("Excepción capturada: Argument 1 passed to CourseNotesService::proccess() must be of the type string, array given\n");
+        $this->expectOutputString("Excepción capturada: Argument 1 passed to course_grades_service::proccess() must be of the type string, array given\n");
         $this->EnumEntities->process($data);
     }
 

@@ -8,7 +8,7 @@
 
 namespace local_uplannerconnect\domain;
 
-use local_uplannerconnect\application\course\CourseNotesService;
+use local_uplannerconnect\application\course\course_grades_service;
 use local_uplannerconnect\application\course\course_evaluation_structure;
 
 /**
@@ -24,7 +24,7 @@ class EnumEtities {
     public function __construct() {
 
         $this->Types = [
-            'course_notes' => CourseNotesService::class,
+            'course_notes' => course_grades_service::class,
             'evaluation_structure' => course_evaluation_structure::class,
         ];
 

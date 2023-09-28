@@ -18,7 +18,7 @@ use local_uplannerconnect\application\repository\CourseNotesRepository;
    * @author Daniel Dorado <doradodaniel14@gmail.com>
    * @description Instancia una entidad de acorde a la funcionalidad que se requiera
 */
-class CourseNotesService {
+class course_grades_service {
 
     //Atributos
     private $courseTraslationData;

@@ -1,18 +1,23 @@
 <?php 
 /**
+ * 
+ * prueba unitaria para verficar que se instancie la clase ManagementFactory
+ * y comportamiento con diferentes tipos de datos
+ * 
  * @package  local_uplanconnect
  * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
- * @des prueba unitaria para verficar que se instancie la clase ManagementFactory
- *      and comportamiento con diferentes tipos de datos
- * @see classes/infrastructure/event/handle_event_course_notes.php
  * @group local_uplanconnect
+ * 
 */
 
 
 //Variables globales
-require_once(__DIR__ . '/../../classes/domain/ManagementFactory.php');
+use local_uplannerconnect\domain\ManagementFactory;
 
-//instantiateManagementFactory
+
+/**
+ * Test case para la clase ManagementFactory 
+*/
 class manager_factory_test extends advanced_testcase {
 
     //Atributos
