@@ -100,7 +100,6 @@ class handle_send_uplanner_task
         $num_request_by_endpoint,
         $num_rows
     ) {
-        error_log("process_email!", 3, "/var/www/html/moodle/log/error.log");
         if ($num_request_by_endpoint <= 0 || $num_rows <= 0 ) {
             return;
         }

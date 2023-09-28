@@ -8,6 +8,7 @@
 namespace local_uplannerconnect\application\repository;
 
 use local_uplannerconnect\plugin_config\plugin_config;
+use moodle_exception;
 
 /**
    * @package uPlannerConnect
@@ -141,4 +142,24 @@ class CourseNotesRepository {
 
     }
 
+    /**
+     * Delete registers by field state
+     *
+     * @param $state
+     * @return bool
+     */
+    public function delete_data_bd($state): bool
+    {
+        $result = false;
+        try {
+            $result = $this->MoodleQueryHandler->delete_records(
+                'uplanner_grades',
+                ['success' => $state]
+            );
+        } catch (moodle_exception $e) {
+            error_log('delete_data_bd: ' . $e->getMessage() . "\n");
+        }
+
+        return $result;
+    }
 }
