@@ -57,7 +57,7 @@ class CourseExtractionData {
              return [];
            }
       }
-      catch (Exception $e) {
+      catch (\Exception $e) {
          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
       }
 
@@ -106,7 +106,7 @@ class CourseExtractionData {
                 'typeEvent' => $data['typeEvent'],
             ];
 
-      } catch (Exception $e) {
+      } catch (\Exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
       }
 
@@ -146,7 +146,7 @@ class CourseExtractionData {
             ];
 
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
 
@@ -182,7 +182,7 @@ class CourseExtractionData {
                 'typeEvent' => 'grade_item_deleted',
             ];
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
     }

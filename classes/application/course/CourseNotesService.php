@@ -21,7 +21,7 @@ use local_uplannerconnect\application\repository\CourseNotesRepository;
 class CourseNotesService {
 
     //Atributos
-    private $courseNotesTrasnform;
+    private $courseTraslationData;
     private $courseExtractionData;
     private $courseNotesRepository;
 
@@ -56,7 +56,7 @@ class CourseNotesService {
             $this->saveResource($dataTrasnform);
             error_log('UplannerConnect: Successful event registration -'. $data['typeEvent']. "\n");
         }
-        catch (Exception $e) {
+        catch (\Exception $e) {
             error_log('Excepción capturada: ' . $e->getMessage() . "\n");
         }
     }

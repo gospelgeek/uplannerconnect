@@ -51,7 +51,7 @@ class DataValidator {
                 $result = $this->$method($data['value']);
             }
         }
-        catch (Exception $e) {
+        catch (\Exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
 
@@ -91,7 +91,7 @@ class DataValidator {
                 }
             }
        }
-       catch (Exception $e) {
+       catch (\Exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
        }
 
@@ -113,7 +113,7 @@ class DataValidator {
             $property = $data['property'];
             return isset($getData->$property) ? $getData->$property : '';
         }
-        catch (Exception $e) {
+        catch (\Exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
     }
@@ -203,7 +203,7 @@ class DataValidator {
         
             return $boolean;
        }
-       catch (Exception $e) {
+       catch (\Exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
        }
 

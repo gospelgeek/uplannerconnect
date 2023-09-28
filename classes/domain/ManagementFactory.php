@@ -41,7 +41,7 @@ class ManagementFactory {
             else {
                 error_log("El método 'process' no existe en la clase EnumEtities.");
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             error_log('Excepción capturada: ' . $e->getMessage() . "\n");
         }
     }
