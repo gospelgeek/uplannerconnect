@@ -6,8 +6,6 @@
 */
 
 
-namespace local_uplannerconnect\infrastructure\event;
-
 use local_uplannerconnect\plugin_config\plugin_config;
 
 
