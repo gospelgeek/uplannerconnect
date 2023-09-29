@@ -36,7 +36,7 @@ class handle_event_course_notes {
     * @return  void
     * 
    */
-   public function user_graded($event) {
+   public static function user_graded($event) {
    
       try {
          //Validar el tipo de evento
@@ -81,7 +81,7 @@ class handle_event_course_notes {
     * @return void
     *  
    */
-   public function grade_deleted($event) {
+   public static function grade_deleted($event) {
       
       try {
          //Instanciar la clase ManagementFactory
@@ -107,7 +107,7 @@ class handle_event_course_notes {
     * @return void
     * 
    */
-   public function grade_item_created($event) {
+   public static function grade_item_created($event) {
             
       try {
       
@@ -143,7 +143,7 @@ class handle_event_course_notes {
     * @package uPlannerConnect
     * @description Lanza un handle cuando se borra un item de calificación 
    */
-   public function grade_item_deleted($event) {
+   public static function grade_item_deleted($event) {
          
       try {
          //  //Instanciar la clase ManagementFactory
