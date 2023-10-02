@@ -8,7 +8,7 @@
 
 namespace local_uplannerconnect\infrastructure\api;
 
-use local_uplannerconnect\application\repository\RepositoryType;
+use local_uplannerconnect\application\repository\repository_type;
 use local_uplannerconnect\infrastructure\api\client\abstract_uplanner_client;
 use local_uplannerconnect\infrastructure\api\factory\uplanner_client_factory;
 use local_uplannerconnect\infrastructure\email\email;
@@ -61,7 +61,7 @@ class handle_send_uplanner_task
         $num_rows = 100,
         $is_email = false
     ) {
-        foreach (RepositoryType::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
+        foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
             $repository = new $repository_class();
             $uplanner_client = $this->uplanner_client_factory->create($type);
             if ($is_email) {
@@ -126,7 +126,7 @@ class handle_send_uplanner_task
             //send email;
             $recipient_email = 'samuel.ramirez@correounivalle.edu.co';
             $response = $this->email->send($recipient_email, $this->file->get_path_file());
-            $status = $response ? RepositoryType::STATE_SEND : RepositoryType::STATE_ERROR;
+            $status = $response ? repository_type::STATE_SEND : repository_type::STATE_ERROR;
             foreach ($rows as $row) {
                 $dataQuery = [
                     'json' => $row->json,

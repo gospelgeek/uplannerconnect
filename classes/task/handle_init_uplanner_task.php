@@ -24,7 +24,7 @@
 
 namespace local_uplannerconnect\task;
 
-use local_uplannerconnect\application\repository\RepositoryType;
+use local_uplannerconnect\application\repository\repository_type;
 use local_uplannerconnect\infrastructure\api\handle_send_uplanner_task;
 use moodle_exception;
 
@@ -57,7 +57,7 @@ class handle_init_uplanner_task extends \core\task\scheduled_task
         mtrace("Update cron started at: " . date('r', $time_now) . "\n");
         try {
             $handle_task = new handle_send_uplanner_task();
-            $handle_task->process(RepositoryType::STATE_DEFAULT, 1, 100, true);
+            $handle_task->process(repository_type::STATE_DEFAULT, 1, 100, true);
         } catch (moodle_exception $e) {
             error_log('handle_init_uplanner_task - execute: ' . $e->getMessage() . "\n");
         }

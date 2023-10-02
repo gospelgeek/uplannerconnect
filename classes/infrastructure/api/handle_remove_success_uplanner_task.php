@@ -8,7 +8,7 @@
 
 namespace local_uplannerconnect\infrastructure\api;
 
-use local_uplannerconnect\application\repository\RepositoryType;
+use local_uplannerconnect\application\repository\repository_type;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die;
@@ -27,12 +27,12 @@ class handle_remove_success_uplanner_task
      * @return void
      */
     public function process() {
-        foreach (RepositoryType::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
+        foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
             try {
                 $repository = new $repository_class($type);
-                $repository->delete_data_bd(RepositoryType::STATE_SEND);
-                $repository->delete_data_bd(RepositoryType::STATE_ERROR);
-                $repository->delete_data_bd(RepositoryType::STATE_DEFAULT);
+                $repository->delete_data_bd(repository_type::STATE_SEND);
+                $repository->delete_data_bd(repository_type::STATE_ERROR);
+                $repository->delete_data_bd(repository_type::STATE_DEFAULT);
             } catch (moodle_exception $e) {
                 error_log('handle_remove_success_uplanner_task - process: ' . $e->getMessage() . "\n");
             }

@@ -1,76 +1,62 @@
 <?php
 /**
- * @package     uPlannerConnect
- * @copyright   Cristian Machado Mosquera <cristian.machado@correounivalle.edu.co>
+ * @package     local_uplannerconnect
+ * @copyright   Cristian Machado  <cristian.machado@correounivalle.edu.co>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
 namespace local_uplannerconnect\application\repository;
 
-
 use local_uplannerconnect\plugin_config\plugin_config;
+use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
-
 /**
- * 
  * Repositorio de datos de los cursos
- * 
- * @package local_uplannerconnectn
- * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
- * 
-*/
-class course_data_repository {
+ */
+class course_data_repository
+{
+    private $moodle_query_handler;
 
-    // Atributos.
-    private $moodleQueryHandler;
-
-    // Constructor.
     public function __construct() {
-        //Instancia de la clase MoodleQueryHandler
-        $this->moodleQueryHandler = new MoodleQueryHandler();
+        $this->moodle_query_handler = new moodle_query_handler();
     }
-
 
     /**
      * Trae el shortname de un curso
-     * 
-     * @package local_uplannerconnect
+     *
+     * @param $courseId
      * @return string
-    */
-    public function getCourseShortname($courseId) : string {
-
+     */
+    public function getCourseShortname($courseId) : string
+    {
+        $short_name = '';
         try {
-
-            //Verificar si el parámetro llega vacío
             if (empty($courseId)) {
-                return '';
+                return $short_name;
             }
 
-            //Traer la información
-            $query = sprintf(
+            //Ejecutar la consulta
+            $result = $this->moodle_query_handler->executeQuery(
+                sprintf(
                 plugin_config::QUERY_SHORNAME_COURSE_BY_ID,
                 plugin_config::TABLE_COURSE_MOODLE,
                 $courseId
+                )
             );
 
-            //Ejecutar la consulta
-            $result = $this->moodleQueryHandler->executeQuery($query);
-
             //Verificar si la información llega vacía
-            if (!isset($result) || empty($result)) { return ''; }
-            //Obtener el shortname
-            $shortname = reset($result);
-            //Verificar si el resultado llega vacío
-            if (!isset($shortname) || empty($shortname)) { return ''; }
-
-            return $shortname->shortname;
+            if (!empty($result)) {
+                $shortname = reset($result);
+                if (!empty($shortname)) {
+                    $short_name = $shortname->shortname;
+                }
+            }
         }
-        catch (\Exception $e) {
+        catch (moodle_exception $e) {
             error_log('Error al traer el shortname del curso: ' . $e->getMessage());
         }
-        return '';
+        return $short_name;
     }
-
 }

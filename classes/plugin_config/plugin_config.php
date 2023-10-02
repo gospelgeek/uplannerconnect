@@ -90,7 +90,7 @@ class plugin_config {
         ['name' => 'dataEvent' , 'type' => 'object'],
         ['name' => 'typeEvent' , 'type' => 'string'],
         ['name' => 'dispatch' , 'type' => 'string'],
-        ['name' => 'EnumEtities' , 'type' => 'string'],
+        ['name' => 'enum_etities' , 'type' => 'string'],
     ];
 
 }

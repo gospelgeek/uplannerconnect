@@ -8,8 +8,8 @@
 
 namespace local_uplannerconnect\infrastructure\event;
 
-use local_uplannerconnect\domain\ManagementFactory;
-use local_uplannerconnect\application\service\EventAccesValidator;
+use local_uplannerconnect\domain\management_factory;
+use local_uplannerconnect\application\service\event_access_validator;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -55,12 +55,12 @@ class handle_event_course_notes {
                //valida si la facultad tiene acceso
                if (!validateAccesFaculty($event)) { return; }
 
-                  //Instanciar la clase ManagementFactory
-                  instantiateManagementFactory([
+                  //Instanciar la clase management_factory
+                  instantiatemanagement_factory([
                      "dataEvent" => $event,
                      "typeEvent" => "user_graded",
                      "dispatch" => "update",
-                     "EnumEtities" => 'course_notes'
+                     "enum_etities" => 'course_notes'
                   ]);
             }
 
@@ -84,12 +84,12 @@ class handle_event_course_notes {
    public static function grade_deleted($event) {
       
       try {
-         //Instanciar la clase ManagementFactory
-         // instantiateManagementFactory([
+         //Instanciar la clase management_factory
+         // instantiatemanagement_factory([
          //    "dataEvent" => $event,
          //    "typeEvent" => "grade_deleted",
          //    "dispatch" => "delete",
-         //    "EnumEtities" => 'course_notes'
+         //    "enum_etities" => 'course_notes'
          // ]);
 
       } 
@@ -122,12 +122,12 @@ class handle_event_course_notes {
          //valida si la facultad tiene acceso
          if (!validateAccesFaculty($event)) { return; }
 
-         //Instanciar la clase ManagementFactory
-         instantiateManagementFactory([
+         //Instanciar la clase management_factory
+         instantiatemanagement_factory([
             "dataEvent" => $event,
             "typeEvent" => "grade_item_created",
             "dispatch" => "create",
-            "EnumEtities" => 'evaluation_structure'
+            "enum_etities" => 'evaluation_structure'
          ]);
 
          }
@@ -146,12 +146,12 @@ class handle_event_course_notes {
    public static function grade_item_deleted($event) {
          
       try {
-         //  //Instanciar la clase ManagementFactory
-         //  instantiateManagementFactory([
+         //  //Instanciar la clase management_factory
+         //  instantiatemanagement_factory([
          //    "dataEvent" => $event,
          //    "typeEvent" => "grade_item_deleted",
          //    "dispatch" => "delete",
-         //    "EnumEtities" => 'course_notes'
+         //    "enum_etities" => 'course_notes'
          //  ]);
       } 
       catch (\Exception $e) {
@@ -172,19 +172,19 @@ class handle_event_course_notes {
  * @return void
  *
 */
-function instantiateManagementFactory(array $data) {
+function instantiatemanagement_factory(array $data) {
    try {
       
       // Verificar si se proporcionan datos válidos
       if (empty($data['dataEvent']) || empty($data['typeEvent']) || 
-          empty($data['dispatch'])  || empty($data['EnumEtities'])) 
+          empty($data['dispatch'])  || empty($data['enum_etities'])) 
       {
          error_log("Error en los datos proporcionados: algunos campos están vacíos.");
          return;
       }
 
-      // Instanciar la clase ManagementFactory
-      $ManageEntity = new ManagementFactory();
+      // Instanciar la clase management_factory
+      $ManageEntity = new management_factory();
 
       // Verificar si existe el método
       if (method_exists($ManageEntity, 'create')) {
@@ -193,10 +193,10 @@ function instantiateManagementFactory(array $data) {
                "dataEvent" => $data['dataEvent'],
                "typeEvent" => $data['typeEvent'],
                "dispatch" => $data['dispatch'],
-               "EnumEtities" => $data['EnumEtities']
+               "enum_etities" => $data['enum_etities']
          ]);
       } else {
-         error_log("El método 'create' no existe en la clase ManagementFactory.");
+         error_log("El método 'create' no existe en la clase management_factory.");
       }
 
    } catch (\Exception $e) {
@@ -216,8 +216,8 @@ function instantiateManagementFactory(array $data) {
 */
 function validateAccessTypeEvent(array $data) : bool {
    try {
-      $eventAccesValidator = new EventAccesValidator();
-      return $eventAccesValidator->validateTypeEvent($data);
+      $event_access_validator = new event_access_validator();
+      return $event_access_validator->validateTypeEvent($data);
    }
    catch (\Exception $e) {
       error_log('Excepción capturada: ',  $e->getMessage(), "\n");
@@ -234,8 +234,8 @@ function validateAccessTypeEvent(array $data) : bool {
 */
 function validateAccesFaculty($data) : bool {
    try {
-      //Instanciar la clase EventAccesValidator
-      $eventAccesValidator = new EventAccesValidator();
+      //Instanciar la clase event_access_validator
+      $event_access_validator = new event_access_validator();
       //Obtener los datos del evento
       $eventData = $data->get_data();
       
@@ -243,7 +243,7 @@ function validateAccesFaculty($data) : bool {
       if (!array_key_exists('courseid', $eventData)) { return false; }
      
       //validar si la facultad tiene acceso
-      return $eventAccesValidator->validateAccessByFaculty($eventData['courseid']);
+      return $event_access_validator->validateAccessByFaculty($eventData['courseid']);
 
    }
    catch (\Exception $e) {

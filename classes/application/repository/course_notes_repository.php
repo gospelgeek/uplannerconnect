@@ -1,7 +1,7 @@
 <?php
 /**
- * @package     local_uplannerconnec
- * @copyright   Cristian Machado <cristian.machado@correounivalle.edu.co>
+ * @package     local_uplannerconnect
+ * @athor       Cristian Machado <cristian.machado@correounivalle.edu.co>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
@@ -11,19 +11,20 @@ use local_uplannerconnect\plugin_config\plugin_config;
 use moodle_exception;
 
 /**
-   * Instancia una entidad de acorde a la funcionalidad que se requiera.
+   * Instancia una entidad de acorde a la funcionalidad que se requiera
 */
-class course_evaluation_structure_repository
+class course_notes_repository
 {
-    const STATE_DEFAULT = 0; //Estado por defecto
+    const STATE_DEFAULT = 0;  //Estado por defecto
     const STATE_SEND = 1; //Estado de envío
     const STATE_ERROR = 2; //Estado de error
 
     private $moodle_query_handler;
+    private $plugin_config;
 
     public function __construct() {
-        //Instancia de la clase moodle_query_handler
         $this->moodle_query_handler = new moodle_query_handler();
+        $this->plugin_config = new plugin_config();
     }
 
     /**
@@ -36,15 +37,15 @@ class course_evaluation_structure_repository
     {
         try {
             if (empty($data)) {
-              error_log('Excepción capturada: ' . 'No hay datos para actualizar' . "\n");
-              return;
+                error_log('Excepción capturada: ' . 'No hay datos para actualizar' . "\n");
+                return;
             }
 
             //insertar datos en la base de datos
             $this->moodle_query_handler->executeQuery(
                 sprintf(
                 plugin_config::QUERY_UPDATE_COURSE_GRADES,
-                plugin_config::TABLE_COURSE_EVALUATION,
+                plugin_config::TABLE_COURSE_GRADE,
                 json_encode($data['json']),
                 json_encode($data['response']),
                 $data['success'],
@@ -67,7 +68,7 @@ class course_evaluation_structure_repository
     {
         try {
             if (empty($data)) {
-              error_log('Excepción capturada: ' . 'No hay datos para guardar' . "\n");
+             error_log('Excepción capturada: ' . 'No hay datos para guardar' . "\n");
               return;
             }
 
@@ -75,7 +76,7 @@ class course_evaluation_structure_repository
             $this->moodle_query_handler->executeQuery(
                 sprintf(
                 plugin_config::QUERY_INSERT_COURSE_GRADES,
-                plugin_config::TABLE_COURSE_EVALUATION,
+                plugin_config::TABLE_COURSE_GRADE,
                 json_encode($data),
                 '{"status": "Default response"}',
                 0,
@@ -99,7 +100,7 @@ class course_evaluation_structure_repository
         $dataQuery = [];
         try {
             if (empty($data)) {
-              error_log('Excepción capturada: ' . 'El estado debe ser un número' . "\n");
+             error_log('Excepción capturada: ' . 'El estado debe ser un número' . "\n");
               return $dataQuery;
             }
 
@@ -107,7 +108,7 @@ class course_evaluation_structure_repository
             $dataQuery = $this->moodle_query_handler->executeQuery(
                 sprintf(
                   plugin_config::QUERY_SELECT_COURSE_GRADES,
-                plugin_config::TABLE_COURSE_EVALUATION,
+                plugin_config::TABLE_COURSE_GRADE,
                   $data['state'],
                   $data['limit'],
                   $data['offset']
@@ -118,5 +119,25 @@ class course_evaluation_structure_repository
           error_log('Excepción capturada: ' . $e->getMessage() . "\n");
         }
         return $dataQuery;
+    }
+
+    /**
+     * Delete registers by field state
+     *
+     * @param $state
+     * @return bool
+     */
+    public function delete_data_bd($state): bool
+    {
+        $result = false;
+        try {
+            $result = $this->moodle_query_handler->delete_records(
+                'uplanner_grades',
+                ['success' => $state]
+            );
+        } catch (moodle_exception $e) {
+            error_log('delete_data_bd: ' . $e->getMessage() . "\n");
+        }
+        return $result;
     }
 }

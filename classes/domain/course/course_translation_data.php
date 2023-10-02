@@ -1,112 +1,95 @@
 <?php
 /**
- * @package     uPlannerConnect
- * @copyright   cristian machado mosquera <cristian.machado@correounivalle.edu.co>
+ * @package     local_uplannerconnect
+ * @copyright   Cristian Machado <cristian.machado@correounivalle.edu.co>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
 namespace local_uplannerconnect\domain\course;
 
-use local_uplannerconnect\application\service\DataValidator;
+use local_uplannerconnect\application\service\data_validator;
 use local_uplannerconnect\plugin_config\plugin_config;
+use moodle_exception;
 
 /**
-   * 
    * Instancia una entidad de acorde a la funcionalidad que se requiera
-   * 
-   * @package local_uplannerconnect
-   * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
-   *  
 */
-class CourseTraslationData {
-
-    //Atributos
+class course_translation_data
+{
     private $typeTransform;
     private $validator;
 
-    //Constructor
     public function __construct() {
-
-        //Inicializar la variable typeTransform
         $this->typeTransform = [
             'user_graded' => 'convertDataGrade',
             'grade_item_updated' => 'convertDataGrade',
             'grade_deleted' => 'convertDataGrade',
             'grade_item_deleted' => 'convertDataGrade',
         ];
-
-        //instancia la clase DataValidator
-        $this->validator = new DataValidator();
-        
+        $this->validator = new data_validator();
     }
 
     /**
      * Convierte los datos acorde al evento que se requiera
-     * 
-     * @package uPlannerConnect
+     *
+     * @param array $data
      * @return array
-    */
-    public function converDataJsonUplanner(array $data) {
-
+     */
+    public function converDataJsonUplanner(array $data): array
+    {
+        $arraySend = [];
         try {
-
             //Traer la información
             $typeTransform = $this->typeTransform[$data['typeEvent']];
             //verificar si existe el método
             if (method_exists($this, $typeTransform)) {
-                return $this->$typeTransform($data);
+                $arraySend = $this->$typeTransform($data);
             }
-            return [];
-
         }
-        catch (\Exception $e) {
+        catch (moodle_exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
-
+        return $arraySend;
     }
-    
 
     /**
      * Transforma los datos del evento en el formato que requiere uPlanner
-     * 
-     * @package local_uplannerconnect
+     *
+     * @param array $data
      * @return array
-    */
-    private function convertDataGrade(array $data) : array {
-
+     */
+    private function convertDataGrade(array $data) : array
+    {
+        $arraySend = [];
         try {
-
             //Traer la información
             $getData = $data['data'];
-
             //return data traslate
-            return $this->createCommonDataArray($getData);
-
-       }
-       catch (\Exception $e) {
+            $arraySend = $this->createCommonDataArray($getData);
+        }
+        catch (moodle_exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
-       }
-
+        }
+        return $arraySend;
     }
-
 
     /**
      *  Crea un array con la estructura que requiere uPlanner
-     * 
-     *  @package local_uplannerconnect
-     *  @return array
-    */
-    private function createCommonDataArray(array $data) : array {
-
+     *
+     * @param array $data
+     * @return array
+     */
+    private function createCommonDataArray(array $data) : array
+    {
+        $arraySend = [];
         try {
-            
             $dataSend = $this->validator->verifyArrayKeyExist([ 
                 'array_verification' => plugin_config::UPLANNER_GRADES,
                 'data' => $data 
             ]);
             
             //Sacar la información del evento
-            return [
+            $arraySend = [
                 'sectionId' => $dataSend['sectionId'],
                 'studentCode' => $dataSend['studentCode'],
                 'finalGrade' =>  $dataSend['finalGrade'],
@@ -130,14 +113,11 @@ class CourseTraslationData {
                 "lastModifiedDate" => $dataSend['lastModifiedDate'],
                 "action" =>  $dataSend['action']
             ];
-
       }
-      catch (\Exception $e) {
+      catch (moodle_exception $e) {
            return [];
            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
       }
-
+      return $arraySend;
     }
-
-
 }
