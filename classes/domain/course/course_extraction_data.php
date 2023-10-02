@@ -1,82 +1,70 @@
 <?php
 /**
- * @package     uPlannerConnect
- * @copyright   cristian machado mosquera <cristian.machado@correounivalle.edu.co>
+ * @package     local_uplannerconnect
+ * @copyright   Cristian Machado <cristian.machado@correounivalle.edu.co>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
 namespace local_uplannerconnect\domain\course;
 
-use local_uplannerconnect\application\service\DataValidator;
+use local_uplannerconnect\application\service\data_validator;
 use local_uplannerconnect\plugin_config\plugin_config;
+use moodle_exception;
 
 /**
-   * @package uPlannerConnect
-   * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
-   * @description Instancia una entidad de acorde a la funcionalidad que se requiera
+   * Instancia una entidad de acorde a la funcionalidad que se requiera
 */
-class CourseExtractionData {
-
-    //Atributos
+class course_extraction_data
+{
     private $typeEvent;
     private $validator;
-
-    //Constructor
+    
     public function __construct() {
- 
-        //Inicializar la variable typeEvent
         $this->typeEvent = [
             'user_graded' => 'ResourceUserGraded',
             'grade_item_updated' => 'ResourceGradeItemUpdated',
             'grade_deleted' => 'ResourceUserGraded',
             'grade_item_deleted' => 'ResourceGradeItemDeleted',
         ];
-
-        //instancia la clase DataValidator
-        $this->validator = new DataValidator();
-
+        $this->validator = new data_validator();
     }
 
     /**
-     * @package uPlannerConnect
-     * @description Retorna los datos acorde al evento que se requiera
+     * Retorna los datos acorde al evento que se requiera
+     *
+     * @param array $data
      * @return array
-    */
-    public function getResource(array $data) : array {
-
+     */
+    public function getResource(array $data) : array
+    {
+      $arraySend = [];  
       try {
-           if ($this->validator->verificateKeyArrayBoolean([
+            if ($this->validator->verificateKeyArrayBoolean([
                'array_verification' => plugin_config::CREATE_EVENT_DATA,
                'get_data' => $data,
-           ])) {
+            ])) {
                $typeEvent = $this->typeEvent[$data['typeEvent']];
-               return $this->$typeEvent($data);
-           }
-           else {
-             error_log('Falta algun tipo de informacion del evento');
-             return [];
-           }
+                $arraySend = $this->$typeEvent($data);
+            }
       }
-      catch (\Exception $e) {
+      catch (moodle_exception $e) {
          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
       }
-
+      return $arraySend;
     }
 
-
     /**
-     *  @package uPlannerConnect
-     *  @description Retorna los datos del evento user_graded
-     *  @return array
-    */
-    private function ResourceUserGraded(array $data) : array {
-        
+     * Retorna los datos del evento user_graded
+     * @param array $data
+     * @return array
+     */
+    private function ResourceUserGraded(array $data) : array
+    {
+       $arraySend = [];  
        try {
-
-            //matar el proceso si no llega la información
             if (empty($data['dataEvent'])) {
                 error_log('No le llego la información del evento user_graded');
-                return [];
+                return $arraySend;
             }
              
             //Traer la información
@@ -85,7 +73,7 @@ class CourseExtractionData {
             $grade = $this->validator->isObjectData($event->get_grade());
             $gradeRecordData = $this->validator->isObjectData($grade->get_record_data());
             $gradeLoadItem = $this->validator->isObjectData($grade->load_grade_item());
-        
+            
             //información a guardar
             $dataToSave = [
                 'sectionId' => $this->validator->isIsset($grade->grade_item->courseid),
@@ -100,34 +88,32 @@ class CourseExtractionData {
                 'lastModifiedDate' => $this->validator->isIsset($gradeLoadItem->timemodified),
                 'action' => $data['dispatch'],
             ];
-            
-            return [
+
+            $arraySend = [
                 'data' => $dataToSave,
                 'typeEvent' => $data['typeEvent'],
             ];
-
-      } catch (\Exception $e) {
+      } catch (moodle_exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
       }
-
+      return $arraySend;
     }
 
-
     /**
-     * @package uPlannerConnect
-     * @description Retorna los datos del evento grade_item_updated
+     * Retorna los datos del evento grade_item_updated
+     *
+     * @param array $data
      * @return array
-    */
-    private function ResourceGradeItemUpdated(array $data)  : array {
-
+     */
+    private function ResourceGradeItemUpdated(array $data)  : array
+    {
+        $arraySend = [];
         try {
-
-            //matar el proceso si no llega la información
             if (empty($data['dataEvent'])) {
                 error_log('No le llego la información del evento grade_item_updated');
-                return [];
+                return $arraySend;
             }
-
+            
             $event = $data['dataEvent'];
             $GradeItem = $this->validator->isObjectData($event->get_grade_item());
             
@@ -140,51 +126,47 @@ class CourseExtractionData {
                 'action' => 'update'
             ];
 
-            return [
+            $arraySend = [
                 'data' => $dataToSave,
                 'typeEvent' => 'grade_item_updated',
             ];
-
-
-        } catch (\Exception $e) {
+        } catch (moodle_exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
-
+        return $arraySend;
     }
 
-    
     /**
-     *  @package uPlannerConnect
-     *  @description Retorna los datos del evento grade_item_deleted
-     *  @return array
-    */
-    private function ResourceGradeItemDeleted(array $data) : array {
-            
+     * Retorna los datos del evento grade_item_deleted
+     *
+     * @param array $data
+     * @return array
+     */
+    private function ResourceGradeItemDeleted(array $data) : array
+    {
+        $arraySend = [];        
         try {
-
-            //matar el proceso si no llega la información
             if (empty($data['dataEvent'])) {
                 error_log('No le llego la información del evento grade_item_deleted');
-                return [];
+                return $arraySend;
             }
-
+            
             $event = $data['dataEvent'];
             $gradeItem = $this->validator->isObjectData($event->get_grade_item());
-
+            
             $dataToSave = [
                 'sectionId' => $this->validator->isIsset($gradeItem->courseid),
                 'evaluationName' => $this->validator->isIsset($gradeItem->itemname),
                 'action' => 'delete'
             ];
-            
-            return [
+
+            $arraySend = [
                 'data' => $dataToSave,
                 'typeEvent' => 'grade_item_deleted',
             ];
-
-        } catch (\Exception $e) {
+        } catch (moodle_exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
+        return $arraySend;
     }
-
 }
