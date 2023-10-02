@@ -22,6 +22,7 @@ class plugin_config {
     CONST TABLE_COURSE_GRADE = 'mdl_uplanner_grades';
     CONST TABLE_COURSE_EVALUATION = 'mdl_uplanner_evaluation';
     CONST TABLE_COURSE_MOODLE = 'mdl_course';
+    const TABLE_LOG = "mdl_uplanner_log";
 
     // Rutas de los eventos.
     CONST ROUTE_HANDLER_EVENT_1 = 'local_uplannerconnect\infrastructure\event\handle_event_course_notes';
@@ -52,6 +53,8 @@ class plugin_config {
     CONST QUERY_UPDATE_COURSE_GRADES = "UPDATE %s SET json = '%s', response = '%s', success = '%s' WHERE id = '%s'";
     CONST QUERY_SELECT_COURSE_GRADES = "SELECT * FROM %s WHERE success = '%s' LIMIT '%s' OFFSET '%s'";
     CONST QUERY_SHORNAME_COURSE_BY_ID = "SELECT shortname FROM %s WHERE id = '%s'";
+    CONST QUERY_COUNT_LOGS = "SELECT count(id) FROM %s";
+    const QUERY_INSERT_LOGS = "INSERT INTO %s (date, num_grades, num_materials, num_anouncements) VALUES ('%s', '%s', '%s' , '%s')";
 
     // Estruturas de datos uPlanner.
     CONST UPLANNER_GRADES = [
@@ -90,7 +93,7 @@ class plugin_config {
         ['name' => 'dataEvent' , 'type' => 'object'],
         ['name' => 'typeEvent' , 'type' => 'string'],
         ['name' => 'dispatch' , 'type' => 'string'],
-        ['name' => 'EnumEtities' , 'type' => 'string'],
+        ['name' => 'enum_etities' , 'type' => 'string'],
     ];
 
 }

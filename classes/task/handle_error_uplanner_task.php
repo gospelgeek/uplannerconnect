@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * @package uPlannerConnect
  * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
  * @author Daniel Dorado <doradodaniel14@gmail.com>
- * @description Tarea queelimina registros en estado completado RepositoryType::STATE_SEND
+ * @description Tarea queelimina registros en estado completado repository_type::STATE_SEND
  */
 class handle_error_uplanner_task extends \core\task\scheduled_task
 {
