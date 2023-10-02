@@ -30,6 +30,7 @@ class handle_remove_success_uplanner_task
         foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
             try {
                 $repository = new $repository_class($type);
+                $repository->add_log_data();
                 $repository->delete_data_bd(repository_type::STATE_SEND);
                 $repository->delete_data_bd(repository_type::STATE_ERROR);
                 $repository->delete_data_bd(repository_type::STATE_DEFAULT);

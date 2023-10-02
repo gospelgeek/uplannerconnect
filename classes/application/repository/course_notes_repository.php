@@ -107,11 +107,11 @@ class course_notes_repository
             //Obtener datos en la base de datos
             $dataQuery = $this->moodle_query_handler->executeQuery(
                 sprintf(
-                  plugin_config::QUERY_SELECT_COURSE_GRADES,
-                plugin_config::TABLE_COURSE_GRADE,
-                  $data['state'],
-                  $data['limit'],
-                  $data['offset']
+                    plugin_config::QUERY_SELECT_COURSE_GRADES,
+                    plugin_config::TABLE_COURSE_GRADE,
+                    $data['state'],
+                    $data['limit'],
+                    $data['offset']
                 )
             );
         }
@@ -139,5 +139,39 @@ class course_notes_repository
             error_log('delete_data_bd: ' . $e->getMessage() . "\n");
         }
         return $result;
+    }
+
+    /**
+     * Delete registers by field state
+     *
+     * @param $state
+     * @return void
+     */
+    public function add_log_data() : void
+    {
+        try {
+            $result = $this->moodle_query_handler->executeQuery(
+                sprintf(
+                    plugin_config::QUERY_COUNT_LOGS,
+                    plugin_config::TABLE_COURSE_GRADE,
+                )
+            );
+
+            $numGrades = reset($result);
+            $timestamp = time();
+
+            $insertLog = $this->moodle_query_handler->executeQuery(
+                sprintf(
+                    plugin_config::QUERY_INSERT_LOGS,
+                    plugin_config::TABLE_LOG,
+                    $timestamp,
+                    $numGrades->count,
+                    0,
+                    0
+                )
+            );
+        } catch (moodle_exception $e) {
+            error_log('delete_data_bd: ' . $e->getMessage() . "\n");
+        }
     }
 }
