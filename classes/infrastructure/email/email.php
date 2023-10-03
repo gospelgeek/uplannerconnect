@@ -27,6 +27,7 @@ class email
         $filename = basename($attachment_path);
         $user = new \stdClass();
         $user->email = $recipient_email;
+        $user->id = '000001';
         $admin = get_admin();
         
         $subject = get_string('upllaner_email_subject', 'local_uplannerconnect');
@@ -37,10 +38,10 @@ class email
 
         Best regards,
         Univalle';
-    
+
         return email_to_user(
-            $admin,
             $user,
+            $admin,
             $subject,
             $body,
             '',
