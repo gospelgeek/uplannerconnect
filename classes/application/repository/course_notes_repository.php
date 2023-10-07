@@ -19,12 +19,11 @@ class course_notes_repository
     const STATE_SEND = 1; //Estado de envío
     const STATE_ERROR = 2; //Estado de error
 
-    private $moodle_query_handler;
-    private $plugin_config;
+    private $general_repository;
 
-    public function __construct() {
-        $this->moodle_query_handler = new moodle_query_handler();
-        $this->plugin_config = new plugin_config();
+    public function __construct()
+    {
+        $this->general_repository = new general_repository();
     }
 
     /**
@@ -35,27 +34,9 @@ class course_notes_repository
      */
     public function updateDataBD(array $data) : void
     {
-        try {
-            if (empty($data)) {
-                error_log('Excepción capturada: ' . 'No hay datos para actualizar' . "\n");
-                return;
-            }
-
-            //insertar datos en la base de datos
-            $this->moodle_query_handler->executeQuery(
-                sprintf(
-                plugin_config::QUERY_UPDATE_COURSE_GRADES,
-                plugin_config::TABLE_COURSE_GRADE,
-                json_encode($data['json']),
-                json_encode($data['response']),
-                $data['success'],
-                $data['id']
-                )
-            );
-        }
-        catch (moodle_exception $e) {
-          error_log('Excepción capturada: ' . $e->getMessage() . "\n");
-        }
+        $data['query'] = plugin_config::QUERY_UPDATE_COURSE_GRADES;
+        $data['table'] = plugin_config::TABLE_COURSE_GRADE;
+        $this->general_repository->updateDataBD($data);
     }
 
     /**
@@ -66,27 +47,9 @@ class course_notes_repository
      */
     public function saveDataBD(array $data) : void
     {
-        try {
-            if (empty($data)) {
-             error_log('Excepción capturada: ' . 'No hay datos para guardar' . "\n");
-              return;
-            }
-
-            //Insertar datos en la base de datos
-            $this->moodle_query_handler->executeQuery(
-                sprintf(
-                plugin_config::QUERY_INSERT_COURSE_GRADES,
-                plugin_config::TABLE_COURSE_GRADE,
-                json_encode($data),
-                '{"status": "Default response"}',
-                0,
-                $data['action']
-                )
-            );
-        }
-        catch (moodle_exception $e) {
-          error_log('Excepción capturada: ' . $e->getMessage() . "\n");
-        }
+        $data['query'] = plugin_config::QUERY_INSERT_COURSE_GRADES;
+        $data['table'] = plugin_config::TABLE_COURSE_GRADE;
+        $this->general_repository->saveDataBD($data);
     }
 
     /**
@@ -97,28 +60,9 @@ class course_notes_repository
      */
     public function getDataBD(array $data = null) : array
     {
-        $dataQuery = [];
-        try {
-            if (empty($data)) {
-             error_log('Excepción capturada: ' . 'El estado debe ser un número' . "\n");
-              return $dataQuery;
-            }
-
-            //Obtener datos en la base de datos
-            $dataQuery = $this->moodle_query_handler->executeQuery(
-                sprintf(
-                    plugin_config::QUERY_SELECT_COURSE_GRADES,
-                    plugin_config::TABLE_COURSE_GRADE,
-                    $data['state'],
-                    $data['limit'],
-                    $data['offset']
-                )
-            );
-        }
-        catch (moodle_exception $e) {
-          error_log('Excepción capturada: ' . $e->getMessage() . "\n");
-        }
-        return $dataQuery;
+        $data['query'] = plugin_config::QUERY_SELECT_COURSE_GRADES;
+        $data['table'] = plugin_config::TABLE_COURSE_GRADE;
+        return $this->general_repository->getDataBD($data);
     }
 
     /**
@@ -129,16 +73,7 @@ class course_notes_repository
      */
     public function delete_data_bd($state): bool
     {
-        $result = false;
-        try {
-            $result = $this->moodle_query_handler->delete_records(
-                'uplanner_grades',
-                ['success' => $state]
-            );
-        } catch (moodle_exception $e) {
-            error_log('delete_data_bd: ' . $e->getMessage() . "\n");
-        }
-        return $result;
+        return $this->general_repository->delete_data_bd($state);
     }
 
     /**
@@ -149,29 +84,11 @@ class course_notes_repository
      */
     public function add_log_data() : void
     {
-        try {
-            $result = $this->moodle_query_handler->executeQuery(
-                sprintf(
-                    plugin_config::QUERY_COUNT_LOGS,
-                    plugin_config::TABLE_COURSE_GRADE,
-                )
-            );
-
-            $numGrades = reset($result);
-            $timestamp = time();
-
-            $insertLog = $this->moodle_query_handler->executeQuery(
-                sprintf(
-                    plugin_config::QUERY_INSERT_LOGS,
-                    plugin_config::TABLE_LOG,
-                    $timestamp,
-                    $numGrades->count,
-                    0,
-                    0
-                )
-            );
-        } catch (moodle_exception $e) {
-            error_log('delete_data_bd: ' . $e->getMessage() . "\n");
-        }
+        $this->general_repository->add_log_data([
+            'query_insert' => plugin_config::QUERY_COUNT_LOGS,
+            'table_insert' => plugin_config::TABLE_COURSE_GRADE,
+            'query_log' => plugin_config::QUERY_INSERT_LOGS,
+            'table_log' => plugin_config::TABLE_LOG
+        ]);
     }
 }

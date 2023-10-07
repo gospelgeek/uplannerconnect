@@ -25,6 +25,7 @@ class course_translation_data
             'grade_item_updated' => 'convertDataGrade',
             'grade_deleted' => 'convertDataGrade',
             'grade_item_deleted' => 'convertDataGrade',
+            'grade_item_created' => 'convertDataEvaluation'
         ];
         $this->validator = new data_validator();
     }
@@ -66,6 +67,68 @@ class course_translation_data
             $getData = $data['data'];
             //return data traslate
             $arraySend = $this->createCommonDataArray($getData);
+        }
+        catch (moodle_exception $e) {
+            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+        }
+        return $arraySend;
+    }
+
+        /**
+     * Transforma los datos del evento en el formato que requiere uPlanner
+     *
+     * @param array $data
+     * @return array
+     * @todo Aqui es evidente que se puede optimizar el código
+     */
+    private function convertDataEvaluation(array $data) : array
+    {
+        $arraySend = [];
+        try {
+            //Traer la información
+            $getData = $data['data'];
+            //return data traslate
+            $arraySend = $this->createCommonDataEvaluation($getData);
+        }
+        catch (moodle_exception $e) {
+            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+        }
+        return $arraySend;
+    }
+
+    /**
+     * Crea un array con la estructura que requiere uPlanner
+     *
+     * @param array $data
+     * @return array
+     */
+    private function createCommonDataEvaluation(array $data) : array
+    {
+        $arraySend = [];
+        try {
+            $dataSend = $this->validator->verifyArrayKeyExist([
+                'array_verification' => plugin_config::UPLANNER_EVALUATION_ESTRUTURE,
+                'data' => $data
+            ]);
+            
+            //Estructura de la evaluación
+            $arraySend = [
+            "sectionId" => $dataSend['sectionId'],
+            "evaluationGroups" => [
+                [
+                    "evaluationGroupCode" => $dataSend['evaluationGroupCode'],
+                    "evaluationGroupName" => $dataSend['evaluationGroupName'],
+                    "evaluations" => [
+                        [
+                            "evaluationId" => $dataSend['evaluationId'],
+                            "evaluationName" => $dataSend['evaluationName'],
+                            "weight" => $dataSend['weight']
+                        ]
+                    ]
+                ]
+            ],
+            "action" => $dataSend['action']
+            ];
         }
         catch (moodle_exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
