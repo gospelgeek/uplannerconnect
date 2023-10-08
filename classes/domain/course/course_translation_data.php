@@ -19,13 +19,14 @@ class course_translation_data
     private $typeTransform;
     private $validator;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->typeTransform = [
-            'user_graded' => 'convertDataGrade',
-            'grade_item_updated' => 'convertDataGrade',
-            'grade_deleted' => 'convertDataGrade',
-            'grade_item_deleted' => 'convertDataGrade',
-            'grade_item_created' => 'convertDataEvaluation'
+            'user_graded' => 'createCommonDataArray',
+            'grade_item_updated' => 'createCommonDataArray',
+            'grade_deleted' => 'createCommonDataArray',
+            'grade_item_deleted' => 'createCommonDataArray',
+            'grade_item_created' => 'createCommonDataEvaluation'
         ];
         $this->validator = new data_validator();
     }
@@ -44,51 +45,8 @@ class course_translation_data
             $typeTransform = $this->typeTransform[$data['typeEvent']];
             //verificar si existe el método
             if (method_exists($this, $typeTransform)) {
-                $arraySend = $this->$typeTransform($data);
+                $arraySend = $this->$typeTransform($data['data']);
             }
-        }
-        catch (moodle_exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
-        }
-        return $arraySend;
-    }
-
-    /**
-     * Transforma los datos del evento en el formato que requiere uPlanner
-     *
-     * @param array $data
-     * @return array
-     */
-    private function convertDataGrade(array $data) : array
-    {
-        $arraySend = [];
-        try {
-            //Traer la información
-            $getData = $data['data'];
-            //return data traslate
-            $arraySend = $this->createCommonDataArray($getData);
-        }
-        catch (moodle_exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
-        }
-        return $arraySend;
-    }
-
-        /**
-     * Transforma los datos del evento en el formato que requiere uPlanner
-     *
-     * @param array $data
-     * @return array
-     * @todo Aqui es evidente que se puede optimizar el código
-     */
-    private function convertDataEvaluation(array $data) : array
-    {
-        $arraySend = [];
-        try {
-            //Traer la información
-            $getData = $data['data'];
-            //return data traslate
-            $arraySend = $this->createCommonDataEvaluation($getData);
         }
         catch (moodle_exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");

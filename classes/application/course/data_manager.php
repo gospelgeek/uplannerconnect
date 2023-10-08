@@ -31,10 +31,11 @@ class data_manager
         }
 
         $this->typeManager = new type_manager($type);
+        $typeManagerArray = $this->typeManager->getTypeManager($type);
 
-        $this->courseExtractionData = new $this->typeManager['courseExtractionData']();
-        $this->courseTranslationData = new $this->typeManager['courseTranslationData']();
-        $this->courseNotesRepository = new $this->typeManager['courseNotesRepository']();
+        $this->courseExtractionData = new $typeManagerArray['courseExtractionData']();
+        $this->courseTranslationData = new $typeManagerArray['courseTranslationData']();
+        $this->courseNotesRepository = new $typeManagerArray['courseNotesRepository']();
     }
 
     /**

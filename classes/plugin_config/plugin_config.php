@@ -19,8 +19,8 @@ class plugin_config {
     CONST PLUGIN_NAME_LOCAL = 'local_uplannerconnect';
 
     // Nombre de las tablas.
-    CONST TABLE_COURSE_GRADE = 'mdl_uplanner_grades';
-    CONST TABLE_COURSE_EVALUATION = 'mdl_uplanner_evaluation';
+    CONST TABLE_COURSE_GRADE = 'uplanner_grades';
+    CONST TABLE_COURSE_EVALUATION = 'uplanner_evaluation';
     CONST TABLE_COURSE_MOODLE = 'mdl_course';
     const TABLE_LOG = "mdl_uplanner_log";
 

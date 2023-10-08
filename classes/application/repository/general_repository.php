@@ -37,17 +37,13 @@ class general_repository
                 return;
             }
 
+            $dataJson = $data['data'];
+
             //insertar datos en la base de datos
-            $this->moodle_query_handler->executeQuery(
-                sprintf(
-                $data['query'],
-                $data['table'],
-                json_encode($data['json']),
-                json_encode($data['response']),
-                $data['success'],
-                $data['id']
-                )
-            );
+            $this->moodle_query_handler->update_record_db([
+                'table' => $data['table'],
+                'data' => $dataJson
+            ]);
         }
         catch (moodle_exception $e) {
           error_log('Excepción capturada: ' . $e->getMessage() . "\n");
@@ -65,21 +61,16 @@ class general_repository
     {
         try {
             if (empty($data)) {
-             error_log('Excepción capturada: ' . 'No hay datos para guardar' . "\n");
+              error_log('Excepción capturada: ' . 'No hay datos para guardar' . "\n");
               return;
             }
-
-            //Insertar datos en la base de datos
-            $this->moodle_query_handler->executeQuery(
-                sprintf(
-                $data['query'],
-                $data['table'],
-                json_encode($data),
-                '{"status": "Default response"}',
-                0,
-                $data['action']
-                )
-            );
+            
+            $dataJson = $data['data'];
+        
+            $this->moodle_query_handler->insert_record_db([
+                'table' => $data['table'],
+                'data' => $dataJson
+            ]);
         }
         catch (moodle_exception $e) {
           error_log('Excepción capturada: ' . $e->getMessage() . "\n");
@@ -98,18 +89,20 @@ class general_repository
         $dataQuery = [];
         try {
             if (empty($data)) {
-             error_log('Excepción capturada: ' . 'El estado debe ser un número' . "\n");
+              error_log('Excepción capturada: ' . 'El estado debe ser un número' . "\n");
               return $dataQuery;
             }
+
+            $dataJson = $data['data'];
 
             //Obtener datos en la base de datos
             $dataQuery = $this->moodle_query_handler->executeQuery(
                 sprintf(
                     $data['query'],
                     $data['table'],
-                    $data['state'],
-                    $data['limit'],
-                    $data['offset']
+                    $dataJson['state'],
+                    $dataJson['limit'],
+                    $dataJson['offset']
                 )
             );
         }

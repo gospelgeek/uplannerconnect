@@ -22,7 +22,7 @@ class type_manager
     /**
      *  Construct
      */
-    public function __construct(string $type)
+    public function __construct()
     {
         $this->typeManager = [
             'grades' => [
@@ -42,9 +42,8 @@ class type_manager
      * Obtiene el tipo de manager
      *
      * @param string $type
-     * @return array
      */
-    public function getTypeManager(string $type) : array
+    public function getTypeManager(string $type) 
     {
         return $this->typeManager[$type];
     }

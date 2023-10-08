@@ -34,22 +34,35 @@ class course_notes_repository
      */
     public function updateDataBD(array $data) : void
     {
-        $data['query'] = plugin_config::QUERY_UPDATE_COURSE_GRADES;
-        $data['table'] = plugin_config::TABLE_COURSE_GRADE;
-        $this->general_repository->updateDataBD($data);
+        $this->general_repository->updateDataBD([
+            'data' => [
+                'json' => json_encode($data['json']),
+                'response' => json_encode($data['response']),
+                'success' => $data['success'],
+                'id' => $data['id'],
+            ],
+            'table' => plugin_config::TABLE_COURSE_GRADE
+        ]);
     }
 
     /**
      * Guarda los datos en la base de datos
      *
+     * @todo Falta validar los tipos de datos
      * @param array $data
      * @return void
      */
     public function saveDataBD(array $data) : void
     {
-        $data['query'] = plugin_config::QUERY_INSERT_COURSE_GRADES;
-        $data['table'] = plugin_config::TABLE_COURSE_GRADE;
-        $this->general_repository->saveDataBD($data);
+        $this->general_repository->saveDataBD([
+            'data' => [
+                'json' => json_encode($data),
+                'response' => '{"status": "Default response"}',
+                'success' => self::STATE_DEFAULT,
+                'request_type' => $data['action'],
+            ],
+            'table' => plugin_config::TABLE_COURSE_GRADE
+        ]);
     }
 
     /**
@@ -60,9 +73,11 @@ class course_notes_repository
      */
     public function getDataBD(array $data = null) : array
     {
-        $data['query'] = plugin_config::QUERY_SELECT_COURSE_GRADES;
-        $data['table'] = plugin_config::TABLE_COURSE_GRADE;
-        return $this->general_repository->getDataBD($data);
+        return $this->general_repository->getDataBD([
+            'data' => $data,
+            'query' => plugin_config::QUERY_SELECT_COURSE_GRADES,
+            'table' => 'mdl_'.plugin_config::TABLE_COURSE_GRADE
+        ]);
     }
 
     /**
