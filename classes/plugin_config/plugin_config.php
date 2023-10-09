@@ -19,9 +19,11 @@ class plugin_config {
     CONST PLUGIN_NAME_LOCAL = 'local_uplannerconnect';
 
     // Nombre de las tablas.
-    CONST TABLE_COURSE_GRADE = 'mdl_uplanner_grades';
-    CONST TABLE_COURSE_EVALUATION = 'mdl_uplanner_evaluation';
-    CONST TABLE_COURSE_MOODLE = 'mdl_course';
+    CONST TABLE_COURSE_GRADE = 'uplanner_grades';
+    CONST TABLE_COURSE_EVALUATION = 'uplanner_evaluation';
+    CONST TABLE_COURSE_MOODLE = 'mdl_course';    
+    CONST TABLE_COURSE = 'course';
+    CONST TABLE_USER_MOODLE = 'user';
     const TABLE_LOG = "mdl_uplanner_log";
 
     // Rutas de los eventos.
@@ -58,13 +60,13 @@ class plugin_config {
 
     // Estruturas de datos uPlanner.
     CONST UPLANNER_GRADES = [
-        ['name' => 'sectionId', 'type' => 'numeric'],
-        ['name' => 'studentCode', 'type' => 'numeric'],
+        ['name' => 'sectionId', 'type' => 'string'],
+        ['name' => 'studentCode', 'type' => 'string'],
         ['name' => 'finalGrade', 'type' => 'numeric'],
         ['name' => 'finalGradeMessage', 'type' => 'string'],
         ['name' => 'finalGradeMessage', 'type' => 'string'],
         ['name' => 'finalGradePercentage', 'type' => 'numeric'],
-        ['name' => 'evaluationGroupCode', 'type' => 'numeric'],
+        ['name' => 'evaluationGroupCode', 'type' => 'string'],
         ['name' => 'grades', 'type' => 'numeric'],
         ['name' => 'evaluationId', 'type' => 'numeric'],
         ['name' => 'value', 'type' => 'numeric'],
@@ -78,7 +80,7 @@ class plugin_config {
 
     // Estruturas de datos uPlanner.
     CONST UPLANNER_EVALUATION_ESTRUTURE = [
-        ['name' => 'sectionId', 'type' => 'numeric'],
+        ['name' => 'sectionId', 'type' => 'string'],
         ['name' => 'evaluationGroupCode', 'type' => 'string'],
         ['name' => 'evaluationGroupName', 'type' => 'string'],
         ['name' => 'evaluationId', 'type' => 'numeric'],

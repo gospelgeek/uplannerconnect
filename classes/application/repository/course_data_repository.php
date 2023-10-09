@@ -19,7 +19,8 @@ class course_data_repository
 {
     private $moodle_query_handler;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->moodle_query_handler = new moodle_query_handler();
     }
 
