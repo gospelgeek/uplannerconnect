@@ -41,11 +41,16 @@ class course_translation_data
     {
         $arraySend = [];
         try {
-            //Traer la información
-            $typeTransform = $this->typeTransform[$data['typeEvent']];
-            //verificar si existe el método
-            if (method_exists($this, $typeTransform)) {
-                $arraySend = $this->$typeTransform($data['data']);
+            if (array_key_exists(
+                  $data['typeEvent'],
+                  $this->typeTransform
+            )) {
+                //Traer la información
+                $typeTransform = $this->typeTransform[$data['typeEvent']];
+                //verificar si existe el método
+                if (method_exists($this, $typeTransform)) {
+                    $arraySend = $this->$typeTransform($data['data']);
+                }
             }
         }
         catch (moodle_exception $e) {

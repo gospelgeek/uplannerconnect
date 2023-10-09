@@ -24,16 +24,21 @@ class type_manager
      */
     public function __construct()
     {
+        $course_extraction_data  = course_extraction_data::class;
+        $course_translation_data = course_translation_data::class;
+        $course_notes_repository = course_notes_repository::class;
+        $course_evaluation_structure = course_evaluation_structure_repository::class;
+
         $this->typeManager = [
             'grades' => [
-                'courseExtractionData' =>  course_extraction_data::class,
-                'courseTranslationData' => course_translation_data::class,
-                'courseNotesRepository' => course_notes_repository::class,
+                'courseExtractionData'  => $course_extraction_data,
+                'courseTranslationData' => $course_translation_data,
+                'courseNotesRepository' => $course_notes_repository,
             ],
             'evaluation_structure' => [
-                'courseExtractionData' =>  course_extraction_data::class,
-                'courseTranslationData' => course_translation_data::class,
-                'courseNotesRepository' => course_evaluation_structure_repository::class,
+                'courseExtractionData'  => $course_extraction_data,
+                'courseTranslationData' => $course_translation_data,
+                'courseNotesRepository' => $course_evaluation_structure,
             ],
         ];
     }
