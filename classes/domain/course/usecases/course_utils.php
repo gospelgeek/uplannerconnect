@@ -143,7 +143,7 @@ class course_utils
      */
     private function shortCategoryName($categoryFullName) : string
     {
-        if (empty($categoryFullName)) {return 'DafaultCtg';}
+        if (empty($categoryFullName)) {return 'NIVEL000';}
         $sinEspacios = str_replace(' ', '', $categoryFullName);
         $categoryShort = substr($sinEspacios, 0, 10);
         return $categoryShort;
