@@ -88,7 +88,7 @@ class course_notes_repository
      */
     public function delete_data_bd($state): bool
     {
-        return $this->general_repository->delete_data_bd($state);
+        return $this->general_repository->delete_data_bd($state, plugin_config::TABLE_COURSE_GRADE);
     }
 
     /**

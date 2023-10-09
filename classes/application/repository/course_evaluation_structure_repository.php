@@ -78,4 +78,15 @@ class course_evaluation_structure_repository
             'table' => 'mdl_s'.plugin_config::TABLE_COURSE_EVALUATION
         ]);
     }
+
+    /**
+     * Delete registers by field state
+     *
+     * @param $state
+     * @return bool
+     */
+    public function delete_data_bd($state): bool
+    {
+        return $this->general_repository->delete_data_bd($state, plugin_config::TABLE_COURSE_EVALUATION);
+    }
 }

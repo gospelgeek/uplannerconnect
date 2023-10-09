@@ -119,12 +119,12 @@ class general_repository
      * @param $state
      * @return bool
      */
-    public function delete_data_bd($state): bool
+    public function delete_data_bd($state,$table): bool
     {
         $result = false;
         try {
             $result = $this->moodle_query_handler->delete_records(
-                'uplanner_grades',
+                $table,
                 ['success' => $state]
             );
         } catch (moodle_exception $e) {
