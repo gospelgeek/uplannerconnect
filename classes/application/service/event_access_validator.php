@@ -21,7 +21,7 @@ class event_access_validator
     const EVENT_METHOD_NAME = 'methodName';
     const DATA_VERIFY_EVENT = 'typeEvent';
     // Facultade a evaluar
-    const FACULTY_ACTIVE = '4';
+    const FACULTY_ACTIVE = ['4','2','3','5'];
     private $courseDataRepository;
 
     public function __construct() {
@@ -74,7 +74,7 @@ class event_access_validator
                 $shortname = $this->courseDataRepository->getCourseShortname($courseid);
                 //verifica si tiene algun dato en la posición 4
                 if (isset($shortname[3])) {
-                    $result = ($shortname[3] === self::FACULTY_ACTIVE);
+                    $result = in_array($shortname[3], self::FACULTY_ACTIVE);
                 }
             }
         }
