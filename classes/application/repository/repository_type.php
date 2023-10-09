@@ -19,7 +19,8 @@ class repository_type
     const GRADE = 'grade';
 
     const ACTIVE_REPOSITORY_TYPES = [
-        'grade' => course_notes_repository::class
+        'grade' => course_notes_repository::class,
+        'evaluation_structure' => course_evaluation_structure_repository::class,
     ];
 
     /**
