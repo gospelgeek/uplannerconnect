@@ -83,6 +83,31 @@ class data_validator
     }
 
     /**
+     * Valida si una consulta tiene resultados
+     * Pero solo un resultado
+     * 
+     * @param array $data
+     * @return array
+     */
+    public function verifyQueryResult(array $data) : array
+    {
+        $arraySend = [
+            'result' => '',
+        ];
+        try {
+            if (!empty($data['data']) && 
+                 is_object($data['data'])) {
+                $arraySend = [
+                    'result' => $data['data']
+                ];
+            }
+        } catch (moodle_exception $e) {
+            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+        }
+        return $arraySend;
+    }
+
+    /**
       *  Validad si un objecto tiene un metodo
       *
       * @param mixed $data El dato a validar.
@@ -95,7 +120,7 @@ class data_validator
             $getData = $data['getData'];
             $property = $data['property'];
             $propertySend = $getData->$property ?? '';
-        } catch (\Exception $e) {
+        } catch (moodle_exception $e) {
             error_log('Excepción capturada: ' . $e->getMessage() . "\n");
         }
         return $propertySend;
@@ -174,8 +199,7 @@ class data_validator
                     $boolean = false;
                 }
             }
-       }
-       catch (moodle_exception $e) {
+       } catch (moodle_exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
        }
         return $boolean;
