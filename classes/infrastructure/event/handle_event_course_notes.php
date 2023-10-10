@@ -111,13 +111,23 @@ class handle_event_course_notes {
             
       try {
       
+         $IsValidEvent = [
+            'delete' => validateAccessTypeEvent([
+               "dataEvent" => $event,
+               "typeEvent" => "\\core\\event\\grade_item_deleted",
+               "key" => "eventname",
+               "methodName" => "get_data"
+            ]),
+            'create' => validateAccessTypeEvent([
+               "dataEvent" => $event,
+               "typeEvent" => "\\core\\event\\grade_item_created",
+               "key" => "eventname",
+               "methodName" => "get_data"
+             ])
+         ];
+
          //Validar el tipo de evento
-         if (validateAccessTypeEvent([
-            "dataEvent" => $event,
-            "typeEvent" => "\\core\\event\\grade_item_created",
-            "key" => "eventname",
-            "methodName" => "get_data"
-         ])) {
+         if ($IsValidEvent['create']  || $IsValidEvent['delete']) {
 
          //valida si la facultad tiene acceso
          if (!validateAccesFaculty($event)) { return; }
@@ -126,12 +136,11 @@ class handle_event_course_notes {
          instantiatemanagement_factory([
             "dataEvent" => $event,
             "typeEvent" => "grade_item_created",
-            "dispatch" => "create",
+            "dispatch" => $IsValidEvent['create']? "create" : "delete",
             "enum_etities" => 'evaluation_structure'
          ]);
 
          }
-         
       } 
       catch (\Exception $e) {
          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
