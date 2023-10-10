@@ -75,7 +75,7 @@ class course_evaluation_structure_repository
         return $this->general_repository->getDataBD([
             'data' => $data,
             'query' => plugin_config::QUERY_SELECT_COURSE_GRADES,
-            'table' => 'mdl_s'.plugin_config::TABLE_COURSE_EVALUATION
+            'table' => 'mdl_'.plugin_config::TABLE_COURSE_EVALUATION
         ]);
     }
 
@@ -88,5 +88,21 @@ class course_evaluation_structure_repository
     public function delete_data_bd($state): bool
     {
         return $this->general_repository->delete_data_bd($state, plugin_config::TABLE_COURSE_EVALUATION);
+    }
+
+    /**
+     * Delete registers by field state
+     *
+     * @param $state
+     * @return void
+     */
+    public function add_log_data() : void
+    {
+        $this->general_repository->add_log_data([
+            'query_insert' => plugin_config::QUERY_COUNT_LOGS,
+            'table_insert' => plugin_config::TABLE_COURSE_EVALUATION,
+            'query_log' => plugin_config::QUERY_INSERT_LOGS,
+            'table_log' => plugin_config::TABLE_LOG
+        ]);
     }
 }
