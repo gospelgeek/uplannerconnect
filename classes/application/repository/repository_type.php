@@ -9,15 +9,13 @@
 namespace local_uplannerconnect\application\repository;
 
 /**
- * debe coincidir con el de los tipos de cliente en UplannerClientType
+ * Register the active repository types, they must match the client types in uplanner_client_type
 */
 class repository_type
 {
-    const STATE_DEFAULT = 0;  //Estado por defecto
-    const STATE_SEND = 1;     //Estado de envío
-    const STATE_ERROR = 2;    //Estado de error
-    const GRADE = 'grade';
-
+    const STATE_DEFAULT = 0;
+    const STATE_SEND = 1;
+    const STATE_ERROR = 2;
     const ACTIVE_REPOSITORY_TYPES = [
         'grade' => course_notes_repository::class,
         'evaluation_structure' => course_evaluation_structure_repository::class,

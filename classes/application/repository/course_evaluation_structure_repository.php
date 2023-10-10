@@ -8,26 +8,29 @@
 namespace local_uplannerconnect\application\repository;
 
 use local_uplannerconnect\plugin_config\plugin_config;
-use moodle_exception;
 
 /**
-   * Instancia una entidad de acorde a la funcionalidad que se requiera.
+ * Loaded class to manipulate data in upplanner_evaluation table
 */
 class course_evaluation_structure_repository
 {
-    const STATE_DEFAULT = 0; //Estado por defecto
-    const STATE_SEND = 1; //Estado de envío
-    const STATE_ERROR = 2; //Estado de error
+    const TABLE_COURSE_EVALUATION = 'uplanner_evaluation';
 
+    /**
+     * @var general_repository
+     */
     private $general_repository;
 
+    /**
+     * Construct
+     */
     public function __construct()
     {
         $this->general_repository = new general_repository(); 
     }
 
     /**
-     * Actualiza los datos en la base de datos
+     * Update data
      *
      * @param array $data
      * @return void
@@ -41,12 +44,12 @@ class course_evaluation_structure_repository
                 'success' => $data['success'],
                 'id' => $data['id'],
             ],
-            'table' => plugin_config::TABLE_COURSE_EVALUATION
+            'table' => self::TABLE_COURSE_EVALUATION
         ]);
     }
 
     /**
-     * Guarda los datos en la base de datos
+     * Save data
      *
      * @param array $data
      * @return void
@@ -57,15 +60,15 @@ class course_evaluation_structure_repository
             'data' => [
                 'json' => json_encode($data),
                 'response' => '{"status": "Default response"}',
-                'success' => self::STATE_DEFAULT,
+                'success' => repository_type::STATE_DEFAULT,
                 'request_type' => $data['action'],
             ],
-            'table' => plugin_config::TABLE_COURSE_EVALUATION
+            'table' => self::TABLE_COURSE_EVALUATION
         ]);
     }
 
     /**
-     * Obtiene los datos en la base de datos
+     * Get data
      *
      * @param array|null $data
      * @return array
@@ -75,7 +78,7 @@ class course_evaluation_structure_repository
         return $this->general_repository->getDataBD([
             'data' => $data,
             'query' => plugin_config::QUERY_SELECT_COURSE_GRADES,
-            'table' => 'mdl_'.plugin_config::TABLE_COURSE_EVALUATION
+            'table' => 'mdl_' . self::TABLE_COURSE_EVALUATION
         ]);
     }
 
@@ -87,20 +90,19 @@ class course_evaluation_structure_repository
      */
     public function delete_data_bd($state): bool
     {
-        return $this->general_repository->delete_data_bd($state, plugin_config::TABLE_COURSE_EVALUATION);
+        return $this->general_repository->delete_data_bd($state, self::TABLE_COURSE_EVALUATION);
     }
 
     /**
      * Delete registers by field state
      *
-     * @param $state
      * @return void
      */
     public function add_log_data() : void
     {
         $this->general_repository->add_log_data([
             'query_insert' => plugin_config::QUERY_COUNT_LOGS,
-            'table_insert' => plugin_config::TABLE_COURSE_EVALUATION,
+            'table_insert' => self::TABLE_COURSE_EVALUATION,
             'query_log' => plugin_config::QUERY_INSERT_LOGS,
             'table_log' => plugin_config::TABLE_LOG
         ]);
