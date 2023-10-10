@@ -37,7 +37,8 @@ $rawData = $moodleQuery->executeQuery('SELECT * FROM mdl_uplanner_log');
 $data->row = [];
 
 foreach ($rawData as $key => $value) {
-    array_push($data->row, $value);
+        $value->date = date('Y-m-d H:i:s', $value->date);
+        array_push($data->row, $value);
 }
 
 //imprimir en console js
