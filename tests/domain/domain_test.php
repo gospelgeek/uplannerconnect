@@ -1,25 +1,32 @@
 <?php
 /**
+ * 
+ * prueba unitaria para verificar la lógica de dominio del plugin
+ * 
  * @package  local_uplanconnect 
  * @author Isabela Rosero <isabela.rosero@correounivalle.edu.co>
- * @des prueba unitaria para verificar la lógica de dominio del plugin
- * @see 
  * @group local_uplanconnect
- */
-
- //Variables globales
-require_once(__DIR__ . '/../../classes/domain/course/CourseTraslationData.php');
+*/
 
 
+use local_uplannerconnect\domain\course\course_translation_data;
+
+/**
+ *  Test case para la clase course_translation_data
+ * 
+ *  @package  local_uplanconnect
+ *  @author Isabela Rosero <isabela.rosero@correounivalle.edu.co>
+ *  
+*/
 class domain_test extends advanced_testcase{
 
     //atributos
-    private $CourseTraslationData;
+    private $course_translation_data;
 
     public function setUp():void{
         parent::setUp();
-         //Instanciar la clase CourseTraslationData antes de cada prueba
-         $this->CourseTraslationData = new CourseTraslationData();
+         //Instanciar la clase course_translation_data antes de cada prueba
+         $this->course_translation_data = new course_translation_data();
     }
 
     /**
@@ -30,7 +37,7 @@ class domain_test extends advanced_testcase{
             'typeEvent' => 'user_graded', 'data' => [],
         ];
 
-        $result = $this->CourseTraslationData->converDataJsonUplanner($data);
+        $result = $this->course_translation_data->converDataJsonUplanner($data);
 
         $this->assertIsArray($result);
 

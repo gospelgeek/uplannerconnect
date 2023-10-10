@@ -1,14 +1,14 @@
 <?php
 /**
- * @package     uPlannerConnect
+ * @package     local_uplannerconnect
  * @copyright   cristian machado mosquera <cristian.machado@correounivalle.edu.co>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
+
+
+use local_uplannerconnect\plugin_config\plugin_config;
+
 defined('MOODLE_INTERNAL') || die();
-
-//Variables globales
-require_once(__DIR__ .'/../classes/plugin_config/plugin_config.php');
-
 
 /**
  * @param $capabilities
@@ -16,13 +16,13 @@ require_once(__DIR__ .'/../classes/plugin_config/plugin_config.php');
  * @TODO:  en el campus real!!!! por ahora se deja en 1
  * @description Define las capacidades para el plugin
 */
-$capabilities = array(
-    'local/'.plugin_config::PLUGIN_NAME.':index' => array(
+$capabilities = [
+    'local/'.plugin_config::PLUGIN_NAME.':index' => [
         'riskbitmask' => 1,
         'contextlevel' => CONTEXT_SYSTEM,
         'captype' => 'write',
-        'archetypes' => array(
+        'archetypes' => [
             'manager' => CAP_ALLOW
-        )
-    )
-);
+        ]
+    ]
+];

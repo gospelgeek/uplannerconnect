@@ -12,7 +12,10 @@ $string['generalsettingsheading_desc'] = 'General settings for the plugin';
 
 // Tasks.
 $string['syncinituplannertask'] = 'Sync uPlanner Task';
-$string['syncerroruplannertask'] = 'Sync Error uPlanner Task';
+$string['syncerroruplannertask'] = 'Sync Log uPlanner Task';
+
+// Email
+$string['upllaner_email_subject'] = 'uPlanner information';
 
 $string['pluginname'] = 'uPlannerConnect';
 $string['welcome'] = 'Bienvenido';

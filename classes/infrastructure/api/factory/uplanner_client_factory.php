@@ -6,7 +6,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(__DIR__ . '/UplannerClientType.php');
+namespace local_uplannerconnect\infrastructure\api\factory;
 
 /**
  * @package uPlannerConnect
@@ -14,7 +14,7 @@ require_once(__DIR__ . '/UplannerClientType.php');
  * @author Daniel Dorado <doradodaniel14@gmail.com>
  * @description Fábrica para crear los diferentes tipos de clientes en Uplanner
  */
-class UplannerClientFactory
+class uplanner_client_factory
 {
     /**
      * Create a client type
@@ -25,11 +25,10 @@ class UplannerClientFactory
     public function create(string $type) {
         $client = null;
         try {
-            $class = UplannerClientType::getClass($type);
+            $class = uplanner_client_type::get_class($type);
             $client = new $class();
-
-        } catch (Exception $e) {
-           //TODO: management structure
+        } catch (\Exception $e) {
+            error_log('uplanner_client_factory - create: ' . $e->getMessage() . "\n");
         }
 
         return $client;

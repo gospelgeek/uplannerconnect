@@ -24,18 +24,22 @@
 
 namespace local_uplannerconnect\task;
 
+use coding_exception;
+use local_uplannerconnect\infrastructure\api\handle_remove_success_uplanner_task;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * @package uPlannerConnect
  * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
  * @author Daniel Dorado <doradodaniel14@gmail.com>
- * @description TODO:
+ * @description Tarea queelimina registros en estado completado repository_type::STATE_SEND
  */
 class handle_error_uplanner_task extends \core\task\scheduled_task
 {
     /**
      * @inerhitdoc
+     * @throws coding_exception
      */
     public function get_name()
     {
@@ -46,14 +50,14 @@ class handle_error_uplanner_task extends \core\task\scheduled_task
      * @inerhitdoc
      */
     public function execute() {
-        global $CFG;
-        require_once(__DIR__ . '/../infrastructure/api/HandleSendUplannerTask.php');
-        try {
-            mtrace("Test");
-            //$handleUplannerTask = new HandleSendUplannerTask();
-            //$handleUplannerTask->procces(2, 5); // 2 is state error
-        } catch (Exception $e) {
-            //TODO: current log
-        }
+        $time_now = time();
+        $start_time = microtime();
+        mtrace("Update cron started at: " . date('r', $time_now) . "\n");
+        $handle_task = new handle_remove_success_uplanner_task();
+        $handle_task->process();
+        mtrace("\n" . 'Cron completed at: ' . date('r', time()) . "\n");
+        mtrace('Memory used: ' . display_size(memory_get_usage())."\n");
+        $diff_time = microtime_diff($start_time, microtime());
+        mtrace("Scheduled task late " . $diff_time . " seconds to finish.\n");
     }
 }

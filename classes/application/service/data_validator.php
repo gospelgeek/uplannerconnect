@@ -1,20 +1,19 @@
 <?php
 /**
- * @package     uPlannerConnect
- * @copyright   cristian machado mosquera <cristian.machado@correounivalle.edu.co>
+ * @package     local_uplannerconnect
+ * @author      Cristian Machado <cristian.machado@correounivalle.edu.co>
+ * @author      Daniel Eduardo Dorado <doradodaniel14@gmail.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
+namespace local_uplannerconnect\application\service;
+use moodle_exception;
 
 /**
- *  @package local_uplannerconnect
- *  @author  Cristian Machado <cristian.machado@correounivalle.edu.co>
- *  @author  Daniel Eduardo Dorado <doradodaniel14@gmail.com>
- * @description Encargada de tener todas las validaciones
+ * Encargada de tener todas las validaciones
 */
-class DataValidator {
-
-    //Constantes
+class data_validator
+{
     CONST TYPE_VERIFICATION = [
         'string' => 'isString',
         'int' => 'isInt',
@@ -26,55 +25,43 @@ class DataValidator {
         'numeric' => 'isNumeric'
     ];
 
-    //constructor
-    public function __construct() {
-    }
-
-
     /**
       * Ejecuta la verificación acorde al tipo de verificación
-      * @package uPlannerConnect
-      * @param mixed $data El dato a validar.
       *
+      * @param mixed $data El dato a validar.
       * @return bool 
     */
-    public function executeVerification(array $data) : bool {
+    public function executeVerification(array $data): bool
+    {
+        $result = false;
         try {
             // Verifica si el tipo de verificación es válido
             if (isset(self::TYPE_VERIFICATION[$data['type_verification']])) {
                 // Obtiene el nombre del método
                 $method = self::TYPE_VERIFICATION[$data['type_verification']];
                 // Llama al método de validación y devuelve el resultado
-                return $this->$method($data['value']);
-            } else {
-                // Tipo de verificación no válido
-                return false;
+                $result = $this->$method($data['value']);
             }
         }
-        catch (Exception $e) {
+        catch (moodle_exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
+        return $result;
     }
-
 
     /**
       * Validad si un array tiene las keys que se requieren
       *
-      * @package uPlannerConnect
       * @param mixed $data El dato a validar.
-      *
       * @return array
     */
-    public function verifyArrayKeyExist(array $data) : array {
-
+    public function verifyArrayKeyExist(array $data): array
+    {
+        $arraySend = [];
         try {
-            //array a devolver
-            $arraySend = [];
-            
-            //Verifica si tiene la key o asigna un valor por defecto
+            // Verifica si tiene la key o asigna un valor por defecto.
             foreach ($data['array_verification'] as $item) {
                 if (array_key_exists($item['name'], $data['data'])) {
-                      
                     //verifica si el dato cumple con el tipo especificado
                     if ($this->executeVerification([
                         'type_verification' => $item['type'],
@@ -83,133 +70,141 @@ class DataValidator {
                         $arraySend[$item['name']] = $data['data'][$item['name']];
                     } else {
                         $arraySend[$item['name']] = '';
-                    }               
-
+                    }
                 } else {
                     $arraySend[$item['name']] = '';
                 }
             }
-        
-            return $arraySend;
        }
-       catch (Exception $e) {
+       catch (moodle_exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
        }
-
+        return $arraySend;
     }
 
+    /**
+     * Valida si una consulta tiene resultados
+     * Pero solo un resultado
+     * 
+     * @param array $data
+     * @return array
+     */
+    public function verifyQueryResult(array $data) : array
+    {
+        $arraySend = [
+            'result' => '',
+        ];
+        try {
+            if (!empty($data['data']) && 
+                 is_object($data['data'])) {
+                $arraySend = [
+                    'result' => $data['data']
+                ];
+            }
+        } catch (moodle_exception $e) {
+            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+        }
+        return $arraySend;
+    }
 
     /**
       *  Validad si un objecto tiene un metodo
       *
-      * @package uPlannerConnect
       * @param mixed $data El dato a validar.
-      *
       * @return method or string
     */
-    public function propertyExists(array $data) {
+    public function propertyExists(array $data): string
+    {
+        $propertySend = '';
         try {
             $getData = $data['getData'];
             $property = $data['property'];
-            return isset($getData->$property) ? $getData->$property : '';
+            $propertySend = $getData->$property ?? '';
+        } catch (moodle_exception $e) {
+            error_log('Excepción capturada: ' . $e->getMessage() . "\n");
         }
-        catch (Exception $e) {
-          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
-        }
+        return $propertySend;
     }
-
 
     /**
       *  Valida si un dato esta seteado 
       *
-      * @package uPlannerConnect
       * @param mixed $data El dato a validar.
-      *
       * @return data or null
     */
-    public function isIsset($data)  {
-        return isset($data) ? $data : null;
+    public function isIsset($data)
+    {
+        return $data ?? null;
     }
 
     /**
       *  Valida si es un array o devielve null
       *
-      * @package uPlannerConnect
       * @param mixed $data El dato a validar.
-      *
       * @return data or null
     */
-    public function isArrayData($data) {
+    public function isArrayData($data)
+    {
         return is_array($data) ? $data : null;
     }
 
-
     /**
-      *  Valida si un dato es un objecto o devuelve null 
+      * Valida si un dato es un objecto o devuelve null
       *
-      * @package uPlannerConnect
       * @param mixed $data El dato a validar.
-      *
       * @return data or null
     */
-    public function isObjectData($data) {
+    public function isObjectData($data)
+    {
         return is_object($data) ? $data : null;
     }
 
-
     /**
-      *  Valida si en un array o detiene la ejecución  
+      *  Valida si en un array o detiene la ejecución
       *
-      * @package uPlannerConnect
       * @param mixed $data El dato a validar.
-      *
       * @return void
     */
-    public function verifyArrayKeyExistOrDie($data) {
+    public function verifyArrayKeyExistOrDie($data) : void
+    {
         if (!$this->isArray($data)) {
             error_log('El parametro no es un array');
             return;
         }
     }
-    
 
     /**
-      *  Valida si una estructura de datos tiene las keys que se requieren  
+      * Valida si una estructura de datos tiene las keys que se requieren
       *
-      * @package uPlannerConnect
       * @param mixed $data El dato a validar.
-      *
       * @return boolean
     */
-    public function verificateKeyArrayBoolean($data) {
+    public function verificateKeyArrayBoolean($data) : bool
+    {
+        $boolean = true;
         try {
-            $boolean = true;
             //Verifica si tiene la key o asigna un valor por defecto
             foreach ($data['array_verification'] as $item) {
                 if (array_key_exists($item['name'], $data['get_data'])) {
-                      
+
                     //verifica si el dato cumple con el tipo especificado
                     if (!($this->executeVerification([
                         'type_verification' => $item['type'],
                         'value' => $data['get_data'][$item['name']]
                     ]))) {
                         $boolean = false;
-                    }               
+                    }
 
                 } else {
                     $boolean = false;
                 }
             }
-        
-            return $boolean;
-       }
-       catch (Exception $e) {
+       } catch (moodle_exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
        }
-
+        return $boolean;
     }
-
-
+    
     /**
       *  Valida si una key existe en un array
       *
@@ -232,8 +227,7 @@ class DataValidator {
     public function isString($data) {
         return is_string($data);
     }
-
-
+    
     /**
      * Valida si un dato es un entero
      * 
@@ -246,68 +240,68 @@ class DataValidator {
     }
 
     /**
-     * Valida si un dato es un float 
-     * 
-     * @package uPlannerConnect
-     * 
+     * Valida si un dato es un float
+     *
+     * @param $data
      * @return boolean
-    */
-    public function isFloat($data) {
+     */
+    public function isFloat($data) : bool
+    {
         return is_float($data);
     }
 
-    /** 
-      *  Valida si un dato es un booleano
-      * 
-      * @package uPlannerConnect
-      * 
-      * @return boolean
-    */
-    public function isBool($data) {
+    /**
+     *  Valida si un dato es un booleano
+     *
+     * @param $data
+     * @return boolean
+     */
+    public function isBool($data): bool
+    {
         return is_bool($data);
     }
 
     /**
      * Valida si un dato es un array
-     * 
-     * @package uPlannerConnect
-     * 
+     *
+     * @param $data
      * @return boolean
-    */
-    public function isArray($data) {
+     */
+    public function isArray($data): bool
+    {
         return is_array($data);
     }
 
     /**
      *  Valida si un dato es un objecto
-     *  @package uPlannerConnect
-     *  
-     *  @return boolean
-    */
-    public function isObject($data) {
+     *
+     * @param $data
+     * @return boolean
+     */
+    public function isObject($data) : bool
+    {
         return is_object($data);
     }
 
     /**
      *  Valida si un dato es null
-     * 
-     *  @package uPlannerConnect
-     *  
-     *  @return boolean
-    */
-    public function isNull($data) {
+     *
+     * @param $data
+     * @return boolean
+     */
+    public function isNull($data) : bool
+    {
         return is_null($data);
     }
 
     /**
      *  Valida si un dato es un numerico
-     * 
-     *  @package uPlannerConnect
-     *  
-     *  @return boolean
-    */
-    public function isNumeric($data) {
+     *
+     * @param $data
+     * @return boolean
+     */
+    public function isNumeric($data) : bool
+    {
         return is_numeric($data);
     }
-
 }
