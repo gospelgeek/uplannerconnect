@@ -43,11 +43,7 @@ class plugin_config {
         [
             'eventname' => '\core\event\grade_item_created',
             'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        // [
-        //     'eventname' => '\core\event\grade_item_deleted',
-        //     'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        // ]
+        ]
     ];
 
     // Conultas a la base de datos.
