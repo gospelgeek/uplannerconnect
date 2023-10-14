@@ -1,0 +1,71 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+    the GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @copyright  2023 Universidad del Valle
+    @template   local_uplannerconnect/index
+
+    Context variables required for this template:
+
+    Example context (json):
+    {
+        "row": [
+            {
+                "id": 1,
+                "date": 1696273730,
+                "num_grades": 0,
+                "num_materials": 0,
+                "num_anouncements": 0
+            },
+            {
+                "id": 2,
+                "date": 1696273797,
+                "num_grades": 1,
+                "num_materials": 0,
+                "num_anouncements": 0
+            },
+            {
+                "id": 3,
+                "date": 1696273816,
+                "num_grades": 0,
+                "num_materials": 0,
+                "num_anouncements": 0
+            }
+        ]
+    }
+}}
+<table>
+   <thead>
+    <tr>
+        <th style="width: 2em; text-align: center;">id</th>
+        <th style="width: 7em; text-align: center;">date</th>
+        <th style="width: 2em; text-align: center;">num_grades</th>
+        <th style="width: 2em; text-align: center;">num_materials</th>
+        <th style="width: 2em; text-align: center;">num_anouncements</th>
+    </tr>
+   </thead>
+   <tbody>
+        {{#row}}
+            <tr>
+                <td style="width: 2em; text-align: center;">{{id}}</td>
+                <td style="width: 7em; text-align: center;">{{date}}</td>
+                <td style="width: 2em; text-align: center;">{{num_grades}}</td>
+                <td style="width: 2em; text-align: center;">{{num_materials}}</td>
+                <td style="width: 2em; text-align: center;">{{num_anouncements}}</td>
+            </tr>
+        {{/row}}
+   </tbody>
+</table>

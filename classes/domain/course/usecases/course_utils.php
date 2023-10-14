@@ -77,7 +77,7 @@ class course_utils
                 'studentCode' => $this->validator->isIsset($queryStudent->username),
                 'evaluationGroupCode' => $this->validator->isIsset($categoryFullName), //Bien
                 'evaluationId' => $this->validator->isIsset($gradeLoadItem->id),
-                'average' => $this->validator->isIsset($grade->weightoverride),
+                'average' => $this->validator->isIsset($grade->aggregationweight),
                 'isApproved' => false,
                 'value' => $this->validator->isIsset(($getData['other'])['finalgrade']),
                 'evaluationName' => $this->validator->isIsset($gradeLoadItem->itemname),
@@ -127,7 +127,7 @@ class course_utils
                 'evaluationGroupName' => $this->validator->isIsset(substr($categoriaInfo->fullname, 0, 50)),
                 'evaluationId' => $this->validator->isIsset($get_grade_item->id),
                 'evaluationName' => $this->validator->isIsset($get_grade_item->itemname),
-                'action' => 'create'
+                'action' => $data['dispatch']
             ];
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
