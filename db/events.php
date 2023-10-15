@@ -20,7 +20,7 @@ foreach (plugin_config::EVENTS_OBSERVERS as $eventData) {
     
     $callback = preg_replace('/^\\\\core\\\\event\\\\/', '', $eventData['eventname']);
    
-    $ozbservers[] = [
+    $observers[] = [
         'eventname' => $eventData['eventname'],
         'callback' => $eventData['includefile'].'::'.$callback,
     ];
