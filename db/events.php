@@ -5,12 +5,9 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-
 use local_uplannerconnect\plugin_config\plugin_config;
 
-
 defined('MOODLE_INTERNAL') || die();
-
 
 $observers = [];
 
@@ -23,7 +20,7 @@ foreach (plugin_config::EVENTS_OBSERVERS as $eventData) {
     
     $callback = preg_replace('/^\\\\core\\\\event\\\\/', '', $eventData['eventname']);
    
-    $observers[] = [
+    $ozbservers[] = [
         'eventname' => $eventData['eventname'],
         'callback' => $eventData['includefile'].'::'.$callback,
     ];
