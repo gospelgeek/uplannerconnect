@@ -1,19 +1,17 @@
 <?php
 /**
- * @package     uPlannerConnect
- * @copyright   cristian machado mosquera <cristian.machado@correounivalle.edu.co>
+ * @package     local_uplannerconnect
+ * @copyright   Cristian Machado <cristian.machado@correounivalle.edu.co>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
 namespace local_uplannerconnect\plugin_config;
 
 /**
- * @package uPlannerConnect
- * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
- * @description Variables globales para el plugin
+ * Variables globales para el plugin
 */
-class plugin_config {
-
+class plugin_config
+{
     // Variables globales.
     CONST PLUGIN_NAME = 'uplannerconnect';
     CONST PLUGIN_NAME_LOCAL = 'local_uplannerconnect';
@@ -29,7 +27,6 @@ class plugin_config {
     // Rutas de los eventos.
     CONST ROUTE_HANDLER_EVENT_1 = 'local_uplannerconnect\infrastructure\event\handle_event_course_notes';
 
-
     // Configuración de los eventos. 
     CONST EVENTS_OBSERVERS = [
         [
@@ -43,7 +40,11 @@ class plugin_config {
         [
             'eventname' => '\core\event\grade_item_created',
             'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ]
+        ],
+        // [
+        //     'eventname' => '\mod_folder\event\course_module_viewed',
+        //     'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        // ]
     ];
 
     // Conultas a la base de datos.
