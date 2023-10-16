@@ -63,6 +63,8 @@ class handle_event_course_notes
    public static function grade_deleted($event)
    {   
       try {
+          error_log('Hola');
+          error_log(print_r($event));
             //Instanciar la clase management_factory
             // instantiatemanagement_factory([
             //    "dataEvent" => $event,

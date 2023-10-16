@@ -33,10 +33,10 @@ class plugin_config
             'eventname' => '\core\event\user_graded',
             'includefile' => self::ROUTE_HANDLER_EVENT_1,
         ],
-        // [
-        //     'eventname' => '\core\event\grade_deleted',
-        //     'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        // ],
+        [
+            'eventname' => '\core\event\grade_deleted',
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
         [
             'eventname' => '\core\event\grade_item_created',
             'includefile' => self::ROUTE_HANDLER_EVENT_1,
