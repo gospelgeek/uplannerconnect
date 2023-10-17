@@ -17,6 +17,9 @@ use moodle_exception;
  */
 class course_utils
 {
+    const TABLE_CATEGORY = 'grade_categories';
+    const TABLE_ITEMS = 'grade_items';
+    
     private $validator;
     private $moodle_query_handler;
 
@@ -161,9 +164,22 @@ class course_utils
     private function getInstanceCategoryName($gradeItem) : string
     {
         $categoryFullName = 'NIVEL000';
-        if (method_exists($gradeItem, 'get_item_category')) {
-            if ($gradeItem->get_item_category() !== false) {
-                $categoryFullName = ($gradeItem->get_item_category())->get_name();
+        //validar si existe el metodo
+        if (property_exists($gradeItem, 'id')) {
+            // Ejecutar la consulta.
+            $queryResult = $this->moodle_query_handler->executeQuery(sprintf(
+                plugin_config::QUERY_NAME_CATEGORY_GRADE, 
+                'mdl_'.self::TABLE_ITEMS, 
+                'mdl_'.self::TABLE_CATEGORY, 
+                $gradeItem->id
+            ));
+            // Obtener el primer elemento del resultado utilizando reset()
+            $firstResult = reset($queryResult);
+            if (isset($firstResult->fullname) && 
+                strlen($firstResult->fullname) !== 0)
+            {
+              // Luego, obtén el valor de 'fullname'
+              $categoryFullName = $firstResult->fullname;
             }
         }
         return $categoryFullName;

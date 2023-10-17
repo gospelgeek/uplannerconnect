@@ -54,6 +54,7 @@ class plugin_config
     CONST QUERY_SHORNAME_COURSE_BY_ID = "SELECT shortname FROM %s WHERE id = '%s'";
     CONST QUERY_COUNT_LOGS = "SELECT count(id) FROM %s";
     const QUERY_INSERT_LOGS = "INSERT INTO %s (date, num_grades, num_materials, num_anouncements) VALUES ('%s', '%s', '%s' , '%s')";
+    const QUERY_NAME_CATEGORY_GRADE = "SELECT t2.fullname FROM %s as t1 INNER JOIN %s as t2 ON t1.id = %s AND t2.id = t1.categoryid";
 
     // Estruturas de datos uPlanner.
     CONST UPLANNER_GRADES = [

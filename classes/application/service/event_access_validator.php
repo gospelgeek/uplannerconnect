@@ -24,7 +24,11 @@ class event_access_validator
     const FACULTY_ACTIVE = ['4','2','3','5'];
     private $courseDataRepository;
 
-    public function __construct() {
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
         $this->courseDataRepository = new course_data_repository();
     }
 
@@ -53,7 +57,7 @@ class event_access_validator
             // Obtener la llave del evento.
             $eventExecute = $dataEvent[$data[self::EVENT_KEY]];
             // valida.
-            $boolean = ($eventExecute === $data[self::DATA_VERIFY_EVENT]);
+            $boolean = in_array($eventExecute,$data[self::DATA_VERIFY_EVENT]);
         }
         catch (moodle_exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");

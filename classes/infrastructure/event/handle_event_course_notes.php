@@ -29,7 +29,7 @@ class handle_event_course_notes
             //Validar el tipo de evento
             if (validateAccessTypeEvent([
                "dataEvent" => $event,
-               "typeEvent" => "\\core\\event\\user_graded",
+               "typeEvent" => ["\\core\\event\\user_graded"],
                "key" => "eventname",
                "methodName" => "get_data"
             ])) {
@@ -40,7 +40,6 @@ class handle_event_course_notes
                if ($eventUser !== -1) {
                   //valida si la facultad tiene acceso
                   if (!validateAccesFaculty($event)) { return; }
-
                      //Instanciar la clase management_factory
                      instantiatemanagement_factory([
                         "dataEvent" => $event,
@@ -63,15 +62,27 @@ class handle_event_course_notes
    public static function grade_deleted($event)
    {   
       try {
-          error_log('Hola');
-          error_log(print_r($event));
-            //Instanciar la clase management_factory
-            // instantiatemanagement_factory([
-            //    "dataEvent" => $event,
-            //    "typeEvent" => "grade_deleted",
-            //    "dispatch" => "delete",
-            //    "enum_etities" => 'course_notes'
-            // ]);
+            //Validar el tipo de evento
+            if (validateAccessTypeEvent([
+               "dataEvent" => $event,
+               "typeEvent" => ["\\core\\event\\grade_deleted"],
+               "key" => "eventname",
+               "methodName" => "get_data"
+            ])) {
+               $eventUser = ($event->get_data())['userid'];
+   
+               if ($eventUser !== -1) {
+                  //valida si la facultad tiene acceso
+                  if (!validateAccesFaculty($event)) { return; }
+                     //Instanciar la clase management_factory
+                     instantiatemanagement_factory([
+                        "dataEvent" => $event,
+                        "typeEvent" => "user_graded",
+                        "dispatch" => 'delete',
+                        "enum_etities" => 'course_notes'
+                     ]);
+               }
+            }
       } catch (moodle_exception $e) {
          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
       }
@@ -89,16 +100,22 @@ class handle_event_course_notes
             $IsValidEvent = [
                'delete' => validateAccessTypeEvent([
                   "dataEvent" => $event,
-                  "typeEvent" => "\\core\\event\\grade_item_deleted",
+                  "typeEvent" => ["\\core\\event\\grade_item_deleted"],
                   "key" => "eventname",
                   "methodName" => "get_data"
                ]),
                'create' => validateAccessTypeEvent([
                   "dataEvent" => $event,
-                  "typeEvent" => "\\core\\event\\grade_item_created",
+                  "typeEvent" => ["\\core\\event\\grade_item_created"],
                   "key" => "eventname",
                   "methodName" => "get_data"
-                  ])
+               ]),
+               'update' => validateAccessTypeEvent([
+                  "dataEvent" => $event,
+                  "typeEvent" => ["\\core\\event\\grade_item_updated"],
+                  "key" => "eventname",
+                  "methodName" => "get_data"
+               ])
             ];
 
             //Validar el tipo de evento
@@ -130,7 +147,7 @@ class handle_event_course_notes
     public static function course_module_viewed($event)
     {
         try {
-             error_log('Hola');
+             error_log('Hola3333');
         } catch (moodle_exception $e) {
              error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
