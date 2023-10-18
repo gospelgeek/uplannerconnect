@@ -80,7 +80,7 @@ class course_utils
                 'studentCode' => $this->validator->isIsset($queryStudent->username),
                 'evaluationGroupCode' => $this->validator->isIsset($categoryFullName), //Bien
                 'evaluationId' => $this->validator->isIsset($gradeLoadItem->id),
-                'average' => $this->validator->isIsset($grade->aggregationweight),
+                'average' => $this->validator->isIsset($gradeLoadItem->aggregationcoef2),
                 'isApproved' => $this->validator->isIsset($aproved),
                 'value' => $this->validator->isIsset(($getData['other'])['finalgrade']),
                 'evaluationName' => $this->validator->isIsset($gradeLoadItem->itemname),
@@ -121,7 +121,7 @@ class course_utils
             //category info
             $categoryItem = $this->getInstanceCategoryName($get_grade_item);
             $categoryFullName = $this->shortCategoryName($categoryItem); 
-            $weight = $this->validator->isIsset($grade->aggregationweight) ?? 0;
+            $weight = $this->validator->isIsset($get_grade_item->aggregationcoef2) ?? 0;
 
             $queryCourse = ($this->validator->verifyQueryResult([                        
                 'data' => $this->moodle_query_handler->extract_data_db([
@@ -138,7 +138,7 @@ class course_utils
                 'evaluationGroupName' => $this->validator->isIsset(substr($categoryItem, 0, 50)),
                 'evaluationId' => $this->validator->isIsset($get_grade_item->id),
                 'evaluationName' => $this->validator->isIsset($get_grade_item->itemname),
-                'weight' => $this->validator->isIsset($get_grade_item->aggregationcoef),
+                'weight' => $weight,
                 'action' => $data['dispatch']
             ];
         } catch (moodle_exception $e) {
@@ -185,7 +185,8 @@ class course_utils
             // Obtener el primer elemento del resultado utilizando reset()
             $firstResult = reset($queryResult);
             if (isset($firstResult->fullname) && 
-                strlen($firstResult->fullname) !== 0)
+                strlen($firstResult->fullname) !== 0 && 
+                $firstResult->fullname !== '?')
             {
               // Luego, obtén el valor de 'fullname'
               $categoryFullName = $firstResult->fullname;
