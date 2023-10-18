@@ -9,9 +9,12 @@ namespace local_uplannerconnect\infrastructure\event;
 
 use local_uplannerconnect\domain\management_factory;
 use local_uplannerconnect\application\service\event_access_validator;
+use local_uplannerconnect\application\repository\moodle_query_handler;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
+
+const LAST_INSERT_EVALUATION = "SELECT json FROM mdl_uplanner_evaluation ORDER BY id DESC limit 1";
 
 /**
  *  Maneja los eventos de moodle
@@ -29,7 +32,7 @@ class handle_event_course_notes
             //Validar el tipo de evento
             if (validateAccessTypeEvent([
                "dataEvent" => $event,
-               "typeEvent" => "\\core\\event\\user_graded",
+               "typeEvent" => ["\\core\\event\\user_graded"],
                "key" => "eventname",
                "methodName" => "get_data"
             ])) {
@@ -40,7 +43,6 @@ class handle_event_course_notes
                if ($eventUser !== -1) {
                   //valida si la facultad tiene acceso
                   if (!validateAccesFaculty($event)) { return; }
-
                      //Instanciar la clase management_factory
                      instantiatemanagement_factory([
                         "dataEvent" => $event,
@@ -63,15 +65,27 @@ class handle_event_course_notes
    public static function grade_deleted($event)
    {   
       try {
-          error_log('Hola');
-          error_log(print_r($event));
-            //Instanciar la clase management_factory
-            // instantiatemanagement_factory([
-            //    "dataEvent" => $event,
-            //    "typeEvent" => "grade_deleted",
-            //    "dispatch" => "delete",
-            //    "enum_etities" => 'course_notes'
-            // ]);
+            //Validar el tipo de evento
+            if (validateAccessTypeEvent([
+               "dataEvent" => $event,
+               "typeEvent" => ["\\core\\event\\grade_deleted"],
+               "key" => "eventname",
+               "methodName" => "get_data"
+            ])) {
+               $eventUser = ($event->get_data())['userid'];
+   
+               if ($eventUser !== -1) {
+                  //valida si la facultad tiene acceso
+                  if (!validateAccesFaculty($event)) { return; }
+                     //Instanciar la clase management_factory
+                     instantiatemanagement_factory([
+                        "dataEvent" => $event,
+                        "typeEvent" => "user_graded",
+                        "dispatch" => 'delete',
+                        "enum_etities" => 'course_notes'
+                     ]);
+               }
+            }
       } catch (moodle_exception $e) {
          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
       }
@@ -89,20 +103,20 @@ class handle_event_course_notes
             $IsValidEvent = [
                'delete' => validateAccessTypeEvent([
                   "dataEvent" => $event,
-                  "typeEvent" => "\\core\\event\\grade_item_deleted",
+                  "typeEvent" => ["\\core\\event\\grade_item_deleted"],
                   "key" => "eventname",
                   "methodName" => "get_data"
                ]),
                'create' => validateAccessTypeEvent([
                   "dataEvent" => $event,
-                  "typeEvent" => "\\core\\event\\grade_item_created",
+                  "typeEvent" => ["\\core\\event\\grade_item_created"],
                   "key" => "eventname",
                   "methodName" => "get_data"
-                  ])
+               ])
             ];
 
             //Validar el tipo de evento
-            if ($IsValidEvent['create']  || $IsValidEvent['delete']) {
+            if ($IsValidEvent['create'] || $IsValidEvent['delete']) {
 
             //valida si la facultad tiene acceso
             if (!validateAccesFaculty($event)) { return; }
@@ -121,20 +135,61 @@ class handle_event_course_notes
       }
    }
 
-   /**
-    * Lanza un handle cuando se actualiza un item de calificación
-    * 
-    * @param object $event
-    * @return void
-    */
-    public static function course_module_viewed($event)
-    {
-        try {
-             error_log('Hola');
-        } catch (moodle_exception $e) {
-             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
-        }
-    }
+   public static function grade_item_updated($event)
+   {
+     try {
+         if (validateAccessTypeEvent([
+            "dataEvent" => $event,
+            "typeEvent" => ["\\core\\event\\grade_item_updated"],
+            "key" => "eventname",
+            "methodName" => "get_data"
+         ])) {
+            if (validateAccesFaculty($event)) {
+               filterRecentUpdate($event);
+            }
+         }
+     } catch (moodle_exception $e) {
+         error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+     }  
+   }
+}
+
+
+/**
+  * Verifica si el evento no es un duplicado
+  */
+function filterRecentUpdate($event)
+{
+   try {
+         $query = new moodle_query_handler();
+         $evaluation = $query->executeQuery(LAST_INSERT_EVALUATION); 
+
+         if (!empty($evaluation)) { 
+            //obeter el primer resultado
+            $firstResult = reset($evaluation);
+            //obtener el json
+            $evaluationLast = (json_decode($firstResult->json));
+            $dataEvent = $event->get_data();
+            //obtener el primer grupo de evaluaciones
+            $evaluationGroups = ($evaluationLast->evaluationGroups)[0];
+            //obtener la primera evaluacion
+            $evaluationsData  = ($evaluationGroups->evaluations)[0];
+            // Validar si la evaluacion es diferente
+            if ($evaluationLast->action.'d' !== $dataEvent['action'] &&
+                $evaluationsData->evaluationId === $dataEvent['objectid']
+            ) {
+                     //Instanciar la clase management_factory
+                     instantiatemanagement_factory([
+                        "dataEvent" => $event,
+                        "typeEvent" => "grade_item_created",
+                        "dispatch" => "update",
+                        "enum_etities" => 'evaluation_structure'
+                     ]);
+            }
+         }
+   } catch (moodle_exception $e) {
+      error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+   }
 }
 
 /** 

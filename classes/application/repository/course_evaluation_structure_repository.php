@@ -98,11 +98,11 @@ class course_evaluation_structure_repository
      */
     public function add_log_data() : void
     {
-        $this->general_repository->add_log_data([
-            'query_insert' => plugin_config::QUERY_COUNT_LOGS,
-            'table_insert' => 'mdl_'.plugin_config::TABLE_COURSE_EVALUATION,
-            'query_log' => plugin_config::QUERY_INSERT_LOGS,
-            'table_log' => plugin_config::TABLE_LOG
-        ]);
+        // $this->general_repository->add_log_data([
+        //     'query_insert' => plugin_config::QUERY_COUNT_LOGS,
+        //     'table_insert' => 'mdl_'.plugin_config::TABLE_COURSE_EVALUATION,
+        //     'query_log' => plugin_config::QUERY_INSERT_LOGS,
+        //     'table_log' => plugin_config::TABLE_LOG
+        // ]);
     }
 }
