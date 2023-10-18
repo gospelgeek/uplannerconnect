@@ -41,10 +41,10 @@ class plugin_config
             'eventname' => '\core\event\grade_item_created',
             'includefile' => self::ROUTE_HANDLER_EVENT_1,
         ],
-        // [
-        //     'eventname' => '\mod_folder\event\course_module_viewed',
-        //     'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        // ]
+        [
+            'eventname' => '\core\event\grade_item_updated',
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ]
     ];
 
     // Conultas a la base de datos.
@@ -53,7 +53,7 @@ class plugin_config
     CONST QUERY_SELECT_COURSE_GRADES = "SELECT * FROM %s WHERE success = '%s' LIMIT '%s' OFFSET '%s'";
     CONST QUERY_SHORNAME_COURSE_BY_ID = "SELECT shortname FROM %s WHERE id = '%s'";
     CONST QUERY_COUNT_LOGS = "SELECT count(id) FROM %s";
-    const QUERY_INSERT_LOGS = "INSERT INTO %s (date, num_grades, num_materials, num_anouncements) VALUES ('%s', '%s', '%s' , '%s')";
+    const QUERY_INSERT_LOGS = "INSERT INTO %s (date, num_grades, num_materials, num_anouncements, num_evaluation) VALUES ('%s', '%s', '%s' , '%s' , '%s')";
     const QUERY_NAME_CATEGORY_GRADE = "SELECT t2.fullname FROM %s as t1 INNER JOIN %s as t2 ON t1.id = %s AND t2.id = t1.categoryid";
 
     // Estruturas de datos uPlanner.

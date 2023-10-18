@@ -111,9 +111,17 @@ class course_utils
             //Traer la información
             $event = $data['dataEvent'];
             $get_grade_item = $this->validator->isObjectData($event->get_grade_item());
+            $dataEvent = $this->validator->isIsset($event->get_data());
+            $grade = null;
+
+            if (key_exists('userid', $dataEvent)) {
+                $grade = $this->validator->isObjectData($get_grade_item->get_grade($dataEvent['userid'], false));    
+            }
+            
             //category info
             $categoryItem = $this->getInstanceCategoryName($get_grade_item);
             $categoryFullName = $this->shortCategoryName($categoryItem); 
+            $weight = $this->validator->isIsset($grade->aggregationweight) ?? 0;
 
             $queryCourse = ($this->validator->verifyQueryResult([                        
                 'data' => $this->moodle_query_handler->extract_data_db([
@@ -130,6 +138,7 @@ class course_utils
                 'evaluationGroupName' => $this->validator->isIsset(substr($categoryItem, 0, 50)),
                 'evaluationId' => $this->validator->isIsset($get_grade_item->id),
                 'evaluationName' => $this->validator->isIsset($get_grade_item->itemname),
+                'weight' => $this->validator->isIsset($get_grade_item->aggregationcoef),
                 'action' => $data['dispatch']
             ];
         } catch (moodle_exception $e) {
