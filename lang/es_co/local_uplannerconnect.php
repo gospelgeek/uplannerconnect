@@ -23,6 +23,7 @@ $string['welcome'] = 'Bienvenido';
 $string['description'] = 'Tiene como objectivo extraer informacion del campus y enviarla a uPlaner.';
 $string['title'] = 'uPlannerConnect';
 $string['uplannerconnect:index'] = 'uPlannerConnect';
+
 // lang/en/local_uplannerconnect.php
 $string['controllerpath'] = 'Ruta del controlador:';
 $string['controllerpathdesc'] = 'Especifica la ruta del controlador.';
@@ -37,3 +38,6 @@ $string['materials_endpoint'] = 'URL del endpoint de materiales';
 $string['materials_endpoint_desc'] = 'Ingrese la URL del endpoint de materiales.';
 $string['task_rutine_primary'] = 'Tiempo de ejecución de la tarea principal';
 $string['task_rutine_primary_desc'] = 'Ingrese el tiempo de ejecución en segundos para la tarea principal.';
+
+// Events.
+$string['uplannerconnect:mod_resource_file'] = "Module Files Uploaded";

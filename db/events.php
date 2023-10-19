@@ -5,12 +5,9 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-
 use local_uplannerconnect\plugin_config\plugin_config;
 
-
 defined('MOODLE_INTERNAL') || die();
-
 
 $observers = [];
 
