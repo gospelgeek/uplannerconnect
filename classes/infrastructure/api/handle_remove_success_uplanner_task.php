@@ -69,7 +69,7 @@ class handle_remove_success_uplanner_task
     private function start_process_per_repository($repository, $uplanner_client)
     {
         try {
-            //$repository->add_log_data();
+            $repository->add_log_data();
             $this->create_file(self::PREFIX . $uplanner_client->get_file_name());
             foreach (repository_type::LIST_STATES as $state) {
                 $dataQuery = [
