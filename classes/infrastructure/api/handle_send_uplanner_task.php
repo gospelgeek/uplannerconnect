@@ -8,6 +8,7 @@
 
 namespace local_uplannerconnect\infrastructure\api;
 
+use coding_exception;
 use local_uplannerconnect\application\repository\repository_type;
 use local_uplannerconnect\infrastructure\api\client\abstract_uplanner_client;
 use local_uplannerconnect\infrastructure\api\factory\uplanner_client_factory;
@@ -53,7 +54,7 @@ class handle_send_uplanner_task
      * Handle process send information to Uplanner
      *
      * @return void
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public function process(
         $state = 0,
@@ -91,7 +92,7 @@ class handle_send_uplanner_task
      * @param $num_request_by_endpoint
      * @param $num_rows
      * @return void
-     * @throws \coding_exception
+     * @throws coding_exception
      */
     public function process_email(
         $uplanner_client,
@@ -114,18 +115,8 @@ class handle_send_uplanner_task
             if (!$rows) {
                 break;
             }
-            $this->file = new file($uplanner_client->get_file_name());
-            $this->file->create_csv(abstract_uplanner_client::FILE_HEADERS);
-            foreach ($rows as $row) {
-                $data = [
-                    $row->json,
-                    $row->request_type
-                ];
-                $this->file->add_row($data);
-            }
-            //send email;
-            $recipient_email = 'samuel.ramirez@correounivalle.edu.co';
-            $response = $this->email->send($recipient_email, $this->file->get_path_file());
+            $this->create_file($uplanner_client->get_file_name(), $rows);
+            $response = $this->send_email($uplanner_client->get_email_subject());
             $status = $response ? repository_type::STATE_SEND : repository_type::STATE_ERROR;
             foreach ($rows as $row) {
                 $dataQuery = [
@@ -160,15 +151,26 @@ class handle_send_uplanner_task
         }
         $index_row = 0;
         while ($index_row < $num_request_by_endpoint) {
-            $rows = $repository->getDataBD($state);
+            $dataQuery = [
+                'state' => $state,
+                'limit' => 100,
+                'offset' => 0,
+            ];
+            $rows = $repository->getDataBD($dataQuery);
             if (!$rows) {
                 break;
             }
             foreach ($rows as $row) {
                 $response = $this->request($uplanner_client, $row['type'], $row['json']);
                 // 2 -> state error, 1 -> state send
-                $status = in_array($response, 'error') ? 2 : 1;
-                //$repository->saveData($status, $response);
+                $status = in_array($response, 'error') ? repository_type::STATE_SEND : repository_type::STATE_ERROR;
+                $dataQuery = [
+                    'json' => $row->json,
+                    'response' => $response,
+                    'success' => $status,
+                    'id' => $row->id
+                ];
+                $repository->updateDataBD($dataQuery);
             }
         }
     }
@@ -199,5 +201,42 @@ class handle_send_uplanner_task
         }
 
         return $response ?? [];
+    }
+
+    /**
+     * Create and add rows in file
+     *
+     * @param $file_name
+     * @param $rows
+     * @return void
+     */
+    private function create_file($file_name, $rows)
+    {
+        $this->file = new file($file_name);
+        $this->file->create_csv(abstract_uplanner_client::FILE_HEADERS);
+        foreach ($rows as $row) {
+            $data = [
+                $row->json,
+                $row->request_type
+            ];
+            $this->file->add_row($data);
+        }
+    }
+
+    /**
+     * Send email
+     *
+     * @param $subject
+     * @return bool
+     * @throws coding_exception
+     */
+    private function send_email($subject): bool
+    {
+        $recipient_email = 'samuel.ramirez@correounivalle.edu.co';
+        return $this->email->send(
+            $recipient_email,
+            $subject,
+            $this->file->get_path_file()
+        );
     }
 }
