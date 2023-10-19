@@ -16,6 +16,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 class general_repository
 {
+    const QUERY_COUNT_ALL_TABLES = "SELECT (SELECT COUNT(id) FROM mdl_uplanner_grades) AS count_t1, (SELECT COUNT(id) FROM mdl_uplanner_materials) AS count_t2, (SELECT COUNT(id) FROM mdl_uplanner_notification) AS count_t3, (SELECT COUNT(id) FROM mdl_uplanner_evaluation) AS count_t4";
+
     private $moodle_query_handler;
 
     public function __construct() {
@@ -115,9 +117,10 @@ class general_repository
     /**
      * Delete registers by field state
      *
-     * @todo Falta hacerlo dinámico
      * @param $state
+     * @param $table
      * @return bool
+     * @todo Falta hacerlo dinámico
      */
     public function delete_data_bd($state,$table): bool
     {
@@ -136,18 +139,13 @@ class general_repository
     /**
      * Delete registers by field state
      *
-     * @param $state
+     * @param array $data
      * @return void
      */
     public function add_log_data(array $data) : void
     {
         try {
-            $result = $this->moodle_query_handler->executeQuery(
-                sprintf(
-                    $data['query_insert'],
-                    $data['table_insert'],
-                )
-            );
+            $result = $this->moodle_query_handler->executeQuery(self::QUERY_COUNT_ALL_TABLES);
 
             $numGrades = reset($result);
             $timestamp = time();
@@ -157,13 +155,14 @@ class general_repository
                     $data['query_log'],
                     $data['table_log'],
                     $timestamp,
-                    $numGrades->count,
-                    0,
-                    0
+                    $numGrades->count_t1,
+                    $numGrades->count_t2,
+                    $numGrades->count_t3,
+                    $numGrades->count_t4,
                 )
             );
         } catch (moodle_exception $e) {
-            error_log('delete_data_bd: ' . $e->getMessage() . "\n");
+            error_log('add_log_data: ' . $e->getMessage() . "\n");
         }
     }
 }

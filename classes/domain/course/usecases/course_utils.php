@@ -17,6 +17,9 @@ use moodle_exception;
  */
 class course_utils
 {
+    const TABLE_CATEGORY = 'grade_categories';
+    const TABLE_ITEMS = 'grade_items';
+    
     private $validator;
     private $moodle_query_handler;
 
@@ -49,9 +52,9 @@ class course_utils
             $grade = $this->validator->isObjectData($event->get_grade());
             $gradeRecordData = $this->validator->isObjectData($grade->get_record_data());
             $gradeLoadItem = $this->validator->isObjectData($grade->load_grade_item());
-            // Category info
-            $categoriaInfo = $this->validator->isIsset($gradeLoadItem->get_parent_category($gradeLoadItem->categoryid));
-            $categoryFullName = $this->shortCategoryName($categoriaInfo->fullname); 
+            $categoryItem = $this->getInstanceCategoryName($gradeLoadItem);
+            $categoryFullName = $this->shortCategoryName($categoryItem); 
+            $aproved = $this->getAprovedItem($gradeLoadItem, $grade);
 
             $queryStudent = $this->validator->verifyQueryResult([
                 'data' => $this->moodle_query_handler->extract_data_db([
@@ -77,8 +80,8 @@ class course_utils
                 'studentCode' => $this->validator->isIsset($queryStudent->username),
                 'evaluationGroupCode' => $this->validator->isIsset($categoryFullName), //Bien
                 'evaluationId' => $this->validator->isIsset($gradeLoadItem->id),
-                'average' => $this->validator->isIsset($grade->weightoverride),
-                'isApproved' => false,
+                'average' => $this->validator->isIsset($gradeLoadItem->aggregationcoef2),
+                'isApproved' => $this->validator->isIsset($aproved),
                 'value' => $this->validator->isIsset(($getData['other'])['finalgrade']),
                 'evaluationName' => $this->validator->isIsset($gradeLoadItem->itemname),
                 'date' => $this->validator->isIsset($gradeLoadItem->timecreated),
@@ -108,9 +111,17 @@ class course_utils
             //Traer la información
             $event = $data['dataEvent'];
             $get_grade_item = $this->validator->isObjectData($event->get_grade_item());
+            $dataEvent = $this->validator->isIsset($event->get_data());
+            $grade = null;
+
+            if (key_exists('userid', $dataEvent)) {
+                $grade = $this->validator->isObjectData($get_grade_item->get_grade($dataEvent['userid'], false));    
+            }
+            
             //category info
-            $categoriaInfo = $this->validator->isIsset($get_grade_item->get_parent_category($get_grade_item->categoryid));
-            $categoryFullName = $this->shortCategoryName($categoriaInfo->fullname); 
+            $categoryItem = $this->getInstanceCategoryName($get_grade_item);
+            $categoryFullName = $this->shortCategoryName($categoryItem); 
+            $weight = $this->validator->isIsset($get_grade_item->aggregationcoef2) ?? 0;
 
             $queryCourse = ($this->validator->verifyQueryResult([                        
                 'data' => $this->moodle_query_handler->extract_data_db([
@@ -124,15 +135,64 @@ class course_utils
             $dataToSave = [
                 'sectionId' => $this->validator->isIsset($queryCourse->shortname),
                 'evaluationGroupCode' => $this->validator->isIsset($categoryFullName),
-                'evaluationGroupName' => $this->validator->isIsset(substr($categoriaInfo->fullname, 0, 50)),
+                'evaluationGroupName' => $this->validator->isIsset(substr($categoryItem, 0, 50)),
                 'evaluationId' => $this->validator->isIsset($get_grade_item->id),
                 'evaluationName' => $this->validator->isIsset($get_grade_item->itemname),
-                'action' => 'create'
+                'weight' => $weight,
+                'action' => $data['dispatch']
             ];
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
         return $dataToSave;
+    }
+
+    /**
+     * Retorna el nombre de la categoria
+     * 
+     * @param object $gradeItem
+     * @return bool
+     */
+    private function getAprovedItem($gradeItem , $gradesGrades) : bool
+    {
+        $boolean = false;
+        if ($gradeItem->grademax) {
+            if ($gradeItem->grademax <= $gradesGrades->finalgrade) {
+                $boolean = true;
+            }
+        }
+        return $boolean;
+    }
+
+    /**
+     * Retorna el nombre de la categoria
+     * 
+     * @param object $gradeItem
+     * @return string
+     */
+    private function getInstanceCategoryName($gradeItem) : string
+    {
+        $categoryFullName = 'NIVEL000';
+        //validar si existe el metodo
+        if (property_exists($gradeItem, 'id')) {
+            // Ejecutar la consulta.
+            $queryResult = $this->moodle_query_handler->executeQuery(sprintf(
+                plugin_config::QUERY_NAME_CATEGORY_GRADE, 
+                'mdl_'.self::TABLE_ITEMS, 
+                'mdl_'.self::TABLE_CATEGORY, 
+                $gradeItem->id
+            ));
+            // Obtener el primer elemento del resultado utilizando reset()
+            $firstResult = reset($queryResult);
+            if (isset($firstResult->fullname) && 
+                strlen($firstResult->fullname) !== 0 && 
+                $firstResult->fullname !== '?')
+            {
+              // Luego, obtén el valor de 'fullname'
+              $categoryFullName = $firstResult->fullname;
+            }
+        }
+        return $categoryFullName;
     }
 
     /**
@@ -143,7 +203,6 @@ class course_utils
      */
     private function shortCategoryName($categoryFullName) : string
     {
-        if (empty($categoryFullName)) {return 'NIVEL000';}
         $sinEspacios = str_replace(' ', '', $categoryFullName);
         $categoryShort = substr($sinEspacios, 0, 10);
         return $categoryShort;

@@ -15,7 +15,18 @@ $string['syncinituplannertask'] = 'Sync uPlanner Task';
 $string['syncerroruplannertask'] = 'Sync Log uPlanner Task';
 
 // Email
-$string['upllaner_email_subject'] = 'uPlanner information';
+$string['upllaner_email_subject_grades'] = 'uPlanner Grades';
+$string['upllaner_email_subject_evaluations'] = 'uPlanner Evaluations';
+$string['upllaner_email_subject_anounciente'] = 'uPlanner Anounciente';
+$string['upllaner_email_subject_materials'] = 'uPlanner Materials';
+$string['upllaner_email_subject_summary'] = 'uPlanner Summary';
+
+$string['delete_upllaner_email_subject_grades'] = 'Delete uPlanner Grades';
+$string['delete_upllaner_email_subject_evaluations'] = 'Delete uPlanner Evaluations';
+$string['delete_upllaner_email_subject_anounciente'] = 'Delete uPlanner Anounciente';
+$string['delete_upllaner_email_subject_materials'] = 'Delete uPlanner Materials';
+$string['delete_upllaner_email_subject_summary'] = 'Delete uPlanner Summary';
+
 
 $string['pluginname'] = 'uPlannerConnect';
 $string['welcome'] = 'Bienvenido';
@@ -35,3 +46,6 @@ $string['materials_endpoint'] = 'URL del endpoint de materiales';
 $string['materials_endpoint_desc'] = 'Ingrese la URL del endpoint de materiales.';
 $string['task_rutine_primary'] = 'Tiempo de ejecución de la tarea principal';
 $string['task_rutine_primary_desc'] = 'Ingrese el tiempo de ejecución en segundos para la tarea principal.';
+
+// Events.
+$string['uplannerconnect:mod_resource_file'] = "Module Files Uploaded";

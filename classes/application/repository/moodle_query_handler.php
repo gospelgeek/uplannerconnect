@@ -10,19 +10,23 @@ namespace local_uplannerconnect\application\repository;
 use dml_exception;
 
 /**
- *  Ejecutar consultas
+ *  Execute Queries
 */
 class moodle_query_handler
 {
     private $db;
 
-    public function __construct() {
+    /**
+     * Construct
+     */
+    public function __construct()
+    {
         global $DB; 
         $this->db = $DB;
     }
 
     /**
-     *  Ejecuta una consulta sql y retorna el resultado.
+     *  Execute a sql query and return the result
      * 
      *  @param $sql
      *  @return array
@@ -31,45 +35,61 @@ class moodle_query_handler
     public function executeQuery($sql) : array
     {
         if (empty($sql)) {
-            error_log('Exception capturada: ' . 'No hay consulta sql' . "\n");
+            error_log('execute_query: No sql statement found' . "\n");
             return [];
         }
+
         return $this->db->get_records_sql($sql);
     }
 
     /**
-     * Inserta un registro en la base de datos
+     * Insert a record into the database
+     *
+     * @param array $data
+     * @return bool|int|null
+     * @throws dml_exception
      */
     public function insert_record_db(array $data)
     {
         if (empty($data)) {
-            error_log('Exception capturada: 333' . 'No hay datos para insertar' . "\n");
-            return;
+            error_log('insert_record_db: There is no data to insert' . "\n");
+            return null;
         }
+
         return $this->db->insert_record_raw($data['table'], $data['data']);
     }
 
     /**
-     * Actualiza un registro en la base de datos
+     * Update a record in the database
+     *
+     * @param array $data
+     * @return bool|null
+     * @throws dml_exception
      */
     public function update_record_db(array $data)
     {
         if (empty($data)) {
-            error_log('Exception capturada: ' . 'No hay datos para actualizar' . "\n");
-            return;
+            error_log('update_record_db: There are no records to update' . "\n");
+            return null;
         }
+
         return $this->db->update_record_raw($data['table'], $data['data']);
     }
 
     /**
-     * Retorna un registro de la base de datos
+     * Return a record from the database
+     *
+     * @param array $data
+     * @return mixed
+     * @throws dml_exception
      */
     public function extract_data_db(array $data)
     {
         if (empty($data)) {
             error_log('Exception capturada: ' . 'No hay datos para extraer' . "\n");
-            return;
+            return null;
         }
+
         return $this->db->get_record($data['table'], $data['conditions']);
     }
 
