@@ -62,7 +62,7 @@ function xmldb_local_uplannerconnect_upgrade($oldversion): bool {
         upgrade_plugin_savepoint(true, 2023100200, 'local', 'uplannerconnect');
     }
 
-    if ($oldversion < 2023100200) {
+    if ($oldversion < 2023100201) {
 
         // Define field success to be dropped from uplanner_log.
         $table = new xmldb_table('uplanner_log');
@@ -74,10 +74,10 @@ function xmldb_local_uplannerconnect_upgrade($oldversion): bool {
         }
 
         // Uplannerconnect savepoint reached.
-        upgrade_plugin_savepoint(true, 2023100200, 'local', 'uplannerconnect');
+        upgrade_plugin_savepoint(true, 2023100201, 'local', 'uplannerconnect');
     }
 
-    if ($oldversion < 2023100201) {
+    if ($oldversion < 2023100202) {
 
         // Define field date to be added to uplanner_log.
         $table = new xmldb_table('uplanner_log');
@@ -89,10 +89,10 @@ function xmldb_local_uplannerconnect_upgrade($oldversion): bool {
         }
 
         // Uplannerconnect savepoint reached.
-        upgrade_plugin_savepoint(true, 2023100201, 'local', 'uplannerconnect');
+        upgrade_plugin_savepoint(true, 2023100202, 'local', 'uplannerconnect');
     }
 
-    if ($oldversion < 2023100201) {
+    if ($oldversion < 2023100203) {
 
         // Define field num_grades to be added to uplanner_log.
         $table = new xmldb_table('uplanner_log');
@@ -104,10 +104,10 @@ function xmldb_local_uplannerconnect_upgrade($oldversion): bool {
         }
 
         // Uplannerconnect savepoint reached.
-        upgrade_plugin_savepoint(true, 2023100201, 'local', 'uplannerconnect');
+        upgrade_plugin_savepoint(true, 2023100203, 'local', 'uplannerconnect');
     }
 
-    if ($oldversion < 2023100202) {
+    if ($oldversion < 2023100204) {
 
         // Define field num_materials to be added to uplanner_log.
         $table = new xmldb_table('uplanner_log');
@@ -119,10 +119,10 @@ function xmldb_local_uplannerconnect_upgrade($oldversion): bool {
         }
 
         // Uplannerconnect savepoint reached.
-        upgrade_plugin_savepoint(true, 2023100202, 'local', 'uplannerconnect');
+        upgrade_plugin_savepoint(true, 2023100204, 'local', 'uplannerconnect');
     }
 
-    if ($oldversion < 2023100202) {
+    if ($oldversion < 2023100205) {
 
         // Define field num_anouncements to be added to uplanner_log.
         $table = new xmldb_table('uplanner_log');
@@ -134,7 +134,22 @@ function xmldb_local_uplannerconnect_upgrade($oldversion): bool {
         }
 
         // Uplannerconnect savepoint reached.
-        upgrade_plugin_savepoint(true, 2023100202, 'local', 'uplannerconnect');
+        upgrade_plugin_savepoint(true, 2023100205, 'local', 'uplannerconnect');
+    }
+
+    if ($oldversion < 2023101802) {
+
+        // Define field num_evaluation to be added to uplanner_log.
+        $table = new xmldb_table('uplanner_log');
+        $field = new xmldb_field('num_evaluation', XMLDB_TYPE_INTEGER, '20', null, null, null, null, 'num_anouncements');
+
+        // Conditionally launch add field num_evaluation.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Uplannerconnect savepoint reached.
+        upgrade_plugin_savepoint(true, 2023101802, 'local', 'uplannerconnect');
     }
 
     return true;

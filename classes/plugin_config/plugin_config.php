@@ -1,19 +1,17 @@
 <?php
 /**
- * @package     uPlannerConnect
- * @copyright   cristian machado mosquera <cristian.machado@correounivalle.edu.co>
+ * @package     local_uplannerconnect
+ * @copyright   Cristian Machado <cristian.machado@correounivalle.edu.co>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
 namespace local_uplannerconnect\plugin_config;
 
 /**
- * @package uPlannerConnect
- * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
- * @description Variables globales para el plugin
+ * Variables globales para el plugin
 */
-class plugin_config {
-
+class plugin_config
+{
     // Variables globales.
     CONST PLUGIN_NAME = 'uplannerconnect';
     CONST PLUGIN_NAME_LOCAL = 'local_uplannerconnect';
@@ -29,19 +27,22 @@ class plugin_config {
     // Rutas de los eventos.
     CONST ROUTE_HANDLER_EVENT_1 = 'local_uplannerconnect\infrastructure\event\handle_event_course_notes';
 
-
     // Configuración de los eventos. 
     CONST EVENTS_OBSERVERS = [
         [
             'eventname' => '\core\event\user_graded',
             'includefile' => self::ROUTE_HANDLER_EVENT_1,
         ],
-        // [
-        //     'eventname' => '\core\event\grade_deleted',
-        //     'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        // ],
+        [
+            'eventname' => '\core\event\grade_deleted',
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
         [
             'eventname' => '\core\event\grade_item_created',
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\core\event\grade_item_updated',
             'includefile' => self::ROUTE_HANDLER_EVENT_1,
         ]
     ];
@@ -52,7 +53,8 @@ class plugin_config {
     CONST QUERY_SELECT_COURSE_GRADES = "SELECT * FROM %s WHERE success = '%s' LIMIT '%s' OFFSET '%s'";
     CONST QUERY_SHORNAME_COURSE_BY_ID = "SELECT shortname FROM %s WHERE id = '%s'";
     CONST QUERY_COUNT_LOGS = "SELECT count(id) FROM %s";
-    const QUERY_INSERT_LOGS = "INSERT INTO %s (date, num_grades, num_materials, num_anouncements) VALUES ('%s', '%s', '%s' , '%s')";
+    const QUERY_INSERT_LOGS = "INSERT INTO %s (date, num_grades, num_materials, num_anouncements, num_evaluation) VALUES ('%s', '%s', '%s' , '%s' , '%s')";
+    const QUERY_NAME_CATEGORY_GRADE = "SELECT t2.fullname FROM %s as t1 INNER JOIN %s as t2 ON t1.id = %s AND t2.id = t1.categoryid";
 
     // Estruturas de datos uPlanner.
     CONST UPLANNER_GRADES = [

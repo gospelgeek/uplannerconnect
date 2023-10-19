@@ -46,3 +46,6 @@ $string['materials_endpoint'] = 'Materials endpoint URL';
 $string['materials_endpoint_desc'] = 'Enter the URL for the materials endpoint.';
 $string['task_rutine_primary'] = 'Primary Task Runtime';
 $string['task_rutine_primary_desc'] = 'Enter the runtime in seconds for the primary task.';
+
+// Events.
+$string['uplannerconnect:mod_resource_file'] = "Module Files Uploaded";
