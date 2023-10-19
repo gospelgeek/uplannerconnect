@@ -94,7 +94,6 @@ class course_notes_repository
     /**
      * Delete registers by field state
      *
-     * @param $state
      * @return void
      */
     public function add_log_data() : void

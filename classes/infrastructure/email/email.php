@@ -8,21 +8,23 @@
 
 namespace local_uplannerconnect\infrastructure\email;
 
+use coding_exception;
+
 /**
  * @package uPlannerConnect
  * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
  * @author Daniel Dorado <doradodaniel14@gmail.com>
- * @description Send email with Upplaner info
+ * @description Send email with uPlaner info
  */
 class email
 {
     /**
-     * Send email with Uplanner info
+     * Send email with uPlanner info
      *
      * @return bool
-     * @throws \coding_exception
+     * @throws coding_exception
      */
-    public function send($recipient_email, $attachment_path)
+    public function send($recipient_email, $subject, $attachment_path)
     {
         $filename = basename($attachment_path);
         $user = new \stdClass();
@@ -30,7 +32,7 @@ class email
         $user->id = '000001';
         $admin = get_admin();
         
-        $subject = get_string('upllaner_email_subject', 'local_uplannerconnect');
+        $subject = get_string($subject, 'local_uplannerconnect');
     
         $body = 'Dear administrator,
 

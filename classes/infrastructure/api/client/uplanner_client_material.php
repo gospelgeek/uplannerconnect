@@ -24,6 +24,11 @@ class uplanner_client_material extends abstract_uplanner_client
     protected string $name_file = 'uplanner_client_material.csv';
 
     /**
+     * @inerhitdoc
+     */
+    protected string $email_subject = 'upllaner_email_subject_materials';
+
+    /**
      * Get material in Uplanner
      *
      * @param null $data

@@ -24,6 +24,11 @@ class uplanner_client_evaluation_structure extends abstract_uplanner_client
     protected string $name_file = 'uplanner_client_evaluation_structure.csv';
 
     /**
+     * @inerhitdoc
+     */
+    protected string $email_subject = 'upllaner_email_subject_evaluations';
+
+    /**
      * Get evaluation structure in Uplanner
      *
      * @param null $data
