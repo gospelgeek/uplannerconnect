@@ -1,29 +1,14 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
-
 /**
  * @package     local_uplannerconnect
  * @copyright   Cristian Machado Mosquera <cristian.machado@correounivalle.edu.co>
- * @copyright   daniel eduardo dorado <doradodaniel14@gmail.com>
+ * @copyright   Daniel Eduardo Dorado <doradodaniel14@gmail.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
 namespace local_uplannerconnect\task;
 
+use coding_exception;
 use local_uplannerconnect\application\repository\repository_type;
 use local_uplannerconnect\infrastructure\api\handle_send_uplanner_task;
 use moodle_exception;
@@ -31,18 +16,14 @@ use moodle_exception;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- *  Handle init uPlanner task
- * 
- * @package local_uplannerconnect
- * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
- * @author Daniel Dorado <doradodaniel14@gmail.com>
- * 
+ *  Task in charge of sending records to uPlanner
 */
 class handle_init_uplanner_task extends \core\task\scheduled_task
 {
     /**
      * @inerhitdoc
-    */
+     * @throws coding_exception
+     */
     public function get_name()
     {
         return get_string('syncinituplannertask', 'local_uplannerconnect');

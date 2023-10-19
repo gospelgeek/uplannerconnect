@@ -14,7 +14,17 @@ $string['generalsettingsheading_desc'] = 'General settings for the plugin';
 $string['reports'] = 'Reports for the UplannerConnect plugin';
 
 // Email
-$string['upllaner_email_subject'] = 'uPlanner information';
+$string['upllaner_email_subject_grades'] = 'uPlanner Grades';
+$string['upllaner_email_subject_evaluations'] = 'uPlanner Evaluations';
+$string['upllaner_email_subject_anounciente'] = 'uPlanner Anounciente';
+$string['upllaner_email_subject_materials'] = 'uPlanner Materials';
+$string['upllaner_email_subject_summary'] = 'uPlanner Summary';
+
+$string['delete_upllaner_email_subject_grades'] = 'Delete uPlanner Grades';
+$string['delete_upllaner_email_subject_evaluations'] = 'Delete uPlanner Evaluations';
+$string['delete_upllaner_email_subject_anounciente'] = 'Delete uPlanner Anounciente';
+$string['delete_upllaner_email_subject_materials'] = 'Delete uPlanner Materials';
+$string['delete_upllaner_email_subject_summary'] = 'Delete uPlanner Summary';
 
 // Tasks.
 $string['syncinituplannertask'] = 'Sync uPlanner Task';
@@ -36,3 +46,6 @@ $string['materials_endpoint'] = 'Materials endpoint URL';
 $string['materials_endpoint_desc'] = 'Enter the URL for the materials endpoint.';
 $string['task_rutine_primary'] = 'Primary Task Runtime';
 $string['task_rutine_primary_desc'] = 'Enter the runtime in seconds for the primary task.';
+
+// Events.
+$string['uplannerconnect:mod_resource_file'] = "Module Files Uploaded";

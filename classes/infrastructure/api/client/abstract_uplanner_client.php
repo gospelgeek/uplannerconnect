@@ -60,6 +60,11 @@ class abstract_uplanner_client
     protected string $name_file = '';
 
     /**
+     * @var string
+     */
+    protected string $email_subject = '';
+
+    /**
      * Construct
      */
     public function __construct()
@@ -83,6 +88,16 @@ class abstract_uplanner_client
     public function get_base_path()
     {
         return $this->base_path;
+    }
+
+    /**
+     * Get email subject
+     *
+     * @return string
+     */
+    public function get_email_subject()
+    {
+        return $this->email_subject;
     }
 
     /**

@@ -24,11 +24,16 @@ class uplanner_client_announcement extends abstract_uplanner_client
     protected string $name_file = 'uplanner_client_announcement.csv';
 
     /**
+     * @inerhitdoc
+     */
+    protected string $email_subject = 'upllaner_email_subject_anounciente';
+
+    /**
      * Get announcement in Uplanner
      *
      * @param null $data
      * @return array|bool|mixed|string
-     * @throws Exception
+     * @throws \Exception
      */
     public function get($data = null)
     {
