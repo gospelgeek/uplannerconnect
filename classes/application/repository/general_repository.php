@@ -117,9 +117,10 @@ class general_repository
     /**
      * Delete registers by field state
      *
-     * @todo Falta hacerlo dinámico
      * @param $state
+     * @param $table
      * @return bool
+     * @todo Falta hacerlo dinámico
      */
     public function delete_data_bd($state,$table): bool
     {
@@ -138,7 +139,7 @@ class general_repository
     /**
      * Delete registers by field state
      *
-     * @param $state
+     * @param array $data
      * @return void
      */
     public function add_log_data(array $data) : void
@@ -161,7 +162,7 @@ class general_repository
                 )
             );
         } catch (moodle_exception $e) {
-            error_log('delete_data_bd: ' . $e->getMessage() . "\n");
+            error_log('add_log_data: ' . $e->getMessage() . "\n");
         }
     }
 }

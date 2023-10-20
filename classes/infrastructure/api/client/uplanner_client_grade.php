@@ -24,6 +24,11 @@ class uplanner_client_grade extends abstract_uplanner_client
     protected string $name_file = 'uplanner_client_grade.csv';
 
     /**
+     * @inerhitdoc
+     */
+    protected string $email_subject = 'upllaner_email_subject_grades';
+
+    /**
      * Get grade in Uplanner
      *
      * @param null $data
