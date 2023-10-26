@@ -63,11 +63,12 @@ class material_utils
             $sizeFile = $fileData->filesize ?? 0;
             $typeFile = $fileData->mimetype ?? $getData['other']['modulename'];
             $url = $this->getUrlResource($event,$fileData);
+            $nameFile = $getData['other']['name'] ?? '';
             
             //información a guardar
             $dataToSave = [
                 'id' => $this->validator->isIsset(strval($getData['other']['instanceid'])),
-                'name' => $this->validator->isIsset($getData['other']['name']),
+                'name' => $this->validator->isIsset($nameFile),
                 'type' => $this->validator->isIsset($typeFile),
                 'url' => $this->validator->isIsset($url),
                 'blackboardSectionId' => $this->validator->isIsset($queryCourse->shortname),
@@ -135,9 +136,9 @@ class material_utils
                         //sacar la url actual
                         $url = $CFG->wwwroot.'/'.sprintf(
                             $typeUrl[$getData['other']['modulename']], 
-                            $dataFile->contextid, 
-                            $dataFile->filearea, 
-                            $dataFile->filename
+                            $dataFile->contextid ?? '', 
+                            $dataFile->filearea ?? '', 
+                            $dataFile->filename ?? ''
                         );
                     }
                     else {

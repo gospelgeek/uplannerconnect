@@ -53,6 +53,14 @@ class plugin_config
         [
             'eventname' => '\core\event\course_module_created',
             'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\core\event\course_module_updated',
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\core\event\course_module_deleted',
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
         ]
     ];
 
