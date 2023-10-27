@@ -116,6 +116,18 @@ class plugin_config
         ['name' => 'action', 'type' => 'string'],
     ];
 
+    CONST UPLANNER_ANNOUNCEMENTS_ESTRUTURE = [
+        ['name' => 'blackboardSectionId', 'type' => 'string'],
+        ['name' => 'createdDate', 'type' => 'string'],
+        ['name' => 'type', 'type' => 'string'],
+        ['name' => 'createdTime', 'type' => 'string'],
+        ['name' => 'title', 'type' => 'string'],
+        ['name' => 'content', 'type' => 'string'],
+        ['name' => 'id', 'type' => 'string'],
+        ['name' => 'usernameCreator', 'type' => 'string'],
+        ['name' => 'action', 'type' => 'string'],
+    ];
+
     // Estructuras de datos para la creacion.
     // De un Evento.
     CONST CREATE_EVENT_DATA = [
