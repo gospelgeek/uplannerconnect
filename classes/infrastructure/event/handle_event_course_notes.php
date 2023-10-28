@@ -135,6 +135,9 @@ class handle_event_course_notes
       }
    }
 
+   /**
+    *  Triggers an event when an item is updated.
+    */
    public static function grade_item_updated($event)
    {
      try {
@@ -151,6 +154,150 @@ class handle_event_course_notes
      } catch (moodle_exception $e) {
          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
      }  
+   }
+
+   /**
+    * Triggers an event when a resource is created.
+    */
+   public static function resource_file($events)
+   {
+      try {
+         error_log('*******************************************************');
+         error_log('resource_file');
+         error_log('*******************************************************');
+      } catch (moodle_exception $e) {
+         error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+      }
+   }
+
+   /**
+    * Resource created
+    */
+   public static function course_module_created($event)
+   {  
+      try {
+            if (validateAccessTypeEvent([
+               "dataEvent" => $event,
+               "typeEvent" => ["\\core\\event\\course_module_created"],
+               "key" => "eventname",
+               "methodName" => "get_data"
+            ])) {
+               $dataEvent = $event->get_data();
+               if(isset($dataEvent['other']['modulename']) && 
+                  $dataEvent['objecttable'] === 'course_modules') {
+                  $moduleType = $dataEvent['other']['modulename'];
+                  
+                  //course_modules
+                  $availableModules = [
+                     'folder',
+                     'resource',
+                     'label',
+                     'lightboxgallery',
+                     'book',
+                     'page',
+                     'url',
+                     'imscp'
+                  ];
+
+                  if (in_array($moduleType, $availableModules)) {
+                     if (!validateAccesFaculty($event)) { return; }
+                     //Instanciar la clase management_factory
+                     instantiatemanagement_factory([
+                        "dataEvent" => $event,
+                        "typeEvent" => "resource_created",
+                        "dispatch" => 'create',
+                        "enum_etities" => 'material_created'
+                     ]);
+                  }
+               }
+            }
+      } catch (moodle_exception $e) {
+         error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+      }
+   }
+
+   public static function course_module_updated($event){
+      try {
+         if (validateAccessTypeEvent([
+            "dataEvent" => $event,
+            "typeEvent" => ["\\core\\event\\course_module_updated"],
+            "key" => "eventname",
+            "methodName" => "get_data"
+         ])) {
+            $dataEvent = $event->get_data();
+            if(isset($dataEvent['other']['modulename']) && 
+               $dataEvent['objecttable'] === 'course_modules') {
+               $moduleType = $dataEvent['other']['modulename'];
+               
+               //course_modules
+               $availableModules = [
+                  'folder',
+                  'resource',
+                  'label',
+                  'lightboxgallery',
+                  'book',
+                  'page',
+                  'url',
+                  'imscp'
+               ];
+
+               if (in_array($moduleType, $availableModules)) {
+                  if (!validateAccesFaculty($event)) { return; }
+                  //Instanciar la clase management_factory
+                  instantiatemanagement_factory([
+                     "dataEvent" => $event,
+                     "typeEvent" => "resource_created",
+                     "dispatch" => 'update',
+                     "enum_etities" => 'material_created'
+                  ]);
+               }
+            }
+         }
+      } catch (moodle_exception $e) {
+         error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+      }
+   }
+
+   public static function course_module_deleted($event){
+      try {
+         if (validateAccessTypeEvent([
+            "dataEvent" => $event,
+            "typeEvent" => ["\\core\\event\\course_module_deleted"],
+            "key" => "eventname",
+            "methodName" => "get_data"
+         ])) {
+            $dataEvent = $event->get_data();
+            if(isset($dataEvent['other']['modulename']) && 
+               $dataEvent['objecttable'] === 'course_modules') {
+               $moduleType = $dataEvent['other']['modulename'];
+               
+               //course_modules
+               $availableModules = [
+                  'folder',
+                  'resource',
+                  'label',
+                  'lightboxgallery',
+                  'book',
+                  'page',
+                  'url',
+                  'imscp'
+               ];
+
+               if (in_array($moduleType, $availableModules)) {
+                  if (!validateAccesFaculty($event)) { return; }
+                  //Instanciar la clase management_factory
+                  instantiatemanagement_factory([
+                     "dataEvent" => $event,
+                     "typeEvent" => "resource_created",
+                     "dispatch" => 'delete',
+                     "enum_etities" => 'material_created'
+                  ]);
+               }
+            }
+         }
+      } catch (moodle_exception $e) {
+         error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+      }
    }
 }
 

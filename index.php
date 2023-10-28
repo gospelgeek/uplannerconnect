@@ -41,9 +41,6 @@ foreach ($rawData as $key => $value) {
         array_push($data->row, $value);
 }
 
-//imprimir en console js
-error_log(print_r($rawData, true));
-
 //Cabecera
 echo $OUTPUT->header();
 

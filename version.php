@@ -8,18 +8,16 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2023101800; //año-mes-día-numeroVersion
+$plugin->version = 2023102500; //año-mes-día-numeroVersion
 $plugin->component = 'local_uplannerconnect';
 
 $plugin->requires = 2022010100; 
 // $plugin->maturity = MATURITY_ALPHA;
 
-
 $plugin->release = '1.0.0';
 $plugin->release = '1.0 (Build: 2023090300)';
 $plugin->author = 'Samuel Ramirez & Cristian Machado Mosquera & Daniel Dorado & Isabela Rosero Obando';
 $plugin->authorcontact = 'samuel.ramirez@correounivalle.edu.co & cristian.machado@correounivalle.edu.co & doradodaniel14@gmail.com & isabela.rosero@correounivalle.edu.co';
-
 
 $plugin->license = 'GNU GPL v3 or later';
 $plugin->description = 'Este plugin se utiliza para enviar información a uPlanner.';

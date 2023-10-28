@@ -19,6 +19,10 @@ $observers = [];
 foreach (plugin_config::EVENTS_OBSERVERS as $eventData) {
     
     $callback = preg_replace('/^\\\\core\\\\event\\\\/', '', $eventData['eventname']);
+    
+    if (isset($eventData['isLocal'])) {
+        $callback = preg_replace('/^\\\\local_uplannerconnect\\\\event\\\\/', '', $eventData['eventname']);
+    }
    
     $observers[] = [
         'eventname' => $eventData['eventname'],
