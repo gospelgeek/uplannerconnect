@@ -14,68 +14,138 @@ $pluginName = plugin_config::PLUGIN_NAME_LOCAL;
 $pluginNameLocal = plugin_config::PLUGIN_NAME;
 
 if ($hassiteconfig) {
-
-    $ADMIN->add('localplugins',
-                new admin_category('local_uplannerconnect_settings',
-                new lang_string('pluginname', 'local_uplannerconnect')));
-    $settings = new admin_settingpage('managelocaluplannerconnect', 
-                new lang_string('manage', 'local_uplannerconnect'));
-
-
+    $ADMIN->add(
+        'localplugins',
+        new admin_category(
+            'local_uplannerconnect_settings',
+            new lang_string('pluginname', 'local_uplannerconnect')
+        )
+    );
+    $settings = new admin_settingpage(
+        'managelocaluplannerconnect',
+        new lang_string('manage', 'local_uplannerconnect')
+    );
     if ($ADMIN->fulltree) {
-
+        $settings->add( new admin_setting_heading(
+                'generalsettingsheading',
+                new lang_string('generalsettingsheading', 'local_uplannerconnect'),
+                new lang_string('generalsettingsheading_desc', 'local_uplannerconnect')
+            )
+        );
+        // uPlanner key
         $settings->add(new admin_setting_heading(
-            'generalsettingsheading',
-            new lang_string('generalsettingsheading', 'local_uplannerconnect'),
-            new lang_string('generalsettingsheading_desc', 'local_uplannerconnect')));
-
+                $pluginName . '_key',
+                get_string('key_heading', $pluginName),
+                'Uplanner key'
+            )
+        );
         $settings->add(new admin_setting_configtext(
-            ''.$pluginName.'/courses_endpoint',
-            get_string('courses_endpoint', $pluginName),
-            get_string('courses_endpoint_desc', $pluginName),
-            'Bus de servicios de uPlanner',
-            PARAM_URL
-        ));
-
-        // Configuración para el endpoint de notificaciones
+                $pluginName . '/key',
+                get_string('key', $pluginName),
+                get_string('key_desc', $pluginName),
+                'uPlanner key',
+                PARAM_TEXT
+            )
+        );
+        // uPlanner token
         $settings->add(new admin_setting_heading(
-            ''.$pluginName.'_notifications', 
-            get_string('notifications_endpoint_heading', 
-            $pluginName), 
-            ''
-        ));
-        
+                $pluginName . '_token',
+                get_string('token_endpoint_heading', $pluginName),
+                'uPlanner token url'
+            )
+        );
         $settings->add(new admin_setting_configtext(
-            ''.$pluginName.'/notifications_endpoint',
-            get_string('notifications_endpoint', $pluginName),
-            get_string('notifications_endpoint_desc', $pluginName),
-            'Bus de servicios de uPlanner',
-            PARAM_URL
-        ));
-
-        // Configuración para el endpoint de materiales
+                $pluginName . '/token_endpoint',
+                get_string('token_endpoint', $pluginName),
+                get_string('token_endpoint_desc', $pluginName),
+                'https://univalle-api.u-planner.com/api/auth/signature',
+                PARAM_URL
+            )
+        );
+        // uPlanner base url
         $settings->add(new admin_setting_heading(
-            ''.$pluginName.'_materials', 
-            get_string('materials_endpoint_heading',
-            $pluginName), 
-            ''
-        ));
-        
+                $pluginName . '_base_url',
+                get_string('base_url_heading', $pluginName),
+                'uPlanner base url (messages)'
+            )
+        );
         $settings->add(new admin_setting_configtext(
-            ''.$pluginName.'/materials_endpoint',
-            get_string('materials_endpoint', $pluginName),
-            get_string('materials_endpoint_desc', $pluginName),
-            'Bus de servicios de uPlanner',
-            PARAM_URL
-        ));
+                $pluginName . '/base_url',
+                get_string('base_url', $pluginName),
+                get_string('base_url_desc', $pluginName),
+                'https://u-plannerplus.servicebus.windows.net/topic/messages',
+                PARAM_URL
+            )
+        );
+        // uPlanner materials
+        $settings->add(new admin_setting_heading(
+                $pluginName . '_materials',
+                get_string('materials_endpoint_heading', $pluginName),
+                'uPlanner materials'
+            )
+        );
+        $settings->add(new admin_setting_configtext(
+                $pluginName . '/materials_endpoint',
+                get_string('materials_endpoint', $pluginName),
+                get_string('materials_endpoint_desc', $pluginName),
+                'univalle/materials',
+                PARAM_URL
+            )
+        );
+        // uPlanner announcements
+        $settings->add(new admin_setting_heading(
+                $pluginName . '_announcements',
+                get_string('announcements_endpoint_heading', $pluginName),
+                'uPlanner announcements'
+            )
+        );
+        $settings->add(new admin_setting_configtext(
+                $pluginName . '/announcements_endpoint',
+                get_string('announcements_endpoint', $pluginName),
+                get_string('announcements_endpoint_desc', $pluginName),
+                'univalle/announcements',
+                PARAM_URL
+            )
+        );
+        // uPlanner evaluation_structure
+        $settings->add(new admin_setting_heading(
+                $pluginName . '_evaluation_structure',
+                get_string('evaluation_structure_endpoint_heading', $pluginName),
+                'uPlanner evaluation structure'
+            )
+        );
+        $settings->add(new admin_setting_configtext(
+                $pluginName . '/evaluation_structure_endpoint',
+                get_string('evaluation_structure_endpoint', $pluginName),
+                get_string('evaluation_structure_endpoint_desc', $pluginName),
+                'univalle/evaluationStructure',
+                PARAM_URL
+            )
+        );
+        // uPlanner grades
+        $settings->add(new admin_setting_heading(
+                $pluginName . '_grades',
+                get_string('grades_endpoint_heading', $pluginName),
+                'uPlanner grades'
+            )
+        );
+        $settings->add(new admin_setting_configtext(
+                $pluginName . '/grades_endpoint',
+                get_string('grades_endpoint', $pluginName),
+                get_string('grades_endpoint_desc', $pluginName),
+                'univalle/grades',
+                PARAM_URL
+            )
+        );
 
         $settings->add(new admin_setting_configtext(
-            ''.$pluginName.'/task_runtime_primary',
-            get_string('task_rutine_primary', $pluginName),
-            get_string('task_rutine_primary_desc', $pluginName),
-            5,
-            PARAM_INT
-        ));
+                $pluginName . '/task_runtime_primary',
+                get_string('task_rutine_primary', $pluginName),
+                get_string('task_rutine_primary_desc', $pluginName),
+                5,
+                PARAM_INT
+            )
+        );
         
     }
 

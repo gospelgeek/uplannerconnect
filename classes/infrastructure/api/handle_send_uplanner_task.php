@@ -115,9 +115,11 @@ class handle_send_uplanner_task
             if (!$rows) {
                 break;
             }
+            $response = $this->request($uplanner_client, $rows);
+            $status = in_array('error', $response) ? repository_type::STATE_ERROR : repository_type::STATE_SEND;
             $this->create_file($uplanner_client->get_file_name(), $rows);
             $response = $this->send_email($uplanner_client->get_email_subject());
-            $status = $response ? repository_type::STATE_SEND : repository_type::STATE_ERROR;
+            //$status = $response ? repository_type::STATE_SEND : repository_type::STATE_ERROR;
             foreach ($rows as $row) {
                 $dataQuery = [
                     'json' => $row->json,
@@ -128,6 +130,7 @@ class handle_send_uplanner_task
                 $repository->updateDataBD($dataQuery);
             }
             $this->file->reset_csv(abstract_uplanner_client::FILE_HEADERS);
+            $index_row++;
         }
     }
 
@@ -160,42 +163,34 @@ class handle_send_uplanner_task
             if (!$rows) {
                 break;
             }
+            $response = $this->request($uplanner_client, $rows);
+            $status = in_array('error', $response) ? repository_type::STATE_ERROR : repository_type::STATE_SEND;
             foreach ($rows as $row) {
-                $response = $this->request($uplanner_client, $row['type'], $row['json']);
-                // 2 -> state error, 1 -> state send
-                $status = in_array($response, 'error') ? repository_type::STATE_SEND : repository_type::STATE_ERROR;
                 $dataQuery = [
-                    'json' => $row->json,
-                    'response' => $response,
+                    'json' => json_encode($row->json),
+                    'response' => json_encode($response),
                     'success' => $status,
                     'id' => $row->id
                 ];
                 $repository->updateDataBD($dataQuery);
             }
+            $index_row++;
         }
     }
 
     /**
      * @param $uplanner_client
-     * @param $type
-     * @param $json
+     * @param $rows
      * @return mixed
      */
-    public function request($uplanner_client, $type, $json)
+    public function request($uplanner_client, $rows)
     {
-        $response = [];
+        $response = $json = [];
         try {
-            switch ($type) {
-                case 'delete':
-                    $response = $uplanner_client->delete($json);
-                    break;
-                case 'update':
-                    $response = $uplanner_client->update($json);
-                    break;
-                default:
-                    $response = $uplanner_client->create($json);
-                    break;
+            foreach ($rows as $row) {
+                $json[] = $row->json;
             }
+            $response = $uplanner_client->request($json);
         } catch (\Exception $e) {
             error_log('handle_send_uplanner_task - request: ' . $e->getMessage() . "\n");
         }
