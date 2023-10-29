@@ -14,7 +14,7 @@ use moodle_exception;
 */
 class data_validator
 {
-    CONST TYPE_VERIFICATION = [
+    const TYPE_VERIFICATION = [
         'string' => 'isString',
         'int' => 'isInt',
         'float' => 'isFloat',
@@ -23,6 +23,16 @@ class data_validator
         'object' => 'isObject',
         'null' => 'isNull',
         'numeric' => 'isNumeric'
+    ];
+
+    const DATA_NATIVE = [
+        'string' => '',
+        'int' => 0,
+        'float' => 0.0,
+        'bool' => false,
+        'array' => [],
+        'null' => null,
+        'numeric' => 0
     ];
 
     /**
@@ -69,10 +79,10 @@ class data_validator
                     ])) {
                         $arraySend[$item['name']] = $data['data'][$item['name']];
                     } else {
-                        $arraySend[$item['name']] = '';
+                        $arraySend[$item['name']] = self::DATA_NATIVE[$item['type']] ?? '';
                     }
                 } else {
-                    $arraySend[$item['name']] = '';
+                    $arraySend[$item['name']] = self::DATA_NATIVE[$item['type']] ?? '';
                 }
             }
        }

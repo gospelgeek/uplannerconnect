@@ -79,7 +79,7 @@ class announcements_translation_data
             "title" => $dataSend['title'],
             "content" => $dataSend['content'],
             "id" => $dataSend['id'],
-            "usernameCreator" => $dataSend['lastUpdatedTime'],
+            "usernameCreator" => $dataSend['usernameCreator'],
             "action" => $dataSend['action']
             ];
         }

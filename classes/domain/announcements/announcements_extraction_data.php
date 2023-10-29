@@ -9,7 +9,7 @@ namespace local_uplannerconnect\domain\announcements;
 
 use local_uplannerconnect\application\service\data_validator;
 use local_uplannerconnect\plugin_config\plugin_config;
-use local_uplannerconnect\domain\announcementss\usecases\announcements_utils;
+use local_uplannerconnect\domain\announcements\usecases\announcements_utils;
 use moodle_exception;
 
 /**

@@ -61,6 +61,36 @@ class plugin_config
         [
             'eventname' => '\core\event\course_module_deleted',
             'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\mod_forum\event\discussion_created',
+            'isForum' => true,
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\mod_forum\event\discussion_deleted',
+            'isForum' => true,
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\mod_forum\event\discussion_updated',
+            'isForum' => true,
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\mod_forum\event\post_created',
+            'isForum' => true,
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\mod_forum\event\post_updated',
+            'isForum' => true,
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\mod_forum\event\post_deleted',
+            'isForum' => true,
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
         ]
     ];
 

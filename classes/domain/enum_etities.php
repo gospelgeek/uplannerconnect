@@ -11,6 +11,7 @@ namespace local_uplannerconnect\domain;
 use local_uplannerconnect\application\course\course_grades_service;
 use local_uplannerconnect\application\course\course_evaluation_structure;
 use local_uplannerconnect\application\materials\material_resource;
+use local_uplannerconnect\application\announcements\announcements_service;
 use moodle_exception;
 
 /**
@@ -25,6 +26,7 @@ class enum_etities
             'course_notes' => course_grades_service::class,
             'evaluation_structure' => course_evaluation_structure::class,
             'material_created' => material_resource::class,
+            'announcements' => announcements_service::class
         ];
     }
 

@@ -30,20 +30,49 @@ $string['delete_upllaner_email_subject_summary'] = 'Delete uPlanner Summary';
 $string['syncinituplannertask'] = 'Sync uPlanner Task';
 $string['syncerroruplannertask'] = 'Sync Log uPlanner Task';
 
+// Module
 $string['pluginname'] = 'uPlannerConnect';
 $string['welcome'] = 'Welcome';
 $string['description'] = 'It aims to extract information from the campus and send it to uPlanner.';
 $string['title'] = 'uPlannerConnect';
 $string['uplannerconnect:index'] = 'uPlannerConnect';
-$string['courses_endpoint_heading'] = 'Courses Endpoint Configuration';
-$string['courses_endpoint'] = 'Courses endpoint URL';
-$string['courses_endpoint_desc'] = 'Enter the URL for the courses endpoint.';
-$string['notifications_endpoint_heading'] = 'Notifications Endpoint Configuration';
-$string['notifications_endpoint'] = 'Notifications endpoint URL';
-$string['notifications_endpoint_desc'] = 'Enter the URL for the notifications endpoint.';
-$string['materials_endpoint_heading'] = 'Materials Endpoint Configuration';
-$string['materials_endpoint'] = 'Materials endpoint URL';
-$string['materials_endpoint_desc'] = 'Enter the URL for the materials endpoint.';
+
+// uPlanner key field
+$string['key_heading'] = 'uPlanner key configuration';
+$string['key'] = 'uPlanner key';
+$string['key_desc'] = 'Enter the uPlanner key';
+
+// uPlanner base url field
+$string['base_url_heading'] = 'uPlanner base url configuration';
+$string['base_url'] = 'uPlanner base url';
+$string['base_url_desc'] = 'Enter the uPlanner base url';
+
+// uPlanner token field
+$string['token_endpoint_heading'] = 'Token url configuration';
+$string['token_endpoint'] = 'Token url';
+$string['token_endpoint_desc'] = 'Enter the url for the token.';
+
+// uPlanner materials field
+$string['materials_endpoint_heading'] = 'Materials topic configuration';
+$string['materials_endpoint'] = 'Materials topic';
+$string['materials_endpoint_desc'] = 'Enter the topic for the materials endpoint.';
+
+// uPlanner announcements field
+$string['announcements_endpoint_heading'] = 'Announcements topic configuration';
+$string['announcements_endpoint'] = 'Announcements topic';
+$string['announcements_endpoint_desc'] = 'Enter the topic for the announcements endpoint.';
+
+// uPlanner evaluation_structure field
+$string['evaluation_structure_endpoint_heading'] = 'Evaluation structure topic configuration';
+$string['evaluation_structure_endpoint'] = 'Evaluation structure topic';
+$string['evaluation_structure_endpoint_desc'] = 'Enter the topic for the evaluation structure endpoint.';
+
+// uPlanner grades field
+$string['grades_endpoint_heading'] = 'Grades topic configuration';
+$string['grades_endpoint'] = 'Grades topic';
+$string['grades_endpoint_desc'] = 'Enter the topic for the grades endpoint.';
+
+// uPlanner task rutine field
 $string['task_rutine_primary'] = 'Primary Task Runtime';
 $string['task_rutine_primary_desc'] = 'Enter the runtime in seconds for the primary task.';
 
