@@ -103,4 +103,25 @@ class course_notes_repository
             'table_log' => plugin_config::TABLE_LOG
         ]);
     }
+
+    /**
+     * Delete register
+     *
+     * @param $id
+     * @return bool
+     */
+    public function delete_row($id): bool
+    {
+        $result = false;
+        try {
+            $result = $this->general_repository->delete_row(
+                plugin_config::TABLE_COURSE_GRADE,
+                $id
+
+            );
+        } catch (moodle_exception $e) {
+            error_log('delete_row: ' . $e->getMessage() . "\n");
+        }
+        return $result;
+    }
 }
