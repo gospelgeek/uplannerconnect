@@ -8,14 +8,13 @@
 namespace local_uplannerconnect\application\repository;
 
 use local_uplannerconnect\plugin_config\plugin_config;
-use moodle_exception;
 
 /**
- * Loaded class to manipulate data in upplanner_evaluation table
+ * Loaded class to manipulate data in upplanner_material table
 */
-class course_evaluation_structure_repository
+class announcements_repository
 {
-    const TABLE_COURSE_EVALUATION = 'uplanner_evaluation';
+    const TABLE_COURSE_MATERIALS = 'uplanner_notification';
 
     /**
      * @var general_repository
@@ -45,7 +44,7 @@ class course_evaluation_structure_repository
                 'success' => $data['success'],
                 'id' => $data['id'],
             ],
-            'table' => self::TABLE_COURSE_EVALUATION
+            'table' => self::TABLE_COURSE_MATERIALS
         ]);
     }
 
@@ -64,7 +63,7 @@ class course_evaluation_structure_repository
                 'success' => repository_type::STATE_DEFAULT,
                 'request_type' => $data['action'],
             ],
-            'table' => self::TABLE_COURSE_EVALUATION
+            'table' => self::TABLE_COURSE_MATERIALS
         ]);
     }
 
@@ -79,7 +78,7 @@ class course_evaluation_structure_repository
         return $this->general_repository->getDataBD([
             'data' => $data,
             'query' => plugin_config::QUERY_SELECT_COURSE_GRADES,
-            'table' => 'mdl_' . self::TABLE_COURSE_EVALUATION
+            'table' => 'mdl_' . self::TABLE_COURSE_MATERIALS
         ]);
     }
 
@@ -91,7 +90,7 @@ class course_evaluation_structure_repository
      */
     public function delete_data_bd($state): bool
     {
-        return $this->general_repository->delete_data_bd($state, self::TABLE_COURSE_EVALUATION);
+        return $this->general_repository->delete_data_bd($state, self::TABLE_COURSE_MATERIALS);
     }
 
     /**
@@ -103,30 +102,9 @@ class course_evaluation_structure_repository
     {
         // $this->general_repository->add_log_data([
         //     'query_insert' => plugin_config::QUERY_COUNT_LOGS,
-        //     'table_insert' => 'mdl_'.plugin_config::TABLE_COURSE_EVALUATION,
+        //     'table_insert' => 'mdl_'.plugin_config::TABLE_COURSE_MATERIALS,
         //     'query_log' => plugin_config::QUERY_INSERT_LOGS,
         //     'table_log' => plugin_config::TABLE_LOG
         // ]);
-    }
-
-    /**
-     * Delete register
-     *
-     * @param $id
-     * @return bool
-     */
-    public function delete_row($id): bool
-    {
-        $result = false;
-        try {
-            $result = $this->general_repository->delete_row(
-                self::TABLE_COURSE_EVALUATION,
-                $id
-
-            );
-        } catch (moodle_exception $e) {
-            error_log('delete_row: ' . $e->getMessage() . "\n");
-        }
-        return $result;
     }
 }
