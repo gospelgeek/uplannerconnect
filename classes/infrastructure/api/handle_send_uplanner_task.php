@@ -187,6 +187,7 @@ class handle_send_uplanner_task
                     'json' => json_encode($row->json),
                     'response' => json_encode($response),
                     'success' => $status,
+                    'request_type' => json_encode($response['code']),
                     'id' => $row->id
                 ];
                 $repository->updateDataBD($dataQuery);
