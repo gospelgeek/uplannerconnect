@@ -136,6 +136,7 @@ class handle_send_uplanner_task
                 ];
                 $repository->updateDataBD($dataQuery);
                 $data_message = [
+                    'id_code' => (int) $row->id,
                     'id_transaction' => (int) $row->id,
                     'ds_topic' => get_class($repository),
                     'ds_mongo_id' => 'ds mongo id',

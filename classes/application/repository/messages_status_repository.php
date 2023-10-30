@@ -50,12 +50,13 @@ class messages_status_repository
             'data' => [
                 'id_transaction' => $data['id_transaction'],
                 'ds_topic' => $data['ds_topic'],
-                'ds_mongo_id' => $data['ds_mongoId'],
+                'ds_mongo_id' => $data['ds_mongo_id'],
                 'ds_error' => $data['ds_error'],
-                'dt_processing_date' => $data['dt_processingDate'],
-                'is_success_ful' => $data['is_successful'],
-                'created_at' => $data['createdAt'],
+                'dt_processing_date' => $data['dt_processing_date'],
+                'is_success_ful' => $data['is_success_ful'],
+                'created_at' => $data['created_at'],
                 'id_code' => $data['id_code'],
+                'id' => $data['id'],
             ],
             'table' => self::TABLE
         ]);
@@ -71,13 +72,14 @@ class messages_status_repository
     {
         $this->general_repository->saveDataBD([
             'data' => [
+                'id_code' => $data['id_code'],
                 'id_transaction' => $data['id_transaction'],
                 'ds_topic' => $data['ds_topic'],
-                'ds_mongo_id' => $data['ds_mongoId'],
+                'ds_mongo_id' => $data['ds_mongo_id'],
                 'ds_error' => $data['ds_error'],
-                'dt_processing_date' => $data['dt_processingDate'],
-                'is_success_ful' => $data['is_successful'],
-                'created_at' => $data['createdAt']
+                'dt_processing_date' => $data['dt_processing_date'],
+                'is_success_ful' => $data['is_success_ful'],
+                'created_at' => $data['created_at']
             ],
             'table' => self::TABLE
         ]);
@@ -113,17 +115,17 @@ class messages_status_repository
     /**
      * Delete register
      *
-     * @param $id_code
+     * @param $id
      * @return bool
      */
-    public function delete_row($id_code): bool
+    public function delete_row($id): bool
     {
         $result = false;
         try {
             $result = $this->general_repository->delete_row(
                 self::TABLE,
-                $id_code,
-                'id_code'
+                $id,
+                'id'
 
             );
         } catch (moodle_exception $e) {
