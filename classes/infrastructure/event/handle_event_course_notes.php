@@ -216,7 +216,11 @@ class handle_event_course_notes
       }
    }
 
-   public static function course_module_updated($event){
+   /**
+    * Resource updated
+    */
+   public static function course_module_updated($event)
+   {
       try {
          if (validateAccessTypeEvent([
             "dataEvent" => $event,
@@ -258,7 +262,11 @@ class handle_event_course_notes
       }
    }
 
-   public static function course_module_deleted($event){
+   /**
+    * Resource deleted
+    */
+   public static function course_module_deleted($event)
+   {
       try {
          if (validateAccessTypeEvent([
             "dataEvent" => $event,
@@ -299,8 +307,163 @@ class handle_event_course_notes
          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
       }
    }
-}
 
+   /**
+    * Triggers an event when a discussion is created.
+    */
+   public static function discussion_created($event)
+   {
+      try {
+            if (validateAccessTypeEvent([
+               "dataEvent" => $event,
+               "typeEvent" => ["\\mod_forum\\event\\discussion_created"],
+               "key" => "eventname",
+               "methodName" => "get_data"
+            ])) {
+               if (!validateAccesFaculty($event)) { return; }
+               //Instanciar la clase management_factory
+               instantiatemanagement_factory([
+                  "dataEvent" => $event,
+                  "typeEvent" => "created_announcements",
+                  "dispatch" => 'create',
+                  "enum_etities" => 'announcements'
+               ]);
+            }
+      } catch (moodle_exception $e) {
+         error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+      }
+   }
+
+   /**
+    * Triggers an event when a discussion is deleted.
+    */
+    public static function discussion_deleted($event)
+    {
+       try {
+             if (validateAccessTypeEvent([
+                "dataEvent" => $event,
+                "typeEvent" => ["\\mod_forum\\event\\discussion_deleted"],
+                "key" => "eventname",
+                "methodName" => "get_data"
+             ])) {
+                if (!validateAccesFaculty($event)) { return; }
+                //Instanciar la clase management_factory
+                instantiatemanagement_factory([
+                   "dataEvent" => $event,
+                   "typeEvent" => "created_announcements",
+                   "dispatch" => 'delete',
+                   "enum_etities" => 'announcements'
+                ]);
+             }
+       } catch (moodle_exception $e) {
+          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+       }
+   }
+
+   /**
+    * Triggers an event when a discussion is deleted.
+    */
+    public static function discussion_updated($event)
+    {
+       try {
+             if (validateAccessTypeEvent([
+                "dataEvent" => $event,
+                "typeEvent" => ["\\mod_forum\\event\\discussion_updated"],
+                "key" => "eventname",
+                "methodName" => "get_data"
+             ])) {
+                if (!validateAccesFaculty($event)) { return; }
+                //Instanciar la clase management_factory
+                instantiatemanagement_factory([
+                   "dataEvent" => $event,
+                   "typeEvent" => "created_announcements",
+                   "dispatch" => 'update',
+                   "enum_etities" => 'announcements'
+                ]);
+             }
+       } catch (moodle_exception $e) {
+          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+       }
+   }
+
+   /**
+    * Triggers an event when a post_created.
+    */
+    public static function post_created($event)
+    {
+       try {
+             if (validateAccessTypeEvent([
+                "dataEvent" => $event,
+                "typeEvent" => ["\\mod_forum\\event\\post_created"],
+                "key" => "eventname",
+                "methodName" => "get_data"
+             ])) {
+                if (!validateAccesFaculty($event)) { return; }
+                //Instanciar la clase management_factory
+                instantiatemanagement_factory([
+                   "dataEvent" => $event,
+                   "typeEvent" => "created_announcements",
+                   "dispatch" => 'create',
+                   "enum_etities" => 'announcements'
+                ]);
+             }
+       } catch (moodle_exception $e) {
+          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+       }
+   }
+
+   /**
+    * Triggers an event when a post_updated.
+    */
+    public static function post_updated($event)
+    {
+       try {
+             if (validateAccessTypeEvent([
+                "dataEvent" => $event,
+                "typeEvent" => ["\\mod_forum\\event\\post_updated"],
+                "key" => "eventname",
+                "methodName" => "get_data"
+             ])) {
+                if (!validateAccesFaculty($event)) { return; }
+                //Instanciar la clase management_factory
+                instantiatemanagement_factory([
+                   "dataEvent" => $event,
+                   "typeEvent" => "created_announcements",
+                   "dispatch" => 'update',
+                   "enum_etities" => 'announcements'
+                ]);
+             }
+       } catch (moodle_exception $e) {
+          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+       }
+   }
+
+   /**
+    * Triggers an event when a post_deleted.
+    */
+    public static function post_deleted($event)
+    {
+       try {
+             if (validateAccessTypeEvent([
+                "dataEvent" => $event,
+                "typeEvent" => ["\\mod_forum\\event\\post_deleted"],
+                "key" => "eventname",
+                "methodName" => "get_data"
+             ])) {
+                if (!validateAccesFaculty($event)) { return; }
+                //Instanciar la clase management_factory
+                instantiatemanagement_factory([
+                   "dataEvent" => $event,
+                   "typeEvent" => "created_announcements",
+                   "dispatch" => 'delete',
+                   "enum_etities" => 'announcements'
+                ]);
+             }
+       } catch (moodle_exception $e) {
+          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+       }
+   }
+}
 
 /**
   * Verifica si el evento no es un duplicado
