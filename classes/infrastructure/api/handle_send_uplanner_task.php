@@ -138,11 +138,11 @@ class handle_send_uplanner_task
                 $data_message = [
                     'id_transaction' => (int) $row->id,
                     'ds_topic' => get_class($repository),
-                    'ds_mongoId' => 'ds mongo id',
+                    'ds_mongo_id' => 'ds mongo id',
                     'ds_error' => 'None',
-                    'dt_processingDate' => date('YYmd'),
-                    'is_successful' => 1,
-                    'createdAt' => date('YYmd')
+                    'dt_processing_date' => date('YYmd'),
+                    'is_success_ful' => 1,
+                    'created_at' => date('YYmd')
                 ];
                 $this->message_repository->save($data_message);
             }
