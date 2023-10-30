@@ -61,5 +61,20 @@
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" />
             </KEYS>
         </TABLE>
+        <TABLE NAME="uplanner_esb_messages_status" COMMENT="uPlanner messages status">
+            <FIELDS>
+                <FIELD NAME="id_code" SEQUENCE="true" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="Entity id" />
+                <FIELD NAME="id_transaction" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="ds_topic" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="ds_mongoId" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="ds_error" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="dt_processingDate" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="is_successful" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="createdAt" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id_code" />
+            </KEYS>
+        </TABLE>
     </TABLES>
 </XMLDB>
