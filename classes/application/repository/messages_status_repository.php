@@ -50,11 +50,11 @@ class messages_status_repository
             'data' => [
                 'id_transaction' => $data['id_transaction'],
                 'ds_topic' => $data['ds_topic'],
-                'ds_mongoId' => $data['ds_mongoId'],
+                'ds_mongo_id' => $data['ds_mongoId'],
                 'ds_error' => $data['ds_error'],
-                'dt_processingDate' => $data['dt_processingDate'],
-                'is_successful' => $data['is_successful'],
-                'createdAt' => $data['createdAt'],
+                'dt_processing_date' => $data['dt_processingDate'],
+                'is_success_ful' => $data['is_successful'],
+                'created_at' => $data['createdAt'],
                 'id_code' => $data['id_code'],
             ],
             'table' => self::TABLE
@@ -73,11 +73,11 @@ class messages_status_repository
             'data' => [
                 'id_transaction' => $data['id_transaction'],
                 'ds_topic' => $data['ds_topic'],
-                'ds_mongoId' => $data['ds_mongoId'],
+                'ds_mongo_id' => $data['ds_mongoId'],
                 'ds_error' => $data['ds_error'],
-                'dt_processingDate' => $data['dt_processingDate'],
-                'is_successful' => $data['is_successful'],
-                'createdAt' => $data['createdAt']
+                'dt_processing_date' => $data['dt_processingDate'],
+                'is_success_ful' => $data['is_successful'],
+                'created_at' => $data['createdAt']
             ],
             'table' => self::TABLE
         ]);
