@@ -44,6 +44,48 @@ class plugin_config
         [
             'eventname' => '\core\event\grade_item_updated',
             'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\local_uplannerconnect\event\resource_file',
+            'isLocal' => true,
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\core\event\course_module_created',
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\core\event\course_module_updated',
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\core\event\course_module_deleted',
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\mod_forum\event\discussion_created',
+            'isForum' => true,
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\mod_forum\event\discussion_deleted',
+            'isForum' => true,
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\mod_forum\event\post_created',
+            'isForum' => true,
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\mod_forum\event\post_updated',
+            'isForum' => true,
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        ],
+        [
+            'eventname' => '\mod_forum\event\post_deleted',
+            'isForum' => true,
+            'includefile' => self::ROUTE_HANDLER_EVENT_1,
         ]
     ];
 
@@ -84,6 +126,30 @@ class plugin_config
         ['name' => 'evaluationId', 'type' => 'numeric'],
         ['name' => 'evaluationName', 'type' => 'string'],
         ['name' => 'weight', 'type' => 'numeric'],
+        ['name' => 'action', 'type' => 'string'],
+    ];
+
+    CONST UPLANNER_MATERIALS_ESTRUTURE = [
+        ['name' => 'id', 'type' => 'string'],
+        ['name' => 'name', 'type' => 'string'],
+        ['name' => 'type', 'type' => 'string'],
+        ['name' => 'url', 'type' => 'string'],
+        ['name' => 'parentId', 'type' => 'string'],
+        ['name' => 'blackboardSectionId', 'type' => 'string'],
+        ['name' => 'size', 'type' => 'numeric'],
+        ['name' => 'lastUpdatedTime', 'type' => 'string'],
+        ['name' => 'action', 'type' => 'string'],
+    ];
+
+    CONST UPLANNER_ANNOUNCEMENTS_ESTRUTURE = [
+        ['name' => 'blackboardSectionId', 'type' => 'string'],
+        ['name' => 'createdDate', 'type' => 'string'],
+        ['name' => 'type', 'type' => 'string'],
+        ['name' => 'createdTime', 'type' => 'string'],
+        ['name' => 'title', 'type' => 'string'],
+        ['name' => 'content', 'type' => 'string'],
+        ['name' => 'id', 'type' => 'string'],
+        ['name' => 'usernameCreator', 'type' => 'string'],
         ['name' => 'action', 'type' => 'string'],
     ];
 

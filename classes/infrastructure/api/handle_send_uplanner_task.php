@@ -10,6 +10,7 @@ namespace local_uplannerconnect\infrastructure\api;
 
 use coding_exception;
 use local_uplannerconnect\application\repository\repository_type;
+use local_uplannerconnect\application\repository\messages_status_repository;
 use local_uplannerconnect\infrastructure\api\client\abstract_uplanner_client;
 use local_uplannerconnect\infrastructure\api\factory\uplanner_client_factory;
 use local_uplannerconnect\infrastructure\email\email;
@@ -42,12 +43,18 @@ class handle_send_uplanner_task
     private $email;
 
     /**
+     * @var messages_status_repository
+     */
+    private $message_repository;
+
+    /**
      * Construct
      */
     public function __construct()
     {
         $this->uplanner_client_factory = new uplanner_client_factory();
         $this->email = new email();
+        $this->message_repository = new messages_status_repository();
     }
 
     /**
@@ -115,9 +122,11 @@ class handle_send_uplanner_task
             if (!$rows) {
                 break;
             }
+            $response = $this->request($uplanner_client, $rows);
+            $status = in_array('error', $response) ? repository_type::STATE_ERROR : repository_type::STATE_SEND;
             $this->create_file($uplanner_client->get_file_name(), $rows);
             $response = $this->send_email($uplanner_client->get_email_subject());
-            $status = $response ? repository_type::STATE_SEND : repository_type::STATE_ERROR;
+            //$status = $response ? repository_type::STATE_SEND : repository_type::STATE_ERROR;
             foreach ($rows as $row) {
                 $dataQuery = [
                     'json' => $row->json,
@@ -126,8 +135,20 @@ class handle_send_uplanner_task
                     'id' => $row->id
                 ];
                 $repository->updateDataBD($dataQuery);
+                $data_message = [
+                    'id_code' => (int) $row->id,
+                    'id_transaction' => (int) $row->id,
+                    'ds_topic' => get_class($repository),
+                    'ds_mongo_id' => 'ds mongo id',
+                    'ds_error' => 'None',
+                    'dt_processing_date' => date('YYmd'),
+                    'is_success_ful' => 1,
+                    'created_at' => date('YYmd')
+                ];
+                $this->message_repository->save($data_message);
             }
             $this->file->reset_csv(abstract_uplanner_client::FILE_HEADERS);
+            $index_row++;
         }
     }
 
@@ -160,42 +181,35 @@ class handle_send_uplanner_task
             if (!$rows) {
                 break;
             }
+            $response = $this->request($uplanner_client, $rows);
+            $status = in_array('error', $response) ? repository_type::STATE_ERROR : repository_type::STATE_SEND;
             foreach ($rows as $row) {
-                $response = $this->request($uplanner_client, $row['type'], $row['json']);
-                // 2 -> state error, 1 -> state send
-                $status = in_array($response, 'error') ? repository_type::STATE_SEND : repository_type::STATE_ERROR;
                 $dataQuery = [
-                    'json' => $row->json,
-                    'response' => $response,
+                    'json' => json_encode($row->json),
+                    'response' => json_encode($response),
                     'success' => $status,
+                    'request_type' => json_encode($response['code']),
                     'id' => $row->id
                 ];
                 $repository->updateDataBD($dataQuery);
             }
+            $index_row++;
         }
     }
 
     /**
      * @param $uplanner_client
-     * @param $type
-     * @param $json
+     * @param $rows
      * @return mixed
      */
-    public function request($uplanner_client, $type, $json)
+    public function request($uplanner_client, $rows)
     {
-        $response = [];
+        $response = $json = [];
         try {
-            switch ($type) {
-                case 'delete':
-                    $response = $uplanner_client->delete($json);
-                    break;
-                case 'update':
-                    $response = $uplanner_client->update($json);
-                    break;
-                default:
-                    $response = $uplanner_client->create($json);
-                    break;
+            foreach ($rows as $row) {
+                $json[] = $row->json;
             }
+            $response = $uplanner_client->request($json);
         } catch (\Exception $e) {
             error_log('handle_send_uplanner_task - request: ' . $e->getMessage() . "\n");
         }

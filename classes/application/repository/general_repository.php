@@ -66,16 +66,15 @@ class general_repository
               error_log('Excepción capturada: ' . 'No hay datos para guardar' . "\n");
               return;
             }
-            
             $dataJson = $data['data'];
-        
+
             $this->moodle_query_handler->insert_record_db([
                 'table' => $data['table'],
                 'data' => $dataJson
             ]);
         }
         catch (moodle_exception $e) {
-          error_log('Excepción capturada: ' . $e->getMessage() . "\n");
+            error_log('Excepción capturada: ' . $e->getMessage() . "\n");
         }
     }
 
@@ -137,6 +136,28 @@ class general_repository
     }
 
     /**
+     * Delete register
+     *
+     * @param $primary_key
+     * @param $id
+     * @param $table
+     * @return bool
+     */
+    public function delete_row($table, $id, $primary_key = 'id'): bool
+    {
+        $result = false;
+        try {
+            $result = $this->moodle_query_handler->delete_records(
+                $table,
+                [$primary_key => $id]
+            );
+        } catch (moodle_exception $e) {
+            error_log('delete_row: ' . $e->getMessage() . "\n");
+        }
+        return $result;
+    }
+
+    /**
      * Delete registers by field state
      *
      * @param array $data
@@ -164,5 +185,23 @@ class general_repository
         } catch (moodle_exception $e) {
             error_log('add_log_data: ' . $e->getMessage() . "\n");
         }
+    }
+
+    /**
+     * Delete registers by field state
+     *
+     * @param $query
+     * @return false|int|mixed
+     */
+    public function count($query)
+    {
+        try {
+            $result = $this->moodle_query_handler->executeQuery($query);
+            return reset($result);
+        } catch (moodle_exception $e) {
+            error_log('add_log_data: ' . $e->getMessage() . "\n");
+        }
+
+        return 0;
     }
 }

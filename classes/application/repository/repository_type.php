@@ -17,13 +17,15 @@ class repository_type
     const STATE_SEND = 1;
     const STATE_ERROR = 2;
     const LIST_STATES = [
-        'default' => 0,
+        //'default' => 0,
         'send' => 1,
-        'error' => 2
+        //'error' => 2
     ];
     const ACTIVE_REPOSITORY_TYPES = [
         'grade' => course_notes_repository::class,
         'evaluation_structure' => course_evaluation_structure_repository::class,
+        'material' => material_repository::class,
+        'announcement' => announcements_repository::class,
     ];
 
     /**
