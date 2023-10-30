@@ -9,6 +9,7 @@
 namespace local_uplannerconnect\infrastructure\api;
 
 use coding_exception;
+use local_uplannerconnect\application\repository\messages_status_repository;
 use local_uplannerconnect\application\repository\repository_type;
 use local_uplannerconnect\infrastructure\api\client\abstract_uplanner_client;
 use local_uplannerconnect\infrastructure\api\factory\uplanner_client_factory;
@@ -40,12 +41,23 @@ class handle_remove_success_uplanner_task
     private $file;
 
     /**
+     * @var email
+     */
+    private $email;
+
+    /**
+     * @var messages_status_repository
+     */
+    private $message_repository;
+
+    /**
      * Construct
      */
     public function __construct()
     {
         $this->uplanner_client_factory = new uplanner_client_factory();
         $this->email = new email();
+        $this->message_repository = new messages_status_repository();
     }
 
     /**
@@ -82,12 +94,21 @@ class handle_remove_success_uplanner_task
                     continue;
                 }
                 $this->add_rows_in_file($rows);
+                foreach ($rows as $row) {
+                    $messages = $this->message_repository->get_data([
+                        'id_transaction' => $row->id,
+                        'limit' => 1,
+                        'offset' => 0,
+                    ]);
+                    $message = reset($messages);
+                    if ($message->is_success_ful == 1) {
+                        $repository->delete_row($row->id);
+                        $this->message_repository->delete_row($message->id);
+                    }
+                }
             }
             $this->send_email(self::PREFIX . $uplanner_client->get_email_subject());
             $this->reset_file();
-            foreach (repository_type::LIST_STATES as $state) {
-                $repository->delete_data_bd($state);
-            }
         } catch (moodle_exception $e) {
             error_log('handle_remove_success_uplanner_task - process: ' . $e->getMessage() . "\n");
         }

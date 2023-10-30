@@ -10,6 +10,7 @@ namespace local_uplannerconnect\infrastructure\api;
 
 use coding_exception;
 use local_uplannerconnect\application\repository\repository_type;
+use local_uplannerconnect\application\repository\messages_status_repository;
 use local_uplannerconnect\infrastructure\api\client\abstract_uplanner_client;
 use local_uplannerconnect\infrastructure\api\factory\uplanner_client_factory;
 use local_uplannerconnect\infrastructure\email\email;
@@ -42,12 +43,18 @@ class handle_send_uplanner_task
     private $email;
 
     /**
+     * @var messages_status_repository
+     */
+    private $message_repository;
+
+    /**
      * Construct
      */
     public function __construct()
     {
         $this->uplanner_client_factory = new uplanner_client_factory();
         $this->email = new email();
+        $this->message_repository = new messages_status_repository();
     }
 
     /**
@@ -128,6 +135,17 @@ class handle_send_uplanner_task
                     'id' => $row->id
                 ];
                 $repository->updateDataBD($dataQuery);
+                $data_message = [
+                    'id_code' => (int) $row->id,
+                    'id_transaction' => (int) $row->id,
+                    'ds_topic' => get_class($repository),
+                    'ds_mongo_id' => 'ds mongo id',
+                    'ds_error' => 'None',
+                    'dt_processing_date' => date('YYmd'),
+                    'is_success_ful' => 1,
+                    'created_at' => date('YYmd')
+                ];
+                $this->message_repository->save($data_message);
             }
             $this->file->reset_csv(abstract_uplanner_client::FILE_HEADERS);
             $index_row++;
@@ -170,6 +188,7 @@ class handle_send_uplanner_task
                     'json' => json_encode($row->json),
                     'response' => json_encode($response),
                     'success' => $status,
+                    'request_type' => json_encode($response['code']),
                     'id' => $row->id
                 ];
                 $repository->updateDataBD($dataQuery);

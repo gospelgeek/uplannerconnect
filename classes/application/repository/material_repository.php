@@ -8,6 +8,7 @@
 namespace local_uplannerconnect\application\repository;
 
 use local_uplannerconnect\plugin_config\plugin_config;
+use moodle_exception;
 
 /**
  * Loaded class to manipulate data in upplanner_material table
@@ -106,5 +107,26 @@ class material_repository
         //     'query_log' => plugin_config::QUERY_INSERT_LOGS,
         //     'table_log' => plugin_config::TABLE_LOG
         // ]);
+    }
+
+    /**
+     * Delete register
+     *
+     * @param $id
+     * @return bool
+     */
+    public function delete_row($id): bool
+    {
+        $result = false;
+        try {
+            $result = $this->general_repository->delete_row(
+                self::TABLE_COURSE_MATERIALS,
+                $id
+
+            );
+        } catch (moodle_exception $e) {
+            error_log('delete_row: ' . $e->getMessage() . "\n");
+        }
+        return $result;
     }
 }

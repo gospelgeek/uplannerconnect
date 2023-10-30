@@ -73,11 +73,6 @@ class plugin_config
             'includefile' => self::ROUTE_HANDLER_EVENT_1,
         ],
         [
-            'eventname' => '\mod_forum\event\discussion_updated',
-            'isForum' => true,
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
             'eventname' => '\mod_forum\event\post_created',
             'isForum' => true,
             'includefile' => self::ROUTE_HANDLER_EVENT_1,
