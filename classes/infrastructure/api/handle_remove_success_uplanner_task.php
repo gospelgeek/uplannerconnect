@@ -101,9 +101,9 @@ class handle_remove_success_uplanner_task
                         'offset' => 0,
                     ]);
                     $message = reset($messages);
-                    if ($message->is_successful === 1) {
+                    if ($message->is_success_ful == 1) {
                         $repository->delete_row($row->id);
-                        $this->message_repository->delete_row($message->id_code);
+                        $this->message_repository->delete_row($message->id);
                     }
                 }
             }

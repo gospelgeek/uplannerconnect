@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/uplannerconnect/db" VERSION="2023103002" COMMENT="XMLDB file for local/uplannerconnect">
+<XMLDB PATH="local/uplannerconnect/db" VERSION="2023104002" COMMENT="XMLDB file for local/uplannerconnect">
     <TABLES>
         <TABLE NAME="uplanner_grades" COMMENT="Se Guardará la información generada por el evento">
             <FIELDS>
@@ -63,7 +63,8 @@
         </TABLE>
         <TABLE NAME="uplanner_esb_messages_status" COMMENT="uPlanner messages status">
             <FIELDS>
-                <FIELD NAME="id_code" SEQUENCE="true" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="Entity id" />
+                <FIELD NAME="id" SEQUENCE="true" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="ID de la tabla" />
+                <FIELD NAME="id_code" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="id_transaction" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="ds_topic" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="ds_mongo_id" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
@@ -73,7 +74,7 @@
                 <FIELD NAME="created_at" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
-                <KEY NAME="primary" TYPE="primary" FIELDS="id_code" />
+                <KEY NAME="primary" TYPE="primary" FIELDS="id" />
             </KEYS>
         </TABLE>
     </TABLES>

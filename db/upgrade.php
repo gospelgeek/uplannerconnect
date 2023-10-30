@@ -167,13 +167,14 @@ function xmldb_local_uplannerconnect_upgrade($oldversion): bool {
         upgrade_plugin_savepoint(true, 2023102502, 'local', 'uplannerconnect');
     }
 
-    if ($oldversion < 2023103000) {
+    if ($oldversion < 20231030002) {
 
         // Define table uplanner_esb_messages_status to be created.
         $table = new xmldb_table('uplanner_esb_messages_status');
 
         // Adding fields to table uplanner_esb_messages_status.
-        $table->add_field('id_code', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('id_code', XMLDB_TYPE_INTEGER, '20', null, null, null, null);
         $table->add_field('id_transaction', XMLDB_TYPE_INTEGER, '20', null, null, null, null);
         $table->add_field('ds_topic', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $table->add_field('ds_mongo_id', XMLDB_TYPE_TEXT, null, null, null, null, null);
@@ -183,7 +184,7 @@ function xmldb_local_uplannerconnect_upgrade($oldversion): bool {
         $table->add_field('created_at', XMLDB_TYPE_TEXT, null, null, null, null, null);
 
         // Adding keys to table uplanner_esb_messages_status.
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id_code']);
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
 
         // Conditionally launch create table for uplanner_esb_messages_status.
         if (!$dbman->table_exists($table)) {
@@ -191,7 +192,7 @@ function xmldb_local_uplannerconnect_upgrade($oldversion): bool {
         }
 
         // Uplannerconnect savepoint reached.
-        upgrade_plugin_savepoint(true, 2023103000, 'local', 'uplannerconnect');
+        upgrade_plugin_savepoint(true, 2023104000, 'local', 'uplannerconnect');
     }
 
     return true;
