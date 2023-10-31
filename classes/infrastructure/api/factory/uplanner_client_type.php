@@ -27,10 +27,10 @@ class uplanner_client_type
     const EVALUATION_STRUCTURE = 'evaluation_structure';
 
     const CLIENT_TYPES = [
-        'material' => uplanner_client_material::class,
         'grade' => uplanner_client_grade::class,
-        'announcement' => uplanner_client_announcement::class,
-        'evaluation_structure' => uplanner_client_evaluation_structure::class
+        'evaluation_structure' => uplanner_client_evaluation_structure::class,
+        'material' => uplanner_client_material::class,
+        'announcement' => uplanner_client_announcement::class
     ];
 
     /**

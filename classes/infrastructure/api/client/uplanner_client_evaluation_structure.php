@@ -16,7 +16,7 @@ class uplanner_client_evaluation_structure extends abstract_uplanner_client
     /**
      * @inerhitdoc
      */
-    protected string $name_file = 'uplanner_client_evaluation_structure.csv';
+    protected string $name_file = 'uplanner_client_evaluation_structure_date.csv';
 
     /**
      * @inerhitdoc

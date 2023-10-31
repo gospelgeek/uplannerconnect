@@ -12,6 +12,7 @@ use coding_exception;
 use local_uplannerconnect\application\repository\repository_type;
 use local_uplannerconnect\application\repository\messages_status_repository;
 use local_uplannerconnect\infrastructure\api\client\abstract_uplanner_client;
+use local_uplannerconnect\infrastructure\api\client\uplanner_client_announcement;
 use local_uplannerconnect\infrastructure\api\factory\uplanner_client_factory;
 use local_uplannerconnect\infrastructure\email\email;
 use local_uplannerconnect\infrastructure\file;
@@ -58,7 +59,7 @@ class handle_send_uplanner_task
     }
 
     /**
-     * Handle process send information to Uplanner
+     * Handle process send information to uPlanner
      *
      * @return void
      * @throws coding_exception
@@ -123,13 +124,14 @@ class handle_send_uplanner_task
                 break;
             }
             $response = $this->request($uplanner_client, $rows);
-            $status = in_array('error', $response) ? repository_type::STATE_ERROR : repository_type::STATE_SEND;
+            $status = (empty($response) || in_array('error', $response))
+                ? repository_type::STATE_ERROR : repository_type::STATE_SEND;
             $this->create_file($uplanner_client->get_file_name(), $rows);
             $response = $this->send_email($uplanner_client->get_email_subject());
             //$status = $response ? repository_type::STATE_SEND : repository_type::STATE_ERROR;
             foreach ($rows as $row) {
                 $dataQuery = [
-                    'json' => $row->json,
+                    'json' => json_decode($row->json, true),
                     'response' => $response,
                     'success' => $status,
                     'id' => $row->id
@@ -147,7 +149,7 @@ class handle_send_uplanner_task
                 ];
                 $this->message_repository->save($data_message);
             }
-            $this->file->reset_csv(abstract_uplanner_client::FILE_HEADERS);
+            $this->file->delete_csv();
             $index_row++;
         }
     }

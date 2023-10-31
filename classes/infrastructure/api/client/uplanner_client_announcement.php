@@ -16,7 +16,7 @@ class uplanner_client_announcement extends abstract_uplanner_client
     /**
      * @inerhitdoc
      */
-    protected string $name_file = 'uplanner_client_announcement.csv';
+    protected string $name_file = 'uplanner_client_announcement_date.csv';
 
     /**
      * @inerhitdoc
