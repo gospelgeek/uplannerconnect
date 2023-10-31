@@ -16,7 +16,7 @@ class uplanner_client_material extends abstract_uplanner_client
     /**
      * @inerhitdoc
      */
-    protected string $name_file = 'uplanner_client_material.csv';
+    protected string $name_file = 'uplanner_client_material_date.csv';
 
     /**
      * @inerhitdoc
