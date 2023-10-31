@@ -37,7 +37,8 @@ class file
     public function __construct(
         $filename
     ) {
-        $this->filename = $filename;
+        $millis = round(microtime(true) * 1000);
+        $this->filename = str_replace("date", $millis, $filename);
     }
 
     /**
@@ -105,5 +106,18 @@ class file
         }
 
         return $this->create_csv($headers);
+    }
+
+    /**
+     * Delete CSV file
+     *
+     * @return void
+     */
+    public function delete_csv()
+    {
+        $csv_file = $this->get_path_file();
+        if (file_exists($csv_file)) {
+            unlink($csv_file);
+        }
     }
 }

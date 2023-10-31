@@ -16,7 +16,7 @@ class uplanner_client_grade extends abstract_uplanner_client
     /**
      * @inerhitdoc
      */
-    protected string $name_file = 'uplanner_client_grade.csv';
+    protected string $name_file = 'uplanner_client_grade_date.csv';
 
     /**
      * @inerhitdoc

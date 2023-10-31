@@ -108,7 +108,7 @@ class handle_remove_success_uplanner_task
                 }
             }
             $this->send_email(self::PREFIX . $uplanner_client->get_email_subject());
-            $this->reset_file();
+            $this->file->delete_csv();
         } catch (moodle_exception $e) {
             error_log('handle_remove_success_uplanner_task - process: ' . $e->getMessage() . "\n");
         }
@@ -126,16 +126,6 @@ class handle_remove_success_uplanner_task
         $headers[] = 'state';
         $this->file = new file($file_name);
         $this->file->create_csv($headers);
-    }
-
-    /**
-     * @return void
-     */
-    private function reset_file()
-    {
-        $headers = abstract_uplanner_client::FILE_HEADERS;
-        $headers[] = 'state';
-        $this->file->reset_csv($headers);
     }
 
     /**
