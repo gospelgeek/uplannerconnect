@@ -59,15 +59,19 @@ class file
      */
     public function create_csv($headers)
     {
-        if (!file_exists($this->directory)) {
-            mkdir($this->directory, 0777, true);
-        }
-        $csv_file = $this->get_path_file();
-        if (!file_exists($csv_file)) {
-            $fp = fopen($csv_file, 'w');
-            fputcsv($fp, $headers);
-            fclose($fp);
-            return true;
+        try {
+            if (!file_exists($this->directory)) {
+                mkdir($this->directory, 0777, true);
+            }
+            $csv_file = $this->get_path_file();
+            if (!file_exists($csv_file)) {
+                $fp = fopen($csv_file, 'w');
+                fputcsv($fp, $headers);
+                fclose($fp);
+                return true;
+            }
+        } catch (\Exception $e) {
+            error_log('create_csv: ',  $e->getMessage(), "\n");
         }
 
         return false;
@@ -81,12 +85,16 @@ class file
      */
     public function add_row($data)
     {
-        $csv_file = $this->get_path_file();
-        if (file_exists($csv_file)) {
-            $fp = fopen($csv_file, 'a');
-            fputcsv($fp, $data);
-            fclose($fp);
-            return true;
+        try {
+            $csv_file = $this->get_path_file();
+            if (file_exists($csv_file)) {
+                $fp = fopen($csv_file, 'a');
+                fputcsv($fp, $data);
+                fclose($fp);
+                return true;
+            }
+        } catch (\Exception $e) {
+            error_log('add_row: ',  $e->getMessage(), "\n");
         }
 
         return false;
@@ -100,9 +108,13 @@ class file
      */
     public function reset_csv($headers)
     {
-        $csv_file = $this->get_path_file();
-        if (file_exists($csv_file)) {
-            unlink($csv_file);
+        try {
+            $csv_file = $this->get_path_file();
+            if (file_exists($csv_file)) {
+                unlink($csv_file);
+            }
+        } catch (\Exception $e) {
+            error_log('reset_csv: ',  $e->getMessage(), "\n");
         }
 
         return $this->create_csv($headers);
@@ -115,9 +127,13 @@ class file
      */
     public function delete_csv()
     {
-        $csv_file = $this->get_path_file();
-        if (file_exists($csv_file)) {
-            unlink($csv_file);
+        try {
+            $csv_file = $this->get_path_file();
+            if (file_exists($csv_file)) {
+                unlink($csv_file);
+            }
+        } catch (\Exception $e) {
+            error_log('delete_csv: ',  $e->getMessage(), "\n");
         }
     }
 }
