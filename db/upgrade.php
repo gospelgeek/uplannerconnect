@@ -210,5 +210,20 @@ function xmldb_local_uplannerconnect_upgrade($oldversion): bool {
         upgrade_plugin_savepoint(true, 2023104000, 'local', 'uplannerconnect');
     }
 
+    if ($oldversion < 2023110201) {
+
+        // Define field date to be added to uplanner_evaluation.
+        $table = new xmldb_table('uplanner_evaluation');
+        $field = new xmldb_field('date', XMLDB_TYPE_TEXT, null, null,null, null, null, 'success');
+
+        // Conditionally launch add field date.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Uplannerconnect savepoint reached.
+        upgrade_plugin_savepoint(true, 2023110201, 'local', 'uplannerconnect');
+    }
+
     return true;
 }

@@ -5,7 +5,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-use local_uplannerconnect\plugin_config\plugin_config;
+use local_uplannerconnect\plugin_config\events_observers;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -16,7 +16,7 @@ $observers = [];
  * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
  * @description Instancia un evento para el manejo de notas de un curso
 */
-foreach (plugin_config::EVENTS_OBSERVERS as $eventData) {
+foreach (events_observers::EVENTS_OBSERVERS as $eventData) {
     
     $callback = preg_replace('/^\\\\core\\\\event\\\\/', '', $eventData['eventname']);
     

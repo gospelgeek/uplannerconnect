@@ -14,7 +14,7 @@ use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
-const LAST_INSERT_EVALUATION = "SELECT json FROM mdl_uplanner_evaluation ORDER BY id DESC limit 1";
+const LAST_INSERT_EVALUATION = "SELECT date,json FROM mdl_uplanner_evaluation ORDER BY id DESC limit 1";
 
 /**
  *  Maneja los eventos de moodle
@@ -141,6 +141,7 @@ class handle_event_course_notes
    public static function grade_item_updated($event)
    {
      try {
+         error_log(print_r($event->get_data(), true));
          if (validateAccessTypeEvent([
             "dataEvent" => $event,
             "typeEvent" => ["\\core\\event\\grade_item_updated"],
@@ -479,14 +480,37 @@ function filterRecentUpdate($event)
             $firstResult = reset($evaluation);
             //obtener el json
             $evaluationLast = (json_decode($firstResult->json));
+            $date = intval($firstResult->date);
             $dataEvent = $event->get_data();
             //obtener el primer grupo de evaluaciones
             $evaluationGroups = ($evaluationLast->evaluationGroups)[0];
             //obtener la primera evaluacion
             $evaluationsData  = ($evaluationGroups->evaluations)[0];
+            $validateUpdateNew = false;
+
+            if (key_exists('objectid', $dataEvent) &&
+                key_exists('timecreated', $dataEvent))
+            {
+               if ($evaluationsData->evaluationId !== 
+                  $dataEvent['objectid'])
+               {
+                  $validateUpdateNew = (
+                     $evaluationLast->action.'d' === 'updated'
+                  );
+               }
+               else {
+                  $validateUpdateNew = (
+                     $evaluationLast->action.'d' === 'updated' &&
+                     $date !== $dataEvent['timecreated']
+                  );
+               }
+               
+            } 
+
             // Validar si la evaluacion es diferente
-            if ($evaluationLast->action.'d' !== $dataEvent['action'] &&
-                $evaluationsData->evaluationId === $dataEvent['objectid']
+            if (($evaluationLast->action.'d' !== $dataEvent['action'] &&
+                 $evaluationsData->evaluationId === $dataEvent['objectid']) ||
+                 $validateUpdateNew
             ) {
                      //Instanciar la clase management_factory
                      instantiatemanagement_factory([

@@ -139,7 +139,8 @@ class course_utils
                 'evaluationId' => $this->validator->isIsset($get_grade_item->id),
                 'evaluationName' => $this->validator->isIsset($get_grade_item->itemname),
                 'weight' => $weight,
-                'action' => $data['dispatch']
+                'action' => $data['dispatch'],
+                "date" => $this->validator->isIsset(strval($dataEvent['timecreated'])),
             ];
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
