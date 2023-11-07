@@ -96,8 +96,6 @@ class handle_clean_uplanner_task
                     }
                     $this->add_rows_in_file($rows);
                     $numRows = 0;
-                    error_log( PHP_EOL."foreach: ", 3, "/var/www/html/moodle/log/error.log");
-
                     foreach ($rows as $row) {
                         $json = json_decode($row->json, true);
                         if (!array_key_exists('transactionId', $json)){
