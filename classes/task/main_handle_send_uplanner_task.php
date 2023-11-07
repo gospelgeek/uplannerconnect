@@ -18,7 +18,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  *  Task in charge of sending records to uPlanner
 */
-class handle_init_uplanner_task extends \core\task\scheduled_task
+class main_handle_send_uplanner_task extends \core\task\scheduled_task
 {
     /**
      * @inerhitdoc
@@ -26,7 +26,7 @@ class handle_init_uplanner_task extends \core\task\scheduled_task
      */
     public function get_name()
     {
-        return get_string('syncinituplannertask', 'local_uplannerconnect');
+        return get_string('syncsendtuplannertask', 'local_uplannerconnect');
     }
 
     /**
@@ -38,9 +38,9 @@ class handle_init_uplanner_task extends \core\task\scheduled_task
         mtrace("Update cron started at: " . date('r', $time_now) . "\n");
         try {
             $handle_task = new handle_send_uplanner_task();
-            $handle_task->process(repository_type::STATE_DEFAULT, 1, 100, true);
+            $handle_task->process(repository_type::STATE_DEFAULT);
         } catch (moodle_exception $e) {
-            error_log('handle_init_uplanner_task - execute: ' . $e->getMessage() . "\n");
+            error_log('main_handle_send_uplanner_task - execute: ' . $e->getMessage() . "\n");
         }
         mtrace("\n" . 'Cron completed at: ' . date('r', time()) . "\n");
         mtrace('Memory used: ' . display_size(memory_get_usage())."\n");
