@@ -24,71 +24,6 @@ class plugin_config
     CONST TABLE_USER_MOODLE = 'user';
     const TABLE_LOG = "mdl_uplanner_log";
 
-    // Rutas de los eventos.
-    CONST ROUTE_HANDLER_EVENT_1 = 'local_uplannerconnect\infrastructure\event\handle_event_course_notes';
-
-    // Configuración de los eventos. 
-    CONST EVENTS_OBSERVERS = [
-        [
-            'eventname' => '\core\event\user_graded',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\grade_deleted',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\grade_item_created',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\grade_item_updated',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\local_uplannerconnect\event\resource_file',
-            'isLocal' => true,
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\course_module_created',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\course_module_updated',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\course_module_deleted',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\mod_forum\event\discussion_created',
-            'isForum' => true,
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\mod_forum\event\discussion_deleted',
-            'isForum' => true,
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\mod_forum\event\post_created',
-            'isForum' => true,
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\mod_forum\event\post_updated',
-            'isForum' => true,
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\mod_forum\event\post_deleted',
-            'isForum' => true,
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ]
-    ];
-
     // Conultas a la base de datos.
     CONST QUERY_INSERT_COURSE_GRADES = "INSERT INTO %s (json, response, success , request_type) VALUES ('%s', '%s', '%s' , '%s')";
     CONST QUERY_UPDATE_COURSE_GRADES = "UPDATE %s SET json = '%s', response = '%s', success = '%s' WHERE id = '%s'";
@@ -127,6 +62,7 @@ class plugin_config
         ['name' => 'evaluationName', 'type' => 'string'],
         ['name' => 'weight', 'type' => 'numeric'],
         ['name' => 'action', 'type' => 'string'],
+        ['name' => 'date', 'type' => 'string'],
     ];
 
     CONST UPLANNER_MATERIALS_ESTRUTURE = [

@@ -14,7 +14,9 @@ use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
-const LAST_INSERT_EVALUATION = "SELECT json FROM mdl_uplanner_evaluation ORDER BY id DESC limit 1";
+const LAST_INSERT_EVALUATION = "SELECT date,json FROM mdl_uplanner_evaluation ORDER BY id DESC limit 1";
+const ITEMTYPE_UPDATE = 'course';
+const IS_ITEM_UPDATE = 'updated';
 
 /**
  *  Maneja los eventos de moodle
@@ -43,13 +45,17 @@ class handle_event_course_notes
                if ($eventUser !== -1) {
                   //valida si la facultad tiene acceso
                   if (!validateAccesFaculty($event)) { return; }
-                     //Instanciar la clase management_factory
-                     instantiatemanagement_factory([
-                        "dataEvent" => $event,
-                        "typeEvent" => "user_graded",
-                        "dispatch" => ($agregationState === 'novalue')? 'create': 'update',
-                        "enum_etities" => 'course_notes'
-                     ]);
+                     $stateDispatch = ($agregationState === 'novalue');
+                     $isTotalItem = isTotalItem($grade-> load_grade_item());
+                     if ($isTotalItem) {
+                         //Instanciar la clase management_factory
+                         instantiatemanagement_factory([
+                            "dataEvent" => $event,
+                            "typeEvent" => "user_graded",
+                            "dispatch" => ($stateDispatch)? 'create': 'update',
+                            "enum_etities" => 'course_notes'
+                         ]);
+                     }
                }
             }
       } catch (moodle_exception $e) {
@@ -115,20 +121,20 @@ class handle_event_course_notes
                ])
             ];
 
+            $isTotalItem = isTotalItem($event->get_grade_item());
             //Validar el tipo de evento
             if ($IsValidEvent['create'] || $IsValidEvent['delete']) {
-
             //valida si la facultad tiene acceso
             if (!validateAccesFaculty($event)) { return; }
-
-            //Instanciar la clase management_factory
-            instantiatemanagement_factory([
-               "dataEvent" => $event,
-               "typeEvent" => "grade_item_created",
-               "dispatch" => $IsValidEvent['create']? "create" : "delete",
-               "enum_etities" => 'evaluation_structure'
-            ]);
-
+               if ($isTotalItem) {
+                  //Instanciar la clase management_factory
+                  instantiatemanagement_factory([
+                     "dataEvent" => $event,
+                     "typeEvent" => "grade_item_created",
+                     "dispatch" => $IsValidEvent['create']? "create" : "delete",
+                     "enum_etities" => 'evaluation_structure'
+                  ]);
+               }
             }
       } catch (moodle_exception $e) {
          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
@@ -358,7 +364,7 @@ class handle_event_course_notes
        } catch (moodle_exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
        }
-   }
+    }
 
    /**
     * Triggers an event when a discussion is deleted.
@@ -384,7 +390,7 @@ class handle_event_course_notes
        } catch (moodle_exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
        }
-   }
+    }
 
    /**
     * Triggers an event when a post_created.
@@ -410,7 +416,7 @@ class handle_event_course_notes
        } catch (moodle_exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
        }
-   }
+     }
 
    /**
     * Triggers an event when a post_updated.
@@ -436,7 +442,7 @@ class handle_event_course_notes
        } catch (moodle_exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
        }
-   }
+    }
 
    /**
     * Triggers an event when a post_deleted.
@@ -462,7 +468,7 @@ class handle_event_course_notes
        } catch (moodle_exception $e) {
           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
        }
-   }
+    }
 }
 
 /**
@@ -479,15 +485,25 @@ function filterRecentUpdate($event)
             $firstResult = reset($evaluation);
             //obtener el json
             $evaluationLast = (json_decode($firstResult->json));
+            $date = intval($firstResult->date);
             $dataEvent = $event->get_data();
             //obtener el primer grupo de evaluaciones
             $evaluationGroups = ($evaluationLast->evaluationGroups)[0];
             //obtener la primera evaluacion
             $evaluationsData  = ($evaluationGroups->evaluations)[0];
+            $validateUpdateNew = isUpdateItem([
+               "dataEvent" => $dataEvent,
+               "evaluationLast" => $evaluationLast
+            
+            ]);
+            $isTotalItem = isTotalItem($event->get_grade_item());
+            
             // Validar si la evaluacion es diferente
-            if ($evaluationLast->action.'d' !== $dataEvent['action'] &&
-                $evaluationsData->evaluationId === $dataEvent['objectid']
+            if (($evaluationLast->action.'d' !== $dataEvent['action'] &&
+                 $evaluationsData->evaluationId === $dataEvent['objectid']) ||
+                 $validateUpdateNew
             ) {
+                 if ($isTotalItem) {
                      //Instanciar la clase management_factory
                      instantiatemanagement_factory([
                         "dataEvent" => $event,
@@ -495,11 +511,53 @@ function filterRecentUpdate($event)
                         "dispatch" => "update",
                         "enum_etities" => 'evaluation_structure'
                      ]);
+                  }
             }
          }
    } catch (moodle_exception $e) {
       error_log('Excepción capturada: ',  $e->getMessage(), "\n");
    }
+}
+
+function isTotalItem($grade_item)
+{
+   $isTotalItem = true;
+   // grade item
+   $grade_item_load = $grade_item ?? null; 
+   // Verificate if the grade item is not null
+   if ($grade_item_load !== null) {
+      $categoryId = $grade_item_load->categoryid ?? 0;
+      $itemType = $grade_item_load->itemtype ?? '';
+      // Verificate if the grade item is total
+      $isTotalItem = !($categoryId === 0 &&
+                       $itemType === ITEMTYPE_UPDATE);
+   }
+
+   return $isTotalItem;
+}
+
+function isUpdateItem(array $data)
+{
+   $dataEvent = $data['dataEvent'];
+   $evaluationLast = $data['evaluationLast'];
+   $validateUpdateNew = false;
+
+   if (key_exists('objectid', $dataEvent) &&
+       key_exists('timecreated', $dataEvent))
+   {
+      if ($evaluationsData->evaluationId !== 
+         $dataEvent['objectid']) {
+         $validateUpdateNew = (
+            $evaluationLast->action.'d' === IS_ITEM_UPDATE
+         );
+      } else {
+         $validateUpdateNew = (
+            $evaluationLast->action.'d' === IS_ITEM_UPDATE &&
+            $date !== $dataEvent['timecreated']
+         );
+      }
+   } 
+   return $validateUpdateNew;
 }
 
 /** 

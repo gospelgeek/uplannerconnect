@@ -90,7 +90,8 @@ class course_translation_data
                     ]
                 ]
             ],
-            "action" => $dataSend['action']
+            "action" => $dataSend['action'],
+            "date" => $dataSend['date']
             ];
         }
         catch (moodle_exception $e) {

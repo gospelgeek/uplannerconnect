@@ -57,12 +57,16 @@ class course_evaluation_structure_repository
      */
     public function saveDataBD(array $data) : void
     {
+        $date = $data['date'];
+        //remove the date field from the array
+        unset($data['date']);
         $this->general_repository->saveDataBD([
             'data' => [
                 'json' => json_encode($data),
                 'response' => '{"status": "Default response"}',
                 'success' => repository_type::STATE_DEFAULT,
                 'request_type' => $data['action'],
+                'date' => $date
             ],
             'table' => self::TABLE_COURSE_EVALUATION
         ]);

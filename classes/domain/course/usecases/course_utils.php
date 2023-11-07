@@ -80,7 +80,7 @@ class course_utils
                 'studentCode' => $this->validator->isIsset($queryStudent->username),
                 'evaluationGroupCode' => $this->validator->isIsset($categoryFullName), //Bien
                 'evaluationId' => $this->validator->isIsset($gradeLoadItem->id),
-                'average' => $this->validator->isIsset($gradeLoadItem->aggregationcoef2),
+                'average' => $this->validator->isIsset($this->getWeight($gradeLoadItem)),
                 'isApproved' => $this->validator->isIsset($aproved),
                 'value' => $this->validator->isIsset(($getData['other'])['finalgrade']),
                 'evaluationName' => $this->validator->isIsset($gradeLoadItem->itemname),
@@ -121,7 +121,7 @@ class course_utils
             //category info
             $categoryItem = $this->getInstanceCategoryName($get_grade_item);
             $categoryFullName = $this->shortCategoryName($categoryItem); 
-            $weight = $this->validator->isIsset($get_grade_item->aggregationcoef2) ?? 0;
+            $weight = $this->validator->isIsset($this->getWeight($get_grade_item)) ?? 0;
 
             $queryCourse = ($this->validator->verifyQueryResult([                        
                 'data' => $this->moodle_query_handler->extract_data_db([
@@ -139,7 +139,8 @@ class course_utils
                 'evaluationId' => $this->validator->isIsset($get_grade_item->id),
                 'evaluationName' => $this->validator->isIsset($get_grade_item->itemname),
                 'weight' => $weight,
-                'action' => $data['dispatch']
+                'action' => $data['dispatch'],
+                "date" => $this->validator->isIsset(strval($dataEvent['timecreated'])),
             ];
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
@@ -206,5 +207,23 @@ class course_utils
         $sinEspacios = str_replace(' ', '', $categoryFullName);
         $categoryShort = substr($sinEspacios, 0, 10);
         return $categoryShort;
+    }
+
+    /**
+     * Retorna el peso de la categoria
+     * 
+     * @param object $gradeItem
+     * @return float
+     */
+    private function getWeight($gradeItem)
+    {
+        $weight = 0;
+        if (property_exists($gradeItem, 'aggregationcoef2')) {
+            $weight = $gradeItem->aggregationcoef2;
+            if (intval($gradeItem->aggregationcoef2) === 0) {
+                $weight = $gradeItem->aggregationcoef;
+            }
+        }
+        return $weight;
     }
 }
