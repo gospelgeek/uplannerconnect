@@ -91,7 +91,8 @@ class course_translation_data
                 ]
             ],
             "action" => $dataSend['action'],
-            "date" => $dataSend['date']
+            "date" => $dataSend['date'],
+            "transactionId" => $dataSend['transactionId']
             ];
         }
         catch (moodle_exception $e) {
@@ -138,7 +139,8 @@ class course_translation_data
                     ]
                 ],
                 "lastModifiedDate" => $dataSend['lastModifiedDate'],
-                "action" =>  $dataSend['action']
+                "action" =>  $dataSend['action'],
+                "transactionId" => $dataSend['transactionId']
             ];
       }
       catch (moodle_exception $e) {

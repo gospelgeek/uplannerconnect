@@ -19,6 +19,8 @@ class announcements_utils
 {   
     const TABLE_FORUM = 'forum_posts';
     const TABLE_USER = 'user';
+    const TABLE_TRANSACTION_UPLANNER = 'uplanner_transaction_seq';
+    const LAST_COURSE_TRANSACTION = 'SELECT id FROM mdl_uplanner_transaction_seq WHERE courseid = %s ORDER BY id DESC LIMIT 1';
 
     private $validator;
     private $moodle_query_handler;
@@ -74,7 +76,8 @@ class announcements_utils
                 'title' => $this->validator->isIsset($dataForum->subject),
                 'content' => $this->validator->isIsset($dataForum->message),
                 'type' => 'html',
-                'action' => $data['dispatch'],
+                'action' => strtoupper($data['dispatch']),
+                'transactionId' => $this->validator->isIsset($this->getLastRowTransaction($courseid)),
             ];
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
@@ -187,5 +190,49 @@ class announcements_utils
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
         return $isCreated;
+    }
+
+    private function insertTransactionUplanner(array $data)
+    {
+        $dataToSave = [];
+        try {
+            $dataToSave = [
+                'courseid' => $data['courseId'],
+                'transaction' => $data['transaction']
+            ];
+            $this->moodle_query_handler->insert_record_db([
+                'table' => self::TABLE_TRANSACTION_UPLANNER,
+                'data' => $dataToSave
+            ]);
+        } catch (moodle_exception $e) {
+            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+        }
+    }
+
+    private function getLastRowTransaction($courseId)
+    {
+        $lastRow = 0;
+        try {
+            $queryResult = $this->moodle_query_handler->executeQuery(sprintf(
+                self::LAST_COURSE_TRANSACTION, 
+                $courseId
+            ));
+
+            if (!empty($queryResult)) {
+                $firstResult = reset($queryResult);
+                $lastRow = intval((($firstResult->id) + 1).''.$courseId);
+            } else {
+                $lastRow = intval('1' . $courseId);
+            }
+
+            $this->insertTransactionUplanner([
+                'courseId' => $courseId,
+                'transaction' => $lastRow
+            ]);
+
+        } catch (moodle_exception $e) {
+            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+        }
+        return $lastRow;
     }
 }

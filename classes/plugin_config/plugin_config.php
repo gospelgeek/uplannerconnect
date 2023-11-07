@@ -51,6 +51,7 @@ class plugin_config
         ['name' => 'average', 'type' => 'numeric'],
         ['name' => 'lastModifiedDate', 'type' => 'string'],
         ['name' => 'action', 'type' => 'string'],
+        ['name' => 'transactionId', 'type' => 'numeric'],
     ];
 
     // Estruturas de datos uPlanner.
@@ -63,6 +64,7 @@ class plugin_config
         ['name' => 'weight', 'type' => 'numeric'],
         ['name' => 'action', 'type' => 'string'],
         ['name' => 'date', 'type' => 'string'],
+        ['name' => 'transactionId', 'type' => 'numeric'],
     ];
 
     CONST UPLANNER_MATERIALS_ESTRUTURE = [
@@ -75,6 +77,7 @@ class plugin_config
         ['name' => 'size', 'type' => 'numeric'],
         ['name' => 'lastUpdatedTime', 'type' => 'string'],
         ['name' => 'action', 'type' => 'string'],
+        ['name' => 'transactionId', 'type' => 'numeric'],
     ];
 
     CONST UPLANNER_ANNOUNCEMENTS_ESTRUTURE = [
@@ -87,6 +90,7 @@ class plugin_config
         ['name' => 'id', 'type' => 'string'],
         ['name' => 'usernameCreator', 'type' => 'string'],
         ['name' => 'action', 'type' => 'string'],
+        ['name' => 'transactionId', 'type' => 'numeric'],
     ];
 
     // Estructuras de datos para la creacion.

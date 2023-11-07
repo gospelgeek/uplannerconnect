@@ -18,6 +18,8 @@ use moodle_exception;
 class material_utils
 {   
     const QUERY_FILE_MATERIAL = "SELECT * FROM mdl_files where contextid='%s' ORDER BY sortorder DESC LIMIT 1";
+    const TABLE_TRANSACTION_UPLANNER = 'uplanner_transaction_seq';
+    const LAST_COURSE_TRANSACTION = 'SELECT id FROM mdl_uplanner_transaction_seq WHERE courseid = %s ORDER BY id DESC LIMIT 1';
 
     private $validator;
     private $moodle_query_handler;
@@ -64,6 +66,9 @@ class material_utils
             $typeFile = $fileData->mimetype ?? $getData['other']['modulename'];
             $url = $this->getUrlResource($event,$fileData);
             $nameFile = $getData['other']['name'] ?? '';
+
+            $timestamp =  $this->validator->isIsset($getData['timecreated']);
+            $formattedDateCreated = date('Y-m-d', $timestamp);
             
             //información a guardar
             $dataToSave = [
@@ -73,8 +78,9 @@ class material_utils
                 'url' => $this->validator->isIsset($url),
                 'blackboardSectionId' => $this->validator->isIsset($queryCourse->shortname),
                 'size' => $sizeFile, 
-                'lastUpdatedTime' => $this->validator->isIsset(strval($getData['timecreated'])),
-                'action' => $data['dispatch'],
+                'lastUpdatedTime' => $this->validator->isIsset($formattedDateCreated),
+                'action' => strtoupper($data['dispatch']),
+                'transactionId' => $this->validator->isIsset($this->getLastRowTransaction($courseid)),
             ];
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
@@ -153,5 +159,49 @@ class material_utils
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
         }
         return $url;
+    }
+
+    private function insertTransactionUplanner(array $data)
+    {
+        $dataToSave = [];
+        try {
+            $dataToSave = [
+                'courseid' => $data['courseId'],
+                'transaction' => $data['transaction']
+            ];
+            $this->moodle_query_handler->insert_record_db([
+                'table' => self::TABLE_TRANSACTION_UPLANNER,
+                'data' => $dataToSave
+            ]);
+        } catch (moodle_exception $e) {
+            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+        }
+    }
+
+    private function getLastRowTransaction($courseId)
+    {
+        $lastRow = 0;
+        try {
+            $queryResult = $this->moodle_query_handler->executeQuery(sprintf(
+                self::LAST_COURSE_TRANSACTION, 
+                $courseId
+            ));
+
+            if (!empty($queryResult)) {
+                $firstResult = reset($queryResult);
+                $lastRow = intval((($firstResult->id) + 1).''.$courseId);
+            } else {
+                $lastRow = intval('1' . $courseId);
+            }
+
+            $this->insertTransactionUplanner([
+                'courseId' => $courseId,
+                'transaction' => $lastRow
+            ]);
+
+        } catch (moodle_exception $e) {
+            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+        }
+        return $lastRow;
     }
 }
