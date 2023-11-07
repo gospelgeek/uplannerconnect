@@ -16,7 +16,7 @@ defined('MOODLE_INTERNAL') || die();
 
 const LAST_INSERT_EVALUATION = "SELECT date,json FROM mdl_uplanner_evaluation ORDER BY id DESC limit 1";
 const ITEMTYPE_UPDATE = 'course';
-const IS_ITEM_UPDATE = 'updated';
+const IS_ITEM_UPDATE = 'UPDATED';
 
 /**
  *  Maneja los eventos de moodle
@@ -493,13 +493,15 @@ function filterRecentUpdate($event)
             $evaluationsData  = ($evaluationGroups->evaluations)[0];
             $validateUpdateNew = isUpdateItem([
                "dataEvent" => $dataEvent,
-               "evaluationLast" => $evaluationLast
-            
+               "evaluationLast" => $evaluationLast,
+               "evaluationsData" => $evaluationsData,
+               "date" => $date
             ]);
             $isTotalItem = isTotalItem($event->get_grade_item());
-            
+            $itemActions = strtolower($evaluationLast->action.'d');
+
             // Validar si la evaluacion es diferente
-            if (($evaluationLast->action.'d' !== $dataEvent['action'] &&
+            if (($itemActions !== $dataEvent['action'] &&
                  $evaluationsData->evaluationId === $dataEvent['objectid']) ||
                  $validateUpdateNew
             ) {
@@ -540,6 +542,8 @@ function isUpdateItem(array $data)
 {
    $dataEvent = $data['dataEvent'];
    $evaluationLast = $data['evaluationLast'];
+   $evaluationsData = $data['evaluationsData'];
+   $date = $data['date'];
    $validateUpdateNew = false;
 
    if (key_exists('objectid', $dataEvent) &&
@@ -548,11 +552,11 @@ function isUpdateItem(array $data)
       if ($evaluationsData->evaluationId !== 
          $dataEvent['objectid']) {
          $validateUpdateNew = (
-            $evaluationLast->action.'d' === IS_ITEM_UPDATE
+            $evaluationLast->action.'D' === IS_ITEM_UPDATE
          );
       } else {
          $validateUpdateNew = (
-            $evaluationLast->action.'d' === IS_ITEM_UPDATE &&
+            $evaluationLast->action.'D' === IS_ITEM_UPDATE &&
             $date !== $dataEvent['timecreated']
          );
       }
