@@ -8,15 +8,17 @@
 
 namespace local_uplannerconnect\task;
 
-use local_uplannerconnect\infrastructure\api\handle_remove_success_uplanner_task;
+use local_uplannerconnect\application\repository\repository_type;
+use local_uplannerconnect\infrastructure\api\handle_send_uplanner_task;
 use coding_exception;
+use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Task in charge of cleaning the daily records sent to uPlanner
  */
-class handle_error_uplanner_task extends \core\task\scheduled_task
+class main_handle_error_uplanner_task extends \core\task\scheduled_task
 {
     /**
      * @inerhitdoc
@@ -34,8 +36,12 @@ class handle_error_uplanner_task extends \core\task\scheduled_task
         $time_now = time();
         $start_time = microtime();
         mtrace("Update cron started at: " . date('r', $time_now) . "\n");
-        $handle_task = new handle_remove_success_uplanner_task();
-        $handle_task->process();
+        try {
+            $handle_task = new handle_send_uplanner_task();
+            $handle_task->process(repository_type::STATE_ERROR, 1000);
+        } catch (moodle_exception $e) {
+            error_log('main_handle_error_uplanner_task - execute: ' . $e->getMessage() . "\n");
+        }
         mtrace("\n" . 'Cron completed at: ' . date('r', time()) . "\n");
         mtrace('Memory used: ' . display_size(memory_get_usage())."\n");
         $diff_time = microtime_diff($start_time, microtime());
