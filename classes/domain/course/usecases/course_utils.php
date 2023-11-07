@@ -80,7 +80,7 @@ class course_utils
                 'studentCode' => $this->validator->isIsset($queryStudent->username),
                 'evaluationGroupCode' => $this->validator->isIsset($categoryFullName), //Bien
                 'evaluationId' => $this->validator->isIsset($gradeLoadItem->id),
-                'average' => $this->validator->isIsset($gradeLoadItem->aggregationcoef2),
+                'average' => $this->validator->isIsset($this->getWeight($gradeLoadItem)),
                 'isApproved' => $this->validator->isIsset($aproved),
                 'value' => $this->validator->isIsset(($getData['other'])['finalgrade']),
                 'evaluationName' => $this->validator->isIsset($gradeLoadItem->itemname),
@@ -215,7 +215,7 @@ class course_utils
      * @param object $gradeItem
      * @return float
      */
-    private function getWeight($gradeItem) : float
+    private function getWeight($gradeItem)
     {
         $weight = 0;
         if (property_exists($gradeItem, 'aggregationcoef2')) {
