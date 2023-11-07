@@ -121,7 +121,7 @@ class course_utils
             //category info
             $categoryItem = $this->getInstanceCategoryName($get_grade_item);
             $categoryFullName = $this->shortCategoryName($categoryItem); 
-            $weight = $this->validator->isIsset($get_grade_item->aggregationcoef2) ?? 0;
+            $weight = $this->validator->isIsset($this->getWeight($get_grade_item)) ?? 0;
 
             $queryCourse = ($this->validator->verifyQueryResult([                        
                 'data' => $this->moodle_query_handler->extract_data_db([
@@ -207,5 +207,23 @@ class course_utils
         $sinEspacios = str_replace(' ', '', $categoryFullName);
         $categoryShort = substr($sinEspacios, 0, 10);
         return $categoryShort;
+    }
+
+    /**
+     * Retorna el peso de la categoria
+     * 
+     * @param object $gradeItem
+     * @return float
+     */
+    private function getWeight($gradeItem) : float
+    {
+        $weight = 0;
+        if (property_exists($gradeItem, 'aggregationcoef2')) {
+            $weight = $gradeItem->aggregationcoef2;
+            if (intval($gradeItem->aggregationcoef2) === 0) {
+                $weight = $gradeItem->aggregationcoef;
+            }
+        }
+        return $weight;
     }
 }
