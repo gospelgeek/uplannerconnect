@@ -210,5 +210,55 @@ function xmldb_local_uplannerconnect_upgrade($oldversion): bool {
         upgrade_plugin_savepoint(true, 2023104000, 'local', 'uplannerconnect');
     }
 
+    if ($oldversion < 2023110201) {
+
+        // Define field date to be added to uplanner_evaluation.
+        $table = new xmldb_table('uplanner_evaluation');
+        $field = new xmldb_field('date', XMLDB_TYPE_TEXT, null, null,null, null, null, 'success');
+
+        // Conditionally launch add field date.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Uplannerconnect savepoint reached.
+        upgrade_plugin_savepoint(true, 2023110201, 'local', 'uplannerconnect');
+    }
+
+    if ($oldversion < 2023110700) {
+
+        // Define table uplanner_transaction_seq to be created.
+        $table = new xmldb_table('uplanner_transaction_seq');
+
+        // Adding fields to table uplanner_transaction_seq.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('courseid', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table uplanner_transaction_seq.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Conditionally launch create table for uplanner_transaction_seq.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Uplannerconnect savepoint reached.
+        upgrade_plugin_savepoint(true, 2023110700, 'local', 'uplannerconnect');
+    }
+
+    if ($oldversion < 2023110701) {
+
+        // Define field transaction to be added to uplanner_transaction_seq.
+        $table = new xmldb_table('uplanner_transaction_seq');
+        $field = new xmldb_field('transaction', XMLDB_TYPE_INTEGER, '20', null, XMLDB_NOTNULL, null, null, 'courseid');
+
+        // Conditionally launch add field transaction.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Uplannerconnect savepoint reached.
+        upgrade_plugin_savepoint(true, 2023110701, 'local', 'uplannerconnect');
+    }
     return true;
 }

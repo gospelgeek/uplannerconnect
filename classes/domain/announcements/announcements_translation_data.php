@@ -80,7 +80,8 @@ class announcements_translation_data
             "content" => $dataSend['content'],
             "id" => $dataSend['id'],
             "usernameCreator" => $dataSend['usernameCreator'],
-            "action" => $dataSend['action']
+            "action" => $dataSend['action'],
+            "transactionId" => $dataSend['transactionId']
             ];
         }
         catch (moodle_exception $e) {

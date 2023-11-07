@@ -1,7 +1,7 @@
 <?php
 /**
  * @package     uPlannerConnect
- * @copyright   cristian machado mosquera <cristian.machado@correounivalle.edu.co>
+ * @copyright   Cristian Machado Mosquera <cristian.machado@correounivalle.edu.co>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
@@ -27,8 +27,9 @@ $string['delete_upllaner_email_subject_materials'] = 'Delete uPlanner Materials'
 $string['delete_upllaner_email_subject_summary'] = 'Delete uPlanner Summary';
 
 // Tasks.
-$string['syncinituplannertask'] = 'Sync uPlanner Task';
-$string['syncerroruplannertask'] = 'Sync Log uPlanner Task';
+$string['syncsendtuplannertask'] = 'Send uPlanner Task';
+$string['synccleanuplannertask'] = 'Clean Log uPlanner Task';
+$string['syncerroruplannertask'] = 'Send registers no processing in uPlanner Task';
 
 // Module
 $string['pluginname'] = 'uPlannerConnect';
@@ -71,6 +72,31 @@ $string['evaluation_structure_endpoint_desc'] = 'Enter the topic for the evaluat
 $string['grades_endpoint_heading'] = 'Grades topic configuration';
 $string['grades_endpoint'] = 'Grades topic';
 $string['grades_endpoint_desc'] = 'Enter the topic for the grades endpoint.';
+
+// uPlanner messages host
+$string['messages_host_heading'] = 'Messages host configuration';
+$string['messages_host'] = 'Messages host';
+$string['messages_host_desc'] = 'Enter teh messages host.';
+
+// uPlanner messages database
+$string['messages_database_heading'] = 'Messages database configuration';
+$string['messages_database'] = 'Messages database';
+$string['messages_database_desc'] = 'Enter teh messages database.';
+
+// uPlanner messages user
+$string['messages_user_heading'] = 'Messages user configuration';
+$string['messages_user'] = 'Messages user';
+$string['messages_user_desc'] = 'Enter teh messages user.';
+
+// uPlanner messages password
+$string['messages_password_heading'] = 'Messages password configuration';
+$string['messages_password'] = 'Messages password';
+$string['messages_password_desc'] = 'Enter teh messages password.';
+
+// uPlanner messages port
+$string['messages_port_heading'] = 'Messages port configuration';
+$string['messages_port'] = 'Messages port';
+$string['messages_port_desc'] = 'Enter teh messages port.';
 
 // uPlanner task rutine field
 $string['task_rutine_primary'] = 'Primary Task Runtime';

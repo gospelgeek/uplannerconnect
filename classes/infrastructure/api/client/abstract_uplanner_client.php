@@ -19,7 +19,8 @@ class abstract_uplanner_client
 {
     const FILE_HEADERS = [
         'json',
-        'request_type'
+        'request_type',
+        'state'
     ];
 
     /**

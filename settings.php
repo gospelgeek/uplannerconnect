@@ -58,7 +58,7 @@ if ($hassiteconfig) {
                 $pluginName . '/token_endpoint',
                 get_string('token_endpoint', $pluginName),
                 get_string('token_endpoint_desc', $pluginName),
-                'https://univalle-api.u-planner.com/api/auth/signature',
+                'https://univalle-qa-api.u-planner.com/api/auth/signature',
                 PARAM_URL
             )
         );
@@ -137,6 +137,81 @@ if ($hassiteconfig) {
                 PARAM_URL
             )
         );
+        // uPlanner messages host
+        $settings->add(new admin_setting_heading(
+                $pluginName . '_messages_host',
+                get_string('messages_host_heading', $pluginName),
+                'uPlanner messages host'
+            )
+        );
+        $settings->add(new admin_setting_configtext(
+                $pluginName . '/messages_host',
+                get_string('messages_host', $pluginName),
+                get_string('messages_host_desc', $pluginName),
+                '',
+                PARAM_TEXT
+            )
+        );
+        // uPlanner messages database
+        $settings->add(new admin_setting_heading(
+                $pluginName . '_messages_database',
+                get_string('messages_database_heading', $pluginName),
+                'uPlanner messages database'
+            )
+        );
+        $settings->add(new admin_setting_configtext(
+                $pluginName . '/messages_database',
+                get_string('messages_database', $pluginName),
+                get_string('messages_database_desc', $pluginName),
+                '',
+                PARAM_TEXT
+            )
+        );
+        // uPlanner messages user
+        $settings->add(new admin_setting_heading(
+                $pluginName . '_messages_user',
+                get_string('messages_user_heading', $pluginName),
+                'uPlanner messages user'
+            )
+        );
+        $settings->add(new admin_setting_configtext(
+                $pluginName . '/messages_user',
+                get_string('messages_user', $pluginName),
+                get_string('messages_user_desc', $pluginName),
+                '',
+                PARAM_TEXT
+            )
+        );
+        // uPlanner messages password
+        $settings->add(new admin_setting_heading(
+                $pluginName . '_messages_password',
+                get_string('messages_password_heading', $pluginName),
+                'uPlanner messages password'
+            )
+        );
+        $settings->add(new admin_setting_configtext(
+                $pluginName . '/messages_password',
+                get_string('messages_password', $pluginName),
+                get_string('messages_password_desc', $pluginName),
+                '',
+                PARAM_TEXT
+            )
+        );
+        // uPlanner messages port
+        $settings->add(new admin_setting_heading(
+                $pluginName . '_messages_port',
+                get_string('messages_port_heading', $pluginName),
+                'uPlanner messages port'
+            )
+        );
+        $settings->add(new admin_setting_configtext(
+                $pluginName . '/messages_port',
+                get_string('messages_port', $pluginName),
+                get_string('messages_port_desc', $pluginName),
+                '',
+                PARAM_INT
+            )
+        );
 
         $settings->add(new admin_setting_configtext(
                 $pluginName . '/task_runtime_primary',
@@ -146,7 +221,6 @@ if ($hassiteconfig) {
                 PARAM_INT
             )
         );
-        
     }
 
     // Agrega la página de configuración al árbol

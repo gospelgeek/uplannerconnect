@@ -25,7 +25,7 @@ defined('MOODLE_INTERNAL') || die;
  * @author Daniel Eduardo Dorado <doradodaniel14@gmail.com>
  * @description Handle remove success uPlanner task
  */
-class handle_remove_success_uplanner_task
+class handle_clean_uplanner_task
 {
     const PREFIX = 'delete_';
 
@@ -33,7 +33,6 @@ class handle_remove_success_uplanner_task
      * @var $uplanner_client_factory
      */
     private $uplanner_client_factory;
-
 
     /**
      * @var $file
@@ -84,27 +83,33 @@ class handle_remove_success_uplanner_task
             $repository->add_log_data();
             $this->create_file(self::PREFIX . $uplanner_client->get_file_name());
             foreach (repository_type::LIST_STATES as $state) {
-                $dataQuery = [
-                    'state' => $state,
-                    'limit' => 100,
-                    'offset' => 0,
-                ];
-                $rows = $repository->getDataBD($dataQuery);
-                if (!$rows) {
-                    continue;
-                }
-                $this->add_rows_in_file($rows);
-                foreach ($rows as $row) {
-                    $messages = $this->message_repository->get_data([
-                        'id_transaction' => $row->id,
-                        'limit' => 1,
-                        'offset' => 0,
-                    ]);
-                    $message = reset($messages);
-                    if ($message->is_success_ful == 1) {
-                        $repository->delete_row($row->id);
-                        $this->message_repository->delete_row($message->id);
+                $offset = 0;
+                while (true) {
+                    $dataQuery = [
+                        'state' => $state,
+                        'limit' => 100,
+                        'offset' => $offset,
+                    ];
+                    $rows = $repository->getDataBD($dataQuery);
+                    if (!$rows) {
+                        break;
                     }
+                    $this->add_rows_in_file($rows);
+                    $numRows = 0;
+                    foreach ($rows as $row) {
+                        $json = json_decode($row->json, true);
+                        if (!array_key_exists('transactionId', $json)){
+                            $numRows++;
+                            continue;
+                        }
+                        $message = $this->message_repository->get_by_transaction_id($json['transactionId']);
+                        if ($message && ($message['is_successful'] === 1 || $message['is_successful'] === '1')) {
+                            $repository->delete_row($row->id);
+                            continue;
+                        }
+                        $numRows++;
+                    }
+                    $offset += $numRows;
                 }
             }
             $this->send_email(self::PREFIX . $uplanner_client->get_email_subject());
@@ -123,7 +128,6 @@ class handle_remove_success_uplanner_task
     private function create_file($file_name)
     {
         $headers = abstract_uplanner_client::FILE_HEADERS;
-        $headers[] = 'state';
         $this->file = new file($file_name);
         $this->file->create_csv($headers);
     }

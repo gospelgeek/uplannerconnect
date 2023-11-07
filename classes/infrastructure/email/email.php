@@ -21,9 +21,12 @@ class email
     /**
      * Send email with uPlanner info
      *
+     * @param $recipient_email
+     * @param $subject
+     * @param $attachment_path
      * @return bool
      */
-    public function send($recipient_email, $subject, $attachment_path)
+    public function send($recipient_email, $subject, $attachment_path): bool
     {
         try {
             $filename = basename($attachment_path);

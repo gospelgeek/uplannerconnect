@@ -21,7 +21,7 @@ class event_access_validator
     const EVENT_METHOD_NAME = 'methodName';
     const DATA_VERIFY_EVENT = 'typeEvent';
     // Facultade a evaluar
-    const FACULTY_ACTIVE = ['4','2','3','5','6','8'];
+    const FACULTY_ACTIVE = ['1','4','2','3','5','6','7','8','9','10'];
     private $courseDataRepository;
 
     /**

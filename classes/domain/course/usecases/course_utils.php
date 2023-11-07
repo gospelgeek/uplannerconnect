@@ -19,7 +19,9 @@ class course_utils
 {
     const TABLE_CATEGORY = 'grade_categories';
     const TABLE_ITEMS = 'grade_items';
-    
+    const TABLE_TRANSACTION_UPLANNER = 'uplanner_transaction_seq';
+    const LAST_COURSE_TRANSACTION = 'SELECT id FROM mdl_uplanner_transaction_seq WHERE courseid = %s ORDER BY id DESC LIMIT 1';
+
     private $validator;
     private $moodle_query_handler;
 
@@ -74,19 +76,25 @@ class course_utils
                 ])
             ]))['result'];
 
+            $timestamp =  $this->validator->isIsset(($gradeLoadItem->timecreated));
+            $formattedDateCreated = date('Y-m-d', $timestamp);
+            $timestampMod =  $this->validator->isIsset(($gradeLoadItem->timemodified));
+            $formattedDateModified = date('Y-m-d', $timestampMod);
+
             //información a guardar
             $dataToSave = [
                 'sectionId' => $this->validator->isIsset($queryCourse->shortname),
                 'studentCode' => $this->validator->isIsset($queryStudent->username),
                 'evaluationGroupCode' => $this->validator->isIsset($categoryFullName), //Bien
                 'evaluationId' => $this->validator->isIsset($gradeLoadItem->id),
-                'average' => $this->validator->isIsset($gradeLoadItem->aggregationcoef2),
+                'average' => $this->validator->isIsset($this->getWeight($gradeLoadItem)),
                 'isApproved' => $this->validator->isIsset($aproved),
                 'value' => $this->validator->isIsset(($getData['other'])['finalgrade']),
                 'evaluationName' => $this->validator->isIsset($gradeLoadItem->itemname),
-                'date' => $this->validator->isIsset($gradeLoadItem->timecreated),
-                'lastModifiedDate' => $this->validator->isIsset($gradeLoadItem->timemodified),
-                'action' => $data['dispatch'],
+                'date' => $this->validator->isIsset($formattedDateCreated),
+                'lastModifiedDate' => $this->validator->isIsset($formattedDateModified),
+                'action' => strtoupper($data['dispatch']),
+                'transactionId' => $this->validator->isIsset($this->getLastRowTransaction($grade->grade_item->courseid)),
             ];
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
@@ -121,7 +129,7 @@ class course_utils
             //category info
             $categoryItem = $this->getInstanceCategoryName($get_grade_item);
             $categoryFullName = $this->shortCategoryName($categoryItem); 
-            $weight = $this->validator->isIsset($get_grade_item->aggregationcoef2) ?? 0;
+            $weight = $this->validator->isIsset($this->getWeight($get_grade_item)) ?? 0;
 
             $queryCourse = ($this->validator->verifyQueryResult([                        
                 'data' => $this->moodle_query_handler->extract_data_db([
@@ -131,7 +139,7 @@ class course_utils
                     ]
                 ])
             ]))['result'];
-            
+          
             $dataToSave = [
                 'sectionId' => $this->validator->isIsset($queryCourse->shortname),
                 'evaluationGroupCode' => $this->validator->isIsset($categoryFullName),
@@ -139,7 +147,9 @@ class course_utils
                 'evaluationId' => $this->validator->isIsset($get_grade_item->id),
                 'evaluationName' => $this->validator->isIsset($get_grade_item->itemname),
                 'weight' => $weight,
-                'action' => $data['dispatch']
+                'action' => strtoupper($data['dispatch']),
+                "date" => $this->validator->isIsset(strval($dataEvent['timecreated'])),
+                'transactionId' => $this->validator->isIsset($this->getLastRowTransaction($get_grade_item->courseid)),
             ];
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: ',  $e->getMessage(), "\n");
@@ -206,5 +216,67 @@ class course_utils
         $sinEspacios = str_replace(' ', '', $categoryFullName);
         $categoryShort = substr($sinEspacios, 0, 10);
         return $categoryShort;
+    }
+
+    /**
+     * Retorna el peso de la categoria
+     * 
+     * @param object $gradeItem
+     * @return float
+     */
+    private function getWeight($gradeItem)
+    {
+        $weight = 0;
+        if (property_exists($gradeItem, 'aggregationcoef2')) {
+            $weight = $gradeItem->aggregationcoef2;
+            if (intval($gradeItem->aggregationcoef2) === 0) {
+                $weight = $gradeItem->aggregationcoef;
+            }
+        }
+        return $weight;
+    }
+
+    private function insertTransactionUplanner(array $data)
+    {
+        $dataToSave = [];
+        try {
+            $dataToSave = [
+                'courseid' => $data['courseId'],
+                'transaction' => $data['transaction']
+            ];
+            $this->moodle_query_handler->insert_record_db([
+                'table' => self::TABLE_TRANSACTION_UPLANNER,
+                'data' => $dataToSave
+            ]);
+        } catch (moodle_exception $e) {
+            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+        }
+    }
+
+    private function getLastRowTransaction($courseId)
+    {
+        $lastRow = 0;
+        try {
+            $queryResult = $this->moodle_query_handler->executeQuery(sprintf(
+                self::LAST_COURSE_TRANSACTION, 
+                $courseId
+            ));
+
+            if (!empty($queryResult)) {
+                $firstResult = reset($queryResult);
+                $lastRow = intval((($firstResult->id) + 1).''.$courseId);
+            } else {
+                $lastRow = intval('1' . $courseId);
+            }
+
+            $this->insertTransactionUplanner([
+                'courseId' => $courseId,
+                'transaction' => $lastRow
+            ]);
+
+        } catch (moodle_exception $e) {
+            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+        }
+        return $lastRow;
     }
 }

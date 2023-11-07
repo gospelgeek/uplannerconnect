@@ -80,7 +80,8 @@ class material_translation_data
             "blackboardSectionId" => $dataSend['blackboardSectionId'],
             "size" => $dataSend['size'],
             "lastUpdatedTime" => $dataSend['lastUpdatedTime'],
-            "action" => $dataSend['action']
+            "action" => $dataSend['action'],
+            "transactionId" => $dataSend['transactionId']
             ];
         }
         catch (moodle_exception $e) {
