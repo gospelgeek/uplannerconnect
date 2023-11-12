@@ -19,7 +19,6 @@ class abstract_uplanner_client
 {
     const FILE_HEADERS = [
         'json',
-        'request_type',
         'state'
     ];
 
@@ -128,14 +127,17 @@ class abstract_uplanner_client
             $headers = [
                 'Content-Type: application/json'
             ];
+            $this->add_log_before_request('POST', $headers, $data);
             $this->curl_wrapper->set_header($headers);
             $response = $this->curl_wrapper->post($this->token_url, $data);
-            if ($this->curl_wrapper->get_code() === 201) {
+            $code = $this->curl_wrapper->get_code();
+            if ($code === 201) {
                 $response = json_decode($response, true);
                 $this->token = $response['signature'];
             } else {
                 $this->token = '';
             }
+            $this->add_log_after_request('POST', $headers, $data, $code, $response);
         }
 
         return $this->token;
@@ -163,9 +165,11 @@ class abstract_uplanner_client
             'Customer: AllMessages'
         ];
         $endpoint = $this->get_endpoint();
+        $this->add_log_before_request('POST', $headers, $data);
         $this->curl_wrapper->set_header($headers);
         $response = $this->curl_wrapper->post($endpoint, $data);
-        if ($this->curl_wrapper->get_code() === 201) {
+        $code = $this->curl_wrapper->get_code();
+        if ($code === 201) {
             $result = json_decode($response, true);
             $result = $result ?? ['code' => 201];
         } else {
@@ -173,6 +177,7 @@ class abstract_uplanner_client
                 'error' => json_encode($response)
             ];
         }
+        $this->add_log_after_request('POST', $headers, $data, $code, $result);
 
         return $result;
     }
@@ -190,5 +195,74 @@ class abstract_uplanner_client
         }
 
         return $url;
+    }
+
+    /**
+     * Add log before request
+     *
+     * @param $method
+     * @param $data
+     * @param $headers
+     * @return void
+     */
+    public function add_log_before_request($method, $headers, $data)
+    {
+        try {
+            $data_request = [
+                'topic' => $this->topic,
+                'url' => $this->token_url,
+                'method' => $method,
+                'data' => $data,
+                'headers' => $headers
+            ];
+            $this->add_log('***** uPlanner - before request data: ', $data_request);
+        } catch (\Exception $e) {
+            error_log('add_log_before_request: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Add log after request
+     *
+     * @param $method
+     * @param $headers
+     * @param $data
+     * @param $code
+     * @param $response
+     * @return void
+     */
+    public function add_log_after_request(
+        $method,
+        $headers,
+        $data,
+        $code,
+        $response
+    ) {
+        try {
+            $data_request = [
+                'url' => $this->token_url,
+                'method' => $method,
+                'data' => $data,
+                'headers' => $headers,
+                'code' => $code,
+                'response' => $response
+            ];
+            $this->add_log('***** uPlanner - after request data: ', $data_request);
+        } catch (\Exception $e) {
+            error_log('add_log_after_request: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Add log request
+     *
+     * @param $firsts_message
+     * @param $data
+     * @return void
+     */
+    public function add_log($firsts_message, $data)
+    {
+        $log_data = PHP_EOL . $firsts_message . json_encode($data);
+        error_log($log_data);
     }
 }

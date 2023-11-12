@@ -225,5 +225,117 @@ function xmldb_local_uplannerconnect_upgrade($oldversion): bool {
         upgrade_plugin_savepoint(true, 2023110201, 'local', 'uplannerconnect');
     }
 
+    if ($oldversion < 2023111100) {
+        // Define table uplanner_esb_messages_status to be dropped.
+        $table = new xmldb_table('uplanner_esb_messages_status');
+        // Conditionally launch drop table for uplanner_esb_messages_status.
+        if ($dbman->table_exists($table)) {
+            $dbman->drop_table($table);
+        }
+        // Uplannerconnect savepoint reached.
+        upgrade_plugin_savepoint(true, 2023111100, 'local', 'uplannerconnect');
+    }
+
+    if ($oldversion < 2023111105) {
+        // Define field ds_error to be added to uplanner_grades.
+        $table = new xmldb_table('uplanner_grades');
+        $field = new xmldb_field('ds_error', XMLDB_TYPE_TEXT, null, null, null, null, null, 'success');
+        // Conditionally launch add field ds_error.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Define field is_sucessful to be added to uplanner_grades.
+        $table = new xmldb_table('uplanner_grades');
+        $field = new xmldb_field('is_sucessful', XMLDB_TYPE_INTEGER, '1', null, null, null, null, 'ds_error');
+        // Conditionally launch add field is_sucessful.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Define field ds_error to be added to uplanner_evaluation.
+        $table = new xmldb_table('uplanner_evaluation');
+        $field = new xmldb_field('ds_error', XMLDB_TYPE_TEXT, null, null, null, null, null, 'success');
+        // Conditionally launch add field ds_error.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Define field is_sucessful to be added to uplanner_evaluation.
+        $table = new xmldb_table('uplanner_evaluation');
+        $field = new xmldb_field('is_sucessful', XMLDB_TYPE_INTEGER, '1', null, null, null, null, 'ds_error');
+        // Conditionally launch add field is_sucessful.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Define field ds_error to be added to uplanner_notification.
+        $table = new xmldb_table('uplanner_notification');
+        $field = new xmldb_field('ds_error', XMLDB_TYPE_TEXT, null, null, null, null, null, 'success');
+        // Conditionally launch add field ds_error.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Define field is_sucessful to be added to uplanner_notification.
+        $table = new xmldb_table('uplanner_notification');
+        $field = new xmldb_field('is_sucessful', XMLDB_TYPE_INTEGER, '1', null, null, null, null, 'ds_error');
+        // Conditionally launch add field is_sucessful.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Define field ds_error to be added to uplanner_materials.
+        $table = new xmldb_table('uplanner_materials');
+        $field = new xmldb_field('ds_error', XMLDB_TYPE_TEXT, null, null, null, null, null, 'success');
+        // Conditionally launch add field ds_error.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Define field is_sucessful to be added to uplanner_materials.
+        $table = new xmldb_table('uplanner_materials');
+        $field = new xmldb_field('is_sucessful', XMLDB_TYPE_INTEGER, '1', null, null, null, null, 'ds_error');
+        // Conditionally launch add field is_sucessful.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Define field num_grades_err to be added to uplanner_log.
+        $table = new xmldb_table('uplanner_log');
+        $field = new xmldb_field('num_grades_err', XMLDB_TYPE_INTEGER, '20', null, null, null, null, 'num_evaluation');
+        // Conditionally launch add field num_grades_err.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field num_materials_err to be added to uplanner_log.
+        $table = new xmldb_table('uplanner_log');
+        $field = new xmldb_field('num_materials_err', XMLDB_TYPE_INTEGER, '20', null, null, null, null, 'num_grades_err');
+        // Conditionally launch add field num_materials_err.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field num_anouncements_err to be added to uplanner_log.
+        $table = new xmldb_table('uplanner_log');
+        $field = new xmldb_field('num_anouncements_err', XMLDB_TYPE_INTEGER, '20', null, null, null, null, 'num_materials_err');
+        // Conditionally launch add field num_anouncements_err.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field num_evaluation_err to be added to uplanner_log.
+        $table = new xmldb_table('uplanner_log');
+        $field = new xmldb_field('num_evaluation_err', XMLDB_TYPE_INTEGER, '20', null, null, null, null, 'num_anouncements_err');
+        // Conditionally launch add field num_evaluation_err.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field updated_at to be added to uplanner_log.
+        $table = new xmldb_table('uplanner_log');
+        $field = new xmldb_field('updated_at', XMLDB_TYPE_TEXT, null, null, null, null, null, 'date');
+        // Conditionally launch add field updated_at.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        // Uplannerconnect savepoint reached.
+        upgrade_plugin_savepoint(true, 2023111105, 'local', 'uplannerconnect');
+    }
+
+
     return true;
 }

@@ -23,11 +23,16 @@ class email
      *
      * @param $recipient_email
      * @param $subject
+     * @param $current_date
      * @param $attachment_path
      * @return bool
      */
-    public function send($recipient_email, $subject, $attachment_path): bool
-    {
+    public function send(
+        $recipient_email,
+        $subject,
+        $current_date,
+        $attachment_path
+    ): bool {
         try {
             $filename = basename($attachment_path);
             $user = new \stdClass();
@@ -47,7 +52,7 @@ class email
             return email_to_user(
                 $user,
                 $admin,
-                $subject,
+                $subject . ' - ' . $current_date,
                 $body,
                 '',
                 $attachment_path,

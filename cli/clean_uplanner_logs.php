@@ -60,7 +60,7 @@ $uplanner_client_factory = new uplanner_client_factory();
 foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
     $repository = new $repository_class($type);
     $uplanner_client = $uplanner_client_factory->create($type);
-    foreach (repository_type::COMPLETE_LIST_STATES as $state) {
+    foreach (repository_type::LIST_STATES as $state) {
         while (true) {
             $dataQuery = [
                 'state' => $state,
