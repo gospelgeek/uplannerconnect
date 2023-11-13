@@ -59,7 +59,7 @@ class email
                 $filename
             );
         } catch (coding_exception $e) {
-            error_log('send: ',  $e->getMessage(), "\n");
+            error_log('send: '. $e->getMessage(). "\n");
         }
 
         return false;

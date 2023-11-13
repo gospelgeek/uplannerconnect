@@ -71,7 +71,7 @@ class file
                 return true;
             }
         } catch (\Exception $e) {
-            error_log('create_csv: ',  $e->getMessage(), "\n");
+            error_log('create_csv: '. $e->getMessage(). "\n");
         }
 
         return false;
@@ -94,7 +94,7 @@ class file
                 return true;
             }
         } catch (\Exception $e) {
-            error_log('add_row: ',  $e->getMessage(), "\n");
+            error_log('add_row: '. $e->getMessage(). "\n");
         }
 
         return false;
@@ -114,7 +114,7 @@ class file
                 unlink($csv_file);
             }
         } catch (\Exception $e) {
-            error_log('reset_csv: ',  $e->getMessage(), "\n");
+            error_log('reset_csv: '.  $e->getMessage(). "\n");
         }
 
         return $this->create_csv($headers);
@@ -133,7 +133,7 @@ class file
                 unlink($csv_file);
             }
         } catch (\Exception $e) {
-            error_log('delete_csv: ',  $e->getMessage(), "\n");
+            error_log('delete_csv: '.  $e->getMessage(). "\n");
         }
     }
 }

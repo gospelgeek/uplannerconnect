@@ -50,7 +50,7 @@ class material_translation_data
             }
         }
         catch (moodle_exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+            error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $arraySend;
     }
@@ -80,11 +80,12 @@ class material_translation_data
             "blackboardSectionId" => $dataSend['blackboardSectionId'],
             "size" => $dataSend['size'],
             "lastUpdatedTime" => $dataSend['lastUpdatedTime'],
-            "action" => $dataSend['action']
+            "action" => $dataSend['action'],
+            "transactionId" => $dataSend['transactionId']
             ];
         }
         catch (moodle_exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+            error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $arraySend;
     }

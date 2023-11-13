@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/uplannerconnect/db" VERSION="2023111107" COMMENT="XMLDB file for local/uplannerconnect">
+<XMLDB PATH="local/uplannerconnect/db" VERSION="2023111322" COMMENT="XMLDB file for local/uplannerconnect">
     <TABLES>
         <TABLE NAME="uplanner_grades" COMMENT="Se Guardará la información generada por el evento">
             <FIELDS>
-                <FIELD NAME="id" SEQUENCE="true" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="ID de la tabla" />
+               <FIELD NAME="id" SEQUENCE="true" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="ID de la tabla" />
                 <FIELD NAME="json" SEQUENCE="false" TYPE="text" NOTNULL="true" COMMENT="Datos en formato JSON" />
                 <FIELD NAME="response" SEQUENCE="false" TYPE="text" NOTNULL="true" COMMENT="Datos en formato JSON" />
                 <FIELD NAME="request_type" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
@@ -36,6 +36,7 @@
                 <FIELD NAME="json" SEQUENCE="false" TYPE="text" NOTNULL="true" COMMENT="Datos en formato JSON" />
                 <FIELD NAME="response" SEQUENCE="false" TYPE="text" NOTNULL="true" COMMENT="Datos en formato JSON" />
                 <FIELD NAME="success" SEQUENCE="false" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="Éxito (0 o 1)" />
+                <FIELD NAME="request_type" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="ds_error" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Has value when an error occurred while processing the uPlanner record."/>
                 <FIELD NAME="is_sucessful" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="If the uPlanner record was processed successfully it is displayed as 1, otherwise 0"/>
             </FIELDS>
@@ -59,20 +60,30 @@
         </TABLE>
         <TABLE NAME="uplanner_log" COMMENT="Tabla para materiales">
             <FIELDS>
-                <FIELD NAME="id" SEQUENCE="true" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="ID de la tabla" />
-                <FIELD NAME="num_grades" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="num_materials" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="num_anouncements" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="num_evaluation" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="num_grades_err" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="num_materials_err" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="num_anouncements_err" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="num_evaluation_err" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="date" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="updated_at" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+               <FIELD NAME="id" SEQUENCE="true" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="ID de la tabla" />
+               <FIELD NAME="date" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+               <FIELD NAME="num_grades" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+               <FIELD NAME="num_materials" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+               <FIELD NAME="num_anouncements" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+               <FIELD NAME="num_evaluation" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+               <FIELD NAME="num_grades_err" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+               <FIELD NAME="num_materials_err" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+               <FIELD NAME="num_anouncements_err" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+               <FIELD NAME="num_evaluation_err" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+               <FIELD NAME="updated_at" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" />
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="uplanner_transaction_seq" COMMENT="Default comment for the table, please edit me">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="courseid" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="transaction" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
             </KEYS>
         </TABLE>
     </TABLES>
