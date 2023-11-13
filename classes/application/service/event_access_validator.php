@@ -60,7 +60,7 @@ class event_access_validator
             $boolean = in_array($eventExecute,$data[self::DATA_VERIFY_EVENT]);
         }
         catch (moodle_exception $e) {
-          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+          error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $boolean;
     }
@@ -83,7 +83,7 @@ class event_access_validator
             }
         }
         catch (moodle_exception $e) {
-          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+          error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $result;
     }
