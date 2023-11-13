@@ -10,7 +10,6 @@ namespace local_uplannerconnect\infrastructure\api;
 
 use coding_exception;
 use local_uplannerconnect\application\repository\repository_type;
-use local_uplannerconnect\application\repository\messages_status_repository;
 use local_uplannerconnect\infrastructure\api\client\abstract_uplanner_client;
 use local_uplannerconnect\infrastructure\api\factory\uplanner_client_factory;
 use local_uplannerconnect\infrastructure\email\email;
@@ -20,10 +19,7 @@ defined('MOODLE_INTERNAL') || die;
 
 
 /**
- * @package uPlannerConnect
- * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
- * @author Daniel Dorado <doradodaniel14@gmail.com>
- * @description Clase que controla la lógica que enváa datos a Uplanner
+ * Class handle_send_uplanner_task, send data to uPlanner
  */
 class handle_send_uplanner_task
 {
@@ -43,65 +39,53 @@ class handle_send_uplanner_task
     private $email;
 
     /**
-     * @var messages_status_repository
-     */
-    private $message_repository;
-
-    /**
      * Construct
      */
     public function __construct()
     {
         $this->uplanner_client_factory = new uplanner_client_factory();
         $this->email = new email();
-        $this->message_repository = new messages_status_repository();
     }
 
     /**
-     * Handle process send information to Uplanner
+     * Handle process send information to uPlanner
      *
+     * @param $state
+     * @param int $num_request_by_endpoint
+     * @param $num_rows MAXVALUE: 100
      * @return void
-     * @throws coding_exception
      */
     public function process(
         $state = 0,
         $num_request_by_endpoint = 1,
-        $num_rows = 100,
-        $is_email = false
+        $num_rows = 100
     ) {
+        $current_date = date("F j, Y, g:i:s a");
         foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
             $repository = new $repository_class();
             $uplanner_client = $this->uplanner_client_factory->create($type);
-            if ($is_email) {
-                $this->process_email(
-                    $uplanner_client,
-                    $repository,
-                    $state,
-                    $num_request_by_endpoint,
-                    $num_rows
-                );
-            } else {
-                $this->process_endpoint(
-                    $uplanner_client,
-                    $repository,
-                    $state,
-                    $num_request_by_endpoint,
-                    $num_rows
-                );
-            }
+            $this->process_request(
+                $current_date,
+                $uplanner_client,
+                $repository,
+                $state,
+                $num_request_by_endpoint,
+                $num_rows
+            );
         }
     }
 
     /**
+     * @param $current_date
      * @param $uplanner_client
      * @param $repository
      * @param $state
      * @param $num_request_by_endpoint
      * @param $num_rows
      * @return void
-     * @throws coding_exception
      */
-    public function process_email(
+    public function process_request(
+        $current_date,
         $uplanner_client,
         $repository,
         $state,
@@ -112,88 +96,40 @@ class handle_send_uplanner_task
             return;
         }
         $index_row = 0;
+        $offset = 0;
         while ($index_row < $num_request_by_endpoint) {
             $dataQuery = [
                 'state' => $state,
-                'limit' => 100,
-                'offset' => 0,
+                'limit' => $num_rows,
+                'offset' => $offset,
             ];
             $rows = $repository->getDataBD($dataQuery);
             if (!$rows) {
                 break;
             }
             $response = $this->request($uplanner_client, $rows);
-            $status = in_array('error', $response) ? repository_type::STATE_ERROR : repository_type::STATE_SEND;
-            $this->create_file($uplanner_client->get_file_name(), $rows);
-            $response = $this->send_email($uplanner_client->get_email_subject());
-            //$status = $response ? repository_type::STATE_SEND : repository_type::STATE_ERROR;
+            $status = (empty($response) || in_array('error', $response))
+                ? repository_type::STATE_ERROR : repository_type::STATE_SEND;
+            $this->create_file($uplanner_client->get_file_name(), $rows, $status);
+            $response = $this->send_email(
+                $uplanner_client->get_email_subject(),
+                $current_date
+            );
+            $numRows = 0;
             foreach ($rows as $row) {
                 $dataQuery = [
-                    'json' => $row->json,
                     'response' => $response,
                     'success' => $status,
                     'id' => $row->id
                 ];
                 $repository->updateDataBD($dataQuery);
-                $data_message = [
-                    'id_code' => (int) $row->id,
-                    'id_transaction' => (int) $row->id,
-                    'ds_topic' => get_class($repository),
-                    'ds_mongo_id' => 'ds mongo id',
-                    'ds_error' => 'None',
-                    'dt_processing_date' => date('YYmd'),
-                    'is_success_ful' => 1,
-                    'created_at' => date('YYmd')
-                ];
-                $this->message_repository->save($data_message);
+                if ($status == $state) {
+                    $numRows++;
+                }
             }
-            $this->file->reset_csv(abstract_uplanner_client::FILE_HEADERS);
+            $this->file->delete_csv();
             $index_row++;
-        }
-    }
-
-    /**
-     * @param $uplanner_client
-     * @param $repository
-     * @param $state
-     * @param $num_request_by_endpoint
-     * @param $num_rows
-     * @return void
-     */
-    public function process_endpoint(
-        $uplanner_client,
-        $repository,
-        $state,
-        $num_request_by_endpoint,
-        $num_rows
-    ) {
-        if ($num_request_by_endpoint <= 0 || $num_rows <= 0 ) {
-            return;
-        }
-        $index_row = 0;
-        while ($index_row < $num_request_by_endpoint) {
-            $dataQuery = [
-                'state' => $state,
-                'limit' => 100,
-                'offset' => 0,
-            ];
-            $rows = $repository->getDataBD($dataQuery);
-            if (!$rows) {
-                break;
-            }
-            $response = $this->request($uplanner_client, $rows);
-            $status = in_array('error', $response) ? repository_type::STATE_ERROR : repository_type::STATE_SEND;
-            foreach ($rows as $row) {
-                $dataQuery = [
-                    'json' => json_encode($row->json),
-                    'response' => json_encode($response),
-                    'success' => $status,
-                    'request_type' => json_encode($response['code']),
-                    'id' => $row->id
-                ];
-                $repository->updateDataBD($dataQuery);
-            }
-            $index_row++;
+            $offset += $numRows;
         }
     }
 
@@ -222,16 +158,17 @@ class handle_send_uplanner_task
      *
      * @param $file_name
      * @param $rows
+     * @param $status
      * @return void
      */
-    private function create_file($file_name, $rows)
+    private function create_file($file_name, $rows, $status)
     {
         $this->file = new file($file_name);
         $this->file->create_csv(abstract_uplanner_client::FILE_HEADERS);
         foreach ($rows as $row) {
             $data = [
                 $row->json,
-                $row->request_type
+                $status
             ];
             $this->file->add_row($data);
         }
@@ -241,15 +178,16 @@ class handle_send_uplanner_task
      * Send email
      *
      * @param $subject
+     * @param $current_date
      * @return bool
-     * @throws coding_exception
      */
-    private function send_email($subject): bool
+    private function send_email($subject, $current_date)
     {
         $recipient_email = 'samuel.ramirez@correounivalle.edu.co';
         return $this->email->send(
             $recipient_email,
             $subject,
+            $current_date,
             $this->file->get_path_file()
         );
     }

@@ -15,7 +15,16 @@ use moodle_exception;
 */
 class course_evaluation_structure_repository
 {
-    const TABLE_COURSE_EVALUATION = 'uplanner_evaluation';
+    const TABLE = 'uplanner_evaluation';
+    const FIELDS = [
+        'json' => 'json',
+        'response' => 'json',
+        'success' => 'int',
+        'ds_error' => 'string',
+        'is_sucessful' => 'int',
+        'date' => 'string',
+        'id' => 'int',
+    ];
 
     /**
      * @var general_repository
@@ -38,14 +47,10 @@ class course_evaluation_structure_repository
      */
     public function updateDataBD(array $data) : void
     {
+        $update_data = $this->general_repository->get_transfor_data(self::FIELDS, $data);
         $this->general_repository->updateDataBD([
-            'data' => [
-                'json' => json_encode($data['json']),
-                'response' => json_encode($data['response']),
-                'success' => $data['success'],
-                'id' => $data['id'],
-            ],
-            'table' => self::TABLE_COURSE_EVALUATION
+            'data' => $update_data,
+            'table' => self::TABLE
         ]);
     }
 
@@ -57,14 +62,18 @@ class course_evaluation_structure_repository
      */
     public function saveDataBD(array $data) : void
     {
+        $date = $data['date'];
+        //remove the date field from the array
+        unset($data['date']);
         $this->general_repository->saveDataBD([
             'data' => [
                 'json' => json_encode($data),
                 'response' => '{"status": "Default response"}',
                 'success' => repository_type::STATE_DEFAULT,
                 'request_type' => $data['action'],
+                'date' => $date
             ],
-            'table' => self::TABLE_COURSE_EVALUATION
+            'table' => self::TABLE
         ]);
     }
 
@@ -79,54 +88,7 @@ class course_evaluation_structure_repository
         return $this->general_repository->getDataBD([
             'data' => $data,
             'query' => plugin_config::QUERY_SELECT_COURSE_GRADES,
-            'table' => 'mdl_' . self::TABLE_COURSE_EVALUATION
+            'table' => 'mdl_' . self::TABLE
         ]);
-    }
-
-    /**
-     * Delete registers by field state
-     *
-     * @param $state
-     * @return bool
-     */
-    public function delete_data_bd($state): bool
-    {
-        return $this->general_repository->delete_data_bd($state, self::TABLE_COURSE_EVALUATION);
-    }
-
-    /**
-     * Delete registers by field state
-     *
-     * @return void
-     */
-    public function add_log_data() : void
-    {
-        // $this->general_repository->add_log_data([
-        //     'query_insert' => plugin_config::QUERY_COUNT_LOGS,
-        //     'table_insert' => 'mdl_'.plugin_config::TABLE_COURSE_EVALUATION,
-        //     'query_log' => plugin_config::QUERY_INSERT_LOGS,
-        //     'table_log' => plugin_config::TABLE_LOG
-        // ]);
-    }
-
-    /**
-     * Delete register
-     *
-     * @param $id
-     * @return bool
-     */
-    public function delete_row($id): bool
-    {
-        $result = false;
-        try {
-            $result = $this->general_repository->delete_row(
-                self::TABLE_COURSE_EVALUATION,
-                $id
-
-            );
-        } catch (moodle_exception $e) {
-            error_log('delete_row: ' . $e->getMessage() . "\n");
-        }
-        return $result;
     }
 }

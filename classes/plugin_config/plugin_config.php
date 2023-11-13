@@ -22,80 +22,12 @@ class plugin_config
     CONST TABLE_COURSE_MOODLE = 'mdl_course';    
     CONST TABLE_COURSE = 'course';
     CONST TABLE_USER_MOODLE = 'user';
-    const TABLE_LOG = "mdl_uplanner_log";
-
-    // Rutas de los eventos.
-    CONST ROUTE_HANDLER_EVENT_1 = 'local_uplannerconnect\infrastructure\event\handle_event_course_notes';
-
-    // Configuración de los eventos. 
-    CONST EVENTS_OBSERVERS = [
-        [
-            'eventname' => '\core\event\user_graded',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\grade_deleted',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\grade_item_created',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\grade_item_updated',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\local_uplannerconnect\event\resource_file',
-            'isLocal' => true,
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\course_module_created',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\course_module_updated',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\core\event\course_module_deleted',
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\mod_forum\event\discussion_created',
-            'isForum' => true,
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\mod_forum\event\discussion_deleted',
-            'isForum' => true,
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\mod_forum\event\post_created',
-            'isForum' => true,
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\mod_forum\event\post_updated',
-            'isForum' => true,
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
-        [
-            'eventname' => '\mod_forum\event\post_deleted',
-            'isForum' => true,
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ]
-    ];
 
     // Conultas a la base de datos.
     CONST QUERY_INSERT_COURSE_GRADES = "INSERT INTO %s (json, response, success , request_type) VALUES ('%s', '%s', '%s' , '%s')";
     CONST QUERY_UPDATE_COURSE_GRADES = "UPDATE %s SET json = '%s', response = '%s', success = '%s' WHERE id = '%s'";
     CONST QUERY_SELECT_COURSE_GRADES = "SELECT * FROM %s WHERE success = '%s' LIMIT '%s' OFFSET '%s'";
     CONST QUERY_SHORNAME_COURSE_BY_ID = "SELECT shortname FROM %s WHERE id = '%s'";
-    CONST QUERY_COUNT_LOGS = "SELECT count(id) FROM %s";
-    const QUERY_INSERT_LOGS = "INSERT INTO %s (date, num_grades, num_materials, num_anouncements, num_evaluation) VALUES ('%s', '%s', '%s' , '%s' , '%s')";
     const QUERY_NAME_CATEGORY_GRADE = "SELECT t2.fullname FROM %s as t1 INNER JOIN %s as t2 ON t1.id = %s AND t2.id = t1.categoryid";
 
     // Estruturas de datos uPlanner.
@@ -116,6 +48,7 @@ class plugin_config
         ['name' => 'average', 'type' => 'numeric'],
         ['name' => 'lastModifiedDate', 'type' => 'string'],
         ['name' => 'action', 'type' => 'string'],
+        ['name' => 'transactionId', 'type' => 'numeric'],
     ];
 
     // Estruturas de datos uPlanner.
@@ -127,6 +60,8 @@ class plugin_config
         ['name' => 'evaluationName', 'type' => 'string'],
         ['name' => 'weight', 'type' => 'numeric'],
         ['name' => 'action', 'type' => 'string'],
+        ['name' => 'date', 'type' => 'string'],
+        ['name' => 'transactionId', 'type' => 'numeric'],
     ];
 
     CONST UPLANNER_MATERIALS_ESTRUTURE = [
@@ -139,6 +74,7 @@ class plugin_config
         ['name' => 'size', 'type' => 'numeric'],
         ['name' => 'lastUpdatedTime', 'type' => 'string'],
         ['name' => 'action', 'type' => 'string'],
+        ['name' => 'transactionId', 'type' => 'numeric'],
     ];
 
     CONST UPLANNER_ANNOUNCEMENTS_ESTRUTURE = [
@@ -151,6 +87,7 @@ class plugin_config
         ['name' => 'id', 'type' => 'string'],
         ['name' => 'usernameCreator', 'type' => 'string'],
         ['name' => 'action', 'type' => 'string'],
+        ['name' => 'transactionId', 'type' => 'numeric'],
     ];
 
     // Estructuras de datos para la creacion.

@@ -10,6 +10,7 @@ namespace local_uplannerconnect\domain\materials\usecases;
 use local_uplannerconnect\application\service\data_validator;
 use local_uplannerconnect\application\repository\moodle_query_handler;
 use local_uplannerconnect\plugin_config\plugin_config;
+use local_uplannerconnect\domain\service\transition_endpoint;
 use moodle_exception;
 
 /**
@@ -21,6 +22,7 @@ class material_utils
 
     private $validator;
     private $moodle_query_handler;
+    private $transition_endpoint; 
 
     /**
      *  Construct
@@ -29,6 +31,7 @@ class material_utils
     {
         $this->validator = new data_validator();
         $this->moodle_query_handler = new moodle_query_handler();
+        $this->transition_endpoint = new transition_endpoint();
     }
 
     /**
@@ -64,6 +67,9 @@ class material_utils
             $typeFile = $fileData->mimetype ?? $getData['other']['modulename'];
             $url = $this->getUrlResource($event,$fileData);
             $nameFile = $getData['other']['name'] ?? '';
+
+            $timestamp =  $this->validator->isIsset($getData['timecreated']);
+            $formattedDateCreated = date('Y-m-d', $timestamp);
             
             //información a guardar
             $dataToSave = [
@@ -73,11 +79,12 @@ class material_utils
                 'url' => $this->validator->isIsset($url),
                 'blackboardSectionId' => $this->validator->isIsset($queryCourse->shortname),
                 'size' => $sizeFile, 
-                'lastUpdatedTime' => $this->validator->isIsset(strval($getData['timecreated'])),
-                'action' => $data['dispatch'],
+                'lastUpdatedTime' => $this->validator->isIsset($formattedDateCreated),
+                'action' => strtoupper($data['dispatch']),
+                'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($courseid)),
             ];
         } catch (moodle_exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+            error_log('Excepción capturada: '.  $e->getMessage(). "\n");
         }
         return $dataToSave;
     }
@@ -108,7 +115,7 @@ class material_utils
                 }
             }
         } catch (moodle_exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+            error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $query;
     }
@@ -150,7 +157,7 @@ class material_utils
                 }
             }
         } catch (moodle_exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+            error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $url;
     }

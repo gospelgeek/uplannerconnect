@@ -50,7 +50,7 @@ class announcements_translation_data
             }
         }
         catch (moodle_exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+            error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $arraySend;
     }
@@ -80,11 +80,12 @@ class announcements_translation_data
             "content" => $dataSend['content'],
             "id" => $dataSend['id'],
             "usernameCreator" => $dataSend['usernameCreator'],
-            "action" => $dataSend['action']
+            "action" => $dataSend['action'],
+            "transactionId" => $dataSend['transactionId']
             ];
         }
         catch (moodle_exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+            error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $arraySend;
     }

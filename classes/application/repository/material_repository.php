@@ -15,7 +15,15 @@ use moodle_exception;
 */
 class material_repository
 {
-    const TABLE_COURSE_MATERIALS = 'uplanner_materials';
+    const TABLE = 'uplanner_materials';
+    const FIELDS = [
+        'json' => 'json',
+        'response' => 'json',
+        'success' => 'int',
+        'ds_error' => 'string',
+        'is_sucessful' => 'int',
+        'id' => 'int',
+    ];
 
     /**
      * @var general_repository
@@ -38,14 +46,10 @@ class material_repository
      */
     public function updateDataBD(array $data) : void
     {
+        $update_data = $this->general_repository->get_transfor_data(self::FIELDS, $data);
         $this->general_repository->updateDataBD([
-            'data' => [
-                'json' => json_encode($data['json']),
-                'response' => json_encode($data['response']),
-                'success' => $data['success'],
-                'id' => $data['id'],
-            ],
-            'table' => self::TABLE_COURSE_MATERIALS
+            'data' => $update_data,
+            'table' => self::TABLE
         ]);
     }
 
@@ -64,7 +68,7 @@ class material_repository
                 'success' => repository_type::STATE_DEFAULT,
                 'request_type' => $data['action'],
             ],
-            'table' => self::TABLE_COURSE_MATERIALS
+            'table' => self::TABLE
         ]);
     }
 
@@ -79,54 +83,7 @@ class material_repository
         return $this->general_repository->getDataBD([
             'data' => $data,
             'query' => plugin_config::QUERY_SELECT_COURSE_GRADES,
-            'table' => 'mdl_' . self::TABLE_COURSE_MATERIALS
+            'table' => 'mdl_' . self::TABLE
         ]);
-    }
-
-    /**
-     * Delete registers by field state
-     *
-     * @param $state
-     * @return bool
-     */
-    public function delete_data_bd($state): bool
-    {
-        return $this->general_repository->delete_data_bd($state, self::TABLE_COURSE_MATERIALS);
-    }
-
-    /**
-     * Delete registers by field state
-     *
-     * @return void
-     */
-    public function add_log_data() : void
-    {
-        // $this->general_repository->add_log_data([
-        //     'query_insert' => plugin_config::QUERY_COUNT_LOGS,
-        //     'table_insert' => 'mdl_'.plugin_config::TABLE_COURSE_MATERIALS,
-        //     'query_log' => plugin_config::QUERY_INSERT_LOGS,
-        //     'table_log' => plugin_config::TABLE_LOG
-        // ]);
-    }
-
-    /**
-     * Delete register
-     *
-     * @param $id
-     * @return bool
-     */
-    public function delete_row($id): bool
-    {
-        $result = false;
-        try {
-            $result = $this->general_repository->delete_row(
-                self::TABLE_COURSE_MATERIALS,
-                $id
-
-            );
-        } catch (moodle_exception $e) {
-            error_log('delete_row: ' . $e->getMessage() . "\n");
-        }
-        return $result;
     }
 }

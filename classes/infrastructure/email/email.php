@@ -21,34 +21,47 @@ class email
     /**
      * Send email with uPlanner info
      *
+     * @param $recipient_email
+     * @param $subject
+     * @param $current_date
+     * @param $attachment_path
      * @return bool
-     * @throws coding_exception
      */
-    public function send($recipient_email, $subject, $attachment_path)
-    {
-        $filename = basename($attachment_path);
-        $user = new \stdClass();
-        $user->email = $recipient_email;
-        $user->id = '000001';
-        $admin = get_admin();
-        
-        $subject = get_string($subject, 'local_uplannerconnect');
+    public function send(
+        $recipient_email,
+        $subject,
+        $current_date,
+        $attachment_path
+    ): bool {
+        try {
+            $filename = basename($attachment_path);
+            $user = new \stdClass();
+            $user->email = $recipient_email;
+            $user->id = '000001';
+            $admin = get_admin();
+
+            $subject = get_string($subject, 'local_uplannerconnect');
+
+            $body = 'Dear administrator,
+
+            We are attaching information regarding the changes towards uPlanner.
     
-        $body = 'Dear administrator,
+            Best regards,
+            Univalle';
 
-        We are attaching information regarding the changes towards uPlanner.
+            return email_to_user(
+                $user,
+                $admin,
+                $subject . ' - ' . $current_date,
+                $body,
+                '',
+                $attachment_path,
+                $filename
+            );
+        } catch (coding_exception $e) {
+            error_log('send: '. $e->getMessage(). "\n");
+        }
 
-        Best regards,
-        Univalle';
-
-        return email_to_user(
-            $user,
-            $admin,
-            $subject,
-            $body,
-            '',
-            $attachment_path,
-            $filename
-        );
+        return false;
     }
 }

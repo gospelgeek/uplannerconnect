@@ -7,150 +7,97 @@
 
 namespace local_uplannerconnect\application\repository;
 
-use moodle_exception;
+use local_uplannerconnect\application\messages\messages_resource;
 
 /**
  * Loaded class to manipulate data in uplanner_esb_messages_status table
  */
 class messages_status_repository
 {
-
-    const TABLE = 'uplanner_esb_messages_status';
-    const QUERY_SELECT = "SELECT * FROM %s WHERE id_transaction = %s LIMIT '%s' OFFSET '%s'";
-    CONST QUERY_COUNT = "SELECT count(*) FROM %s";
-
     /**
-     * @var general_repository
+     * @var messages_resource
      */
-    private $general_repository;
-
-    /**
-     * @var moodle_query_handler
-     */
-    private $moodle_query_handler;
+    private $messages_resource;
 
     /**
      * Construct
      */
     public function __construct()
     {
-        $this->general_repository = new general_repository();
-        $this->moodle_query_handler = new moodle_query_handler();
+        $this->messages_resource = new messages_resource();
     }
 
     /**
-     * Update data
+     * get message by transaction id
      *
-     * @param array $data
-     * @return void
+     * @param $transaction_id
+     * @return array|null
      */
-    public function update(array $data) : void
+    public function get_by_transaction_id($transaction_id)
     {
-        $this->general_repository->updateDataBD([
-            'data' => [
-                'id_transaction' => $data['id_transaction'],
-                'ds_topic' => $data['ds_topic'],
-                'ds_mongo_id' => $data['ds_mongo_id'],
-                'ds_error' => $data['ds_error'],
-                'dt_processing_date' => $data['dt_processing_date'],
-                'is_success_ful' => $data['is_success_ful'],
-                'created_at' => $data['created_at'],
-                'id_code' => $data['id_code'],
-                'id' => $data['id'],
-            ],
-            'table' => self::TABLE
-        ]);
+        return $this->messages_resource->get_message($transaction_id);
     }
 
     /**
-     * Save data
+     * get list by transactions
      *
-     * @param array $data
-     * @return void
-     */
-    public function save(array $data) : void
-    {
-        $this->general_repository->saveDataBD([
-            'data' => [
-                'id_code' => $data['id_code'],
-                'id_transaction' => $data['id_transaction'],
-                'ds_topic' => $data['ds_topic'],
-                'ds_mongo_id' => $data['ds_mongo_id'],
-                'ds_error' => $data['ds_error'],
-                'dt_processing_date' => $data['dt_processing_date'],
-                'is_success_ful' => $data['is_success_ful'],
-                'created_at' => $data['created_at']
-            ],
-            'table' => self::TABLE
-        ]);
-    }
-
-    /**
-     * Get data
-     *
-     * @param array|null $data
+     * @param $transactions_ids
      * @return array
      */
-    public function get_data(array $data = null) : array
+    public function get_list_by_transactions($transactions_ids)
     {
-        $dataQuery = [];
-        try {
-            $dataQuery = $this->moodle_query_handler->executeQuery(
-                sprintf(
-                    self::QUERY_SELECT,
-                    'mdl_' . self::TABLE,
-                    $data['id_transaction'],
-                    $data['limit'],
-                    $data['offset']
-                )
-            );
-        }
-        catch (moodle_exception $e) {
-            error_log('get_data: ' . $e->getMessage() . "\n");
-        }
-
-        return $dataQuery;
+        return $this->messages_resource->get_messages(
+            implode(',', $transactions_ids)
+        );
     }
 
     /**
-     * Delete register
+     * Compare message log in uPlanner
      *
-     * @param $id
-     * @return bool
+     * @return void
      */
-    public function delete_row($id): bool
+    public function process($repository, $rows)
     {
-        $result = false;
         try {
-            $result = $this->general_repository->delete_row(
-                self::TABLE,
-                $id,
-                'id'
-
+            $up_messages = $this->get_list_by_transactions(
+                $this->get_uv_transactions($rows)
             );
-        } catch (moodle_exception $e) {
-            error_log('delete_row: ' . $e->getMessage() . "\n");
+            foreach ($rows as $row) {
+                $json = json_decode($row->json, true);
+                $id_transaction = intval($json['transactionId']);
+                $filtered_messages = array_filter($up_messages, function ($message) use ($id_transaction) {
+                    return $message['id_transaction'] == $id_transaction;
+                });
+                $message = reset($filtered_messages);
+                $is_successful = 0;
+                $ds_error = 'Error invalid data';
+                if ($message && ($message['is_successful'] === 1 || $message['is_successful'] === '1')) {
+                    $ds_error = '';
+                    $is_successful = 1;
+                }
+                $data = [
+                    'is_sucessful' => $is_successful,
+                    'ds_error' => $ds_error,
+                    'id' => $row->id
+                ];
+                $repository->updateDataBD($data);
+            }
+        } catch (\Exception $e) {
+            error_log('messages_status_repository->process: ' . $e->getMessage() . "\n");
         }
-        return $result;
     }
 
     /**
-     * Count all rows
+     * Return list transactions
      *
-     * @return bool
+     * @param $rows
+     * @return array
      */
-    public function count(): bool
+    private function get_uv_transactions($rows)
     {
-        $result = false;
-        try {
-            $query =  sprintf(
-                self::QUERY_COUNT,
-                self::TABLE,
-            );
-            $result = $this->general_repository->count($query);
-        } catch (moodle_exception $e) {
-            error_log('delete_row: ' . $e->getMessage() . "\n");
-        }
-        return $result;
+        return array_map(function ($row) {
+            $json = json_decode($row->json, true);
+            return intval($json['transactionId']);
+        }, $rows);
     }
 }

@@ -10,6 +10,7 @@ namespace local_uplannerconnect\domain\announcements\usecases;
 use local_uplannerconnect\application\service\data_validator;
 use local_uplannerconnect\application\repository\moodle_query_handler;
 use local_uplannerconnect\plugin_config\plugin_config;
+use local_uplannerconnect\domain\service\transition_endpoint; 
 use moodle_exception;
 
 /**
@@ -22,6 +23,7 @@ class announcements_utils
 
     private $validator;
     private $moodle_query_handler;
+    private $transition_endpoint;
 
     /**
      *  Construct
@@ -30,6 +32,7 @@ class announcements_utils
     {
         $this->validator = new data_validator();
         $this->moodle_query_handler = new moodle_query_handler();
+        $this->transition_endpoint = new transition_endpoint();
     }
 
     /**
@@ -74,10 +77,11 @@ class announcements_utils
                 'title' => $this->validator->isIsset($dataForum->subject),
                 'content' => $this->validator->isIsset($dataForum->message),
                 'type' => 'html',
-                'action' => $data['dispatch'],
+                'action' => strtoupper($data['dispatch']),
+                'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($courseid)),
             ];
         } catch (moodle_exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+            error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $dataToSave;
     }
@@ -108,7 +112,7 @@ class announcements_utils
                 }
             }
         } catch (moodle_exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+            error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $data;
     }
@@ -140,7 +144,7 @@ class announcements_utils
                 }
             }
         } catch (moodle_exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+            error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $data;
     }
@@ -168,7 +172,7 @@ class announcements_utils
                 }
             }
         } catch (moodle_exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+            error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $name;
     }
@@ -184,7 +188,7 @@ class announcements_utils
                 $isCreated = key_exists('discussionid', $data['other']);
             }
         } catch (moodle_exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+            error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $isCreated;
     }

@@ -106,7 +106,7 @@ class course_extraction_data
             }
         }
         catch (moodle_exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+            error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $arraySend;
     }

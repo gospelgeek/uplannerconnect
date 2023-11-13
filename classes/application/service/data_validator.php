@@ -54,7 +54,7 @@ class data_validator
             }
         }
         catch (moodle_exception $e) {
-          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+          error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $result;
     }
@@ -87,7 +87,7 @@ class data_validator
             }
        }
        catch (moodle_exception $e) {
-          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+          error_log('Excepción capturada: '. $e->getMessage(). "\n");
        }
         return $arraySend;
     }
@@ -112,7 +112,7 @@ class data_validator
                 ];
             }
         } catch (moodle_exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+            error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $arraySend;
     }
@@ -210,7 +210,7 @@ class data_validator
                 }
             }
        } catch (moodle_exception $e) {
-          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+          error_log('Excepción capturada: '. $e->getMessage(). "\n");
        }
         return $boolean;
     }

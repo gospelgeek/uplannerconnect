@@ -54,7 +54,7 @@ class course_translation_data
             }
         }
         catch (moodle_exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+            error_log('Excepción capturada: '.  $e->getMessage(). "\n");
         }
         return $arraySend;
     }
@@ -90,11 +90,13 @@ class course_translation_data
                     ]
                 ]
             ],
-            "action" => $dataSend['action']
+            "action" => $dataSend['action'],
+            "date" => $dataSend['date'],
+            "transactionId" => $dataSend['transactionId']
             ];
         }
         catch (moodle_exception $e) {
-            error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+            error_log('Excepción capturada: 888 ',  $e->getMessage(), "\n");
         }
         return $arraySend;
     }
@@ -137,12 +139,13 @@ class course_translation_data
                     ]
                 ],
                 "lastModifiedDate" => $dataSend['lastModifiedDate'],
-                "action" =>  $dataSend['action']
+                "action" =>  $dataSend['action'],
+                "transactionId" => $dataSend['transactionId']
             ];
       }
       catch (moodle_exception $e) {
            return [];
-           error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+           error_log('Excepción capturada: '. $e->getMessage(). "\n");
       }
       return $arraySend;
     }
