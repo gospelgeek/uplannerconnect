@@ -13,7 +13,7 @@ namespace local_uplannerconnect\application\messages;
 class messages_resource
 {
     const TABLE = 'esb_messages_status';
-    const QUERY_SELECT = "SELECT * FROM %s WHERE id_transaction = %s";
+    const QUERY_SELECT = 'SELECT * FROM %s WHERE %s';
 
     /**
      * Get message
@@ -28,7 +28,11 @@ class messages_resource
         try {
             $connection = connection::getInstance()->getConnection();
             if ($connection) {
-                $query = sprintf(self::QUERY_SELECT, $transaction_id);
+                $where_clause = sprintf(
+                    "id_transaction = %d",
+                    implode(',', $transaction_id)
+                );
+                $query = sprintf(self::QUERY_SELECT, self::TABLE, $where_clause);
                 $get_results = sqlsrv_query($connection, $query);
                 if ($get_results) {
                     while ($row = sqlsrv_fetch_array($get_results, SQLSRV_FETCH_ASSOC)) {
@@ -38,12 +42,48 @@ class messages_resource
                     sqlsrv_free_stmt($get_results);
                 }
             } else {
-                error_log('get_message: ' .  print_r(sqlsrv_errors(), true) . "\n");
+                error_log('get_message connection fail: ' .  print_r(sqlsrv_errors(), true) . "\n");
             }
         } catch (\Exception $e) {
             error_log('get_message: ' . $e->getMessage() . "\n");
         }
 
         return $message;
+    }
+
+    /**
+     * Get messages
+     *
+     * @param $transactions
+     * @return array
+     */
+    public function get_messages($transactions)
+    {
+        $messages = [];
+        try {
+            $connection = connection::getInstance()->getConnection();
+            if ($connection) {
+                $where_clause = sprintf(
+                    "id_transaction IN (%s)",
+                    $transactions
+                );
+                $query = sprintf(self::QUERY_SELECT, self::TABLE, $where_clause);
+                $get_results = sqlsrv_query($connection, $query);
+                if ($get_results) {
+                    while ($row = sqlsrv_fetch_array($get_results, SQLSRV_FETCH_ASSOC)) {
+                        $messages[] = $row;
+                        break;
+                    }
+                    sqlsrv_free_stmt($get_results);
+                }
+            } else {
+                error_log('get_messages connect fail: ' .  print_r(sqlsrv_errors(), true) . "\n");
+            }
+        } catch (\Exception $e) {
+            error_log('get_messages: ' . $e->getMessage() . "\n");
+        }
+
+
+        return $messages;
     }
 }

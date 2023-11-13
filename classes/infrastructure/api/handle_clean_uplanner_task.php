@@ -9,6 +9,7 @@
 namespace local_uplannerconnect\infrastructure\api;
 
 use coding_exception;
+use local_uplannerconnect\application\repository\general_repository;
 use local_uplannerconnect\application\repository\messages_status_repository;
 use local_uplannerconnect\application\repository\repository_type;
 use local_uplannerconnect\infrastructure\api\client\abstract_uplanner_client;
@@ -50,6 +51,11 @@ class handle_clean_uplanner_task
     private $message_repository;
 
     /**
+     * @var general_repository
+     */
+    private $general_repository;
+
+    /**
      * Construct
      */
     public function __construct()
@@ -57,63 +63,83 @@ class handle_clean_uplanner_task
         $this->uplanner_client_factory = new uplanner_client_factory();
         $this->email = new email();
         $this->message_repository = new messages_status_repository();
+        $this->general_repository = new general_repository();
     }
 
     /**
      * Handle process remove state success registers uPlanner
      *
+     * @param int $page_size
      * @return void
      */
-    public function process() {
+    public function process($page_size = 1000) {
+        $current_date = date("F j, Y, g:i:s a");
+        $log_id = $this->general_repository->add_log_data();
         foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
             $repository = new $repository_class($type);
             $uplanner_client = $this->uplanner_client_factory->create($type);
-            $this->start_process_per_repository($repository, $uplanner_client);
+            $this->start_process_per_repository(
+                $repository,
+                $uplanner_client,
+                $page_size,
+                $current_date
+            );
+        }
+        $this->general_repository->add_log_errors_data($log_id);
+        foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
+            $repository = new $repository_class($type);
+            $condition = [
+                'success' => 1,
+                'is_sucessful' => 0
+            ];
+            $this->general_repository->delete_rows($repository::TABLE, $condition);
         }
     }
 
     /**
      * @param $repository
      * @param $uplanner_client
+     * @param $page_size
+     * @param $current_date
      * @return void
      */
-    private function start_process_per_repository($repository, $uplanner_client)
-    {
+    private function start_process_per_repository(
+        $repository,
+        $uplanner_client,
+        $page_size,
+        $current_date
+    ) {
         try {
-            $repository->add_log_data();
-            $this->create_file(self::PREFIX . $uplanner_client->get_file_name());
-            foreach (repository_type::LIST_STATES as $state) {
-                $offset = 0;
-                while (true) {
-                    $dataQuery = [
-                        'state' => $state,
-                        'limit' => 100,
-                        'offset' => $offset,
-                    ];
-                    $rows = $repository->getDataBD($dataQuery);
-                    if (!$rows) {
-                        break;
-                    }
-                    $this->add_rows_in_file($rows);
-                    $numRows = 0;
-                    foreach ($rows as $row) {
-                        $json = json_decode($row->json, true);
-                        if (!array_key_exists('transactionId', $json)){
-                            $numRows++;
-                            continue;
-                        }
-                        $message = $this->message_repository->get_by_transaction_id($json['transactionId']);
-                        if ($message && ($message['is_successful'] === 1 || $message['is_successful'] === '1')) {
-                            $repository->delete_row($row->id);
-                            continue;
-                        }
-                        $numRows++;
-                    }
-                    $offset += $numRows;
-                }
+            if ($page_size <= 0) {
+                return;
             }
-            $this->send_email(self::PREFIX . $uplanner_client->get_email_subject());
-            $this->file->delete_csv();
+            $this->create_file(self::PREFIX . $uplanner_client->get_file_name());
+            $offset = 0;
+            while (true) {
+                $data = [
+                    'state' => repository_type::STATE_SEND,
+                    'limit' => $page_size,
+                    'offset' => $offset,
+                ];
+                $rows = $repository->getDataBD($data);
+                if (!$rows) {
+                    break;
+                }
+                $this->message_repository->process($repository, $rows);
+                $data = [
+                    'state' => repository_type::STATE_SEND,
+                    'limit' => $page_size,
+                    'offset' => $offset,
+                ];
+                $rows = $repository->getDataBD($data);
+                $this->add_rows_in_file($rows);
+                $this->send_email(
+                    self::PREFIX . $uplanner_client->get_email_subject(),
+                    $current_date
+                );
+                $this->file->delete_csv();
+                $offset += count($rows);
+            }
         } catch (moodle_exception $e) {
             error_log('handle_remove_success_uplanner_task - process: ' . $e->getMessage() . "\n");
         }
@@ -128,6 +154,8 @@ class handle_clean_uplanner_task
     private function create_file($file_name)
     {
         $headers = abstract_uplanner_client::FILE_HEADERS;
+        $headers[] = 'is_sucessful';
+        $headers[] = 'ds_error';
         $this->file = new file($file_name);
         $this->file->create_csv($headers);
     }
@@ -143,8 +171,9 @@ class handle_clean_uplanner_task
         foreach ($rows as $row) {
             $data = [
                 $row->json,
-                $row->request_type,
-                $row->success
+                $row->success,
+                $row->is_sucessful,
+                $row->ds_error
             ];
             $this->file->add_row($data);
         }
@@ -154,15 +183,16 @@ class handle_clean_uplanner_task
      * Send email
      *
      * @param $subject
+     * @param $current_date
      * @return bool
-     * @throws coding_exception
      */
-    private function send_email($subject): bool
+    private function send_email($subject, $current_date): bool
     {
         $recipient_email = 'samuel.ramirez@correounivalle.edu.co';
         return $this->email->send(
             $recipient_email,
             $subject,
+            $current_date,
             $this->file->get_path_file()
         );
     }
