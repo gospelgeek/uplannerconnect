@@ -482,8 +482,8 @@ function filterRecentUpdate($event)
 {
    try {
          $query = new moodle_query_handler();
-         $evaluation = $query->executeQuery(LAST_INSERT_EVALUATION); 
-
+         $evaluation = $query->executeQuery(LAST_INSERT_EVALUATION);
+         
          if (!empty($evaluation)) { 
             //obeter el primer resultado
             $firstResult = reset($evaluation);

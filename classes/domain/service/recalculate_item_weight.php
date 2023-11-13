@@ -17,7 +17,9 @@ use moodle_exception;
 class recalculate_item_weight
 {    
     const IS_NATURAL = 13;
+    const IS_SIMPLE = 11;
     const TABLE_CATEGORY = 'course_categories';
+    const ITEM_TYPE_CATEGORY = 'category';
 
     /**
      * Recalculate Item Weight
@@ -35,5 +37,20 @@ class recalculate_item_weight
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
+    }
+
+    /**
+     * Verify if the item is a category
+     * 
+     * @param string $typeItem
+     * @return bool
+     */
+    private function isItemCategory($typeItem) : bool
+    {
+        if (empty($typeItem)) {
+            error_log('isItemCategory: There is no type item' . "\n");
+            return false;
+        }
+        return $typeItem === self::ITEM_TYPE_CATEGORY;
     }
 }

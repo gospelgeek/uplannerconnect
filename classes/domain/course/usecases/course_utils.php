@@ -130,12 +130,14 @@ class course_utils
             
             //category info
             $itemType = $this->validator->isIsset($get_grade_item->itemtype);
+            $itemName = $get_grade_item->itemname;
 
             if ($itemType === self::ITEM_TYPE_CATEGORY) {
                 $iteminstance = $this->validator->isIsset($get_grade_item->iteminstance);
-                $categoryItem = $this->getNameCategoryItem($iteminstance);
+                $dataCategory = $this->getDataCategories($iteminstance);
+                $categoryItem = $this->getNameCategoryItem($dataCategory);
                 $categoryFullName = $this->shortCategoryName($categoryItem);
-                $get_grade_item->itemname = 'IsCategory';
+                $itemName = $categoryItem.' total';
             } else {
                 $categoryItem = $this->getInstanceCategoryName($get_grade_item);
                 $categoryFullName = $this->shortCategoryName($categoryItem);
@@ -156,7 +158,7 @@ class course_utils
                 'evaluationGroupCode' => $this->validator->isIsset($categoryFullName),
                 'evaluationGroupName' => $this->validator->isIsset(substr($categoryItem, 0, 50)),
                 'evaluationId' => $this->validator->isIsset($get_grade_item->id),
-                'evaluationName' => $this->validator->isIsset($get_grade_item->itemname),
+                'evaluationName' => $this->validator->isIsset($itemName),
                 'weight' => $weight,
                 'action' => strtoupper($data['dispatch']),
                 "date" => $this->validator->isIsset(strval($dataEvent['timecreated'])),
@@ -240,7 +242,8 @@ class course_utils
         $weight = 0;
         if (property_exists($gradeItem, 'aggregationcoef2')) {
             $weight = $gradeItem->aggregationcoef2;
-            if (intval($gradeItem->aggregationcoef2) === 0) {
+            if ($gradeItem->aggregationcoef2 === 0 ||
+                $gradeItem->aggregationcoef2 === 0.0) {
                 $weight = $gradeItem->aggregationcoef;
             }
         }
@@ -253,18 +256,11 @@ class course_utils
      * @param object $gradeItem
      * @return string
      */
-    private function getNameCategoryItem($idCategory)
+    private function getNameCategoryItem($queryResult)
     {
         $nameCategory = 'ISCATEGORY001';
         try {
-            if (!empty($idCategory)) {
-                $queryResult = $this->moodle_query_handler->extract_data_db([
-                    'table' => self::TABLE_CATEGORY,
-                    'conditions' => [
-                        'id' => $idCategory
-                    ]
-                ]);
-
+            if (!empty($queryResult)) {
                 if (isset($queryResult->fullname) && 
                     strlen($queryResult->fullname) !== 0 && 
                     $queryResult->fullname !== '?')
@@ -277,5 +273,28 @@ class course_utils
             error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $nameCategory;
+    }
+
+    /**
+     * Return all data of category
+     * 
+     */
+    private function getDataCategories($idCategory)
+    {
+        $objectClass = new \stdClass();
+        try {
+            if (!empty($idCategory)) {
+                $queryResult = $this->moodle_query_handler->extract_data_db([
+                    'table' => self::TABLE_CATEGORY,
+                    'conditions' => [
+                        'id' => $idCategory
+                    ]
+                ]);
+                $objectClass = $queryResult;
+            }
+        } catch (moodle_exception $e) {
+            error_log('Excepción capturada: '. $e->getMessage(). "\n");
+        }
+        return $objectClass;
     }
 }
