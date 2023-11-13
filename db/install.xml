@@ -70,7 +70,6 @@
                <FIELD NAME="num_materials_err" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
                <FIELD NAME="num_anouncements_err" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
                <FIELD NAME="num_evaluation_err" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-               <FIELD NAME="date" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
                <FIELD NAME="updated_at" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
