@@ -19,11 +19,6 @@ class repository_type
     const LIST_STATES = [
         'send' => 1
     ];
-    const COMPLETE_LIST_STATES = [
-        'default' => 0,
-        'send' => 1,
-        'error' => 2
-    ];
     const ACTIVE_REPOSITORY_TYPES = [
         'grade' => course_notes_repository::class,
         'evaluation_structure' => course_evaluation_structure_repository::class,

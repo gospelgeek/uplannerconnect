@@ -58,7 +58,7 @@ class data_manager
             error_log('UplannerConnect: Successful event registration -'. $data['typeEvent']. "\n");
         }
         catch (moodle_exception $e) {
-            error_log('Excepción capturada: ' . $e->getMessage() . "\n");
+            error_log('Excepción capturada: 444444' . $e->getMessage() . "\n");
         }
     }
 

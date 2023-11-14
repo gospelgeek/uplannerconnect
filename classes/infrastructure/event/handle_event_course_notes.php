@@ -45,7 +45,11 @@ class handle_event_course_notes
                if ($eventUser !== -1) {
                   //valida si la facultad tiene acceso
                   if (!validateAccesFaculty($event)) { return; }
-                     $stateDispatch = ($agregationState === 'novalue');
+                     $stateCreated = [
+                        'novalue',
+                        'unknown'
+                     ];
+                     $stateDispatch = in_array($agregationState,$stateCreated);
                      $isTotalItem = isTotalItem($grade-> load_grade_item());
                      if ($isTotalItem) {
                          //Instanciar la clase management_factory
@@ -59,7 +63,7 @@ class handle_event_course_notes
                }
             }
       } catch (moodle_exception $e) {
-         error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+         error_log('Excepción capturada: '. $e->getMessage(). "\n");
       }
    }
 
@@ -93,7 +97,7 @@ class handle_event_course_notes
                }
             }
       } catch (moodle_exception $e) {
-         error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+         error_log('Excepción capturada: '. $e->getMessage(). "\n");
       }
    }
 
@@ -104,7 +108,7 @@ class handle_event_course_notes
     * @return void
    */
    public static function grade_item_created($event)
-   {         
+   {        
       try {
             $IsValidEvent = [
                'delete' => validateAccessTypeEvent([
@@ -137,7 +141,7 @@ class handle_event_course_notes
                }
             }
       } catch (moodle_exception $e) {
-         error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+         error_log('Excepción capturada: '. $e->getMessage(). "\n");
       }
    }
 
@@ -158,7 +162,7 @@ class handle_event_course_notes
             }
          }
      } catch (moodle_exception $e) {
-         error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+         error_log('Excepción capturada: '.  $e->getMessage(). "\n");
      }  
    }
 
@@ -172,7 +176,7 @@ class handle_event_course_notes
          error_log('resource_file');
          error_log('*******************************************************');
       } catch (moodle_exception $e) {
-         error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+         error_log('Excepción capturada: '. $e->getMessage(). "\n");
       }
    }
 
@@ -218,7 +222,7 @@ class handle_event_course_notes
                }
             }
       } catch (moodle_exception $e) {
-         error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+         error_log('Excepción capturada: '. $e->getMessage(). "\n");
       }
    }
 
@@ -264,7 +268,7 @@ class handle_event_course_notes
             }
          }
       } catch (moodle_exception $e) {
-         error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+         error_log('Excepción capturada: '. $e->getMessage(). "\n");
       }
    }
 
@@ -310,7 +314,7 @@ class handle_event_course_notes
             }
          }
       } catch (moodle_exception $e) {
-         error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+         error_log('Excepción capturada: '. $e->getMessage(). "\n");
       }
    }
 
@@ -336,7 +340,7 @@ class handle_event_course_notes
                ]);
             }
       } catch (moodle_exception $e) {
-         error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+         error_log('Excepción capturada: '. $e->getMessage(). "\n");
       }
    }
 
@@ -362,7 +366,7 @@ class handle_event_course_notes
                 ]);
              }
        } catch (moodle_exception $e) {
-          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+          error_log('Excepción capturada: '. $e->getMessage(). "\n");
        }
     }
 
@@ -388,7 +392,7 @@ class handle_event_course_notes
                 ]);
              }
        } catch (moodle_exception $e) {
-          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+          error_log('Excepción capturada: '. $e->getMessage(). "\n");
        }
     }
 
@@ -414,7 +418,7 @@ class handle_event_course_notes
                 ]);
              }
        } catch (moodle_exception $e) {
-          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+          error_log('Excepción capturada: '. $e->getMessage(). "\n");
        }
      }
 
@@ -440,7 +444,7 @@ class handle_event_course_notes
                 ]);
              }
        } catch (moodle_exception $e) {
-          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+          error_log('Excepción capturada: '. $e->getMessage(). "\n");
        }
     }
 
@@ -466,7 +470,7 @@ class handle_event_course_notes
                 ]);
              }
        } catch (moodle_exception $e) {
-          error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+          error_log('Excepción capturada: '. $e->getMessage(). "\n");
        }
     }
 }
@@ -478,8 +482,8 @@ function filterRecentUpdate($event)
 {
    try {
          $query = new moodle_query_handler();
-         $evaluation = $query->executeQuery(LAST_INSERT_EVALUATION); 
-
+         $evaluation = $query->executeQuery(LAST_INSERT_EVALUATION);
+         
          if (!empty($evaluation)) { 
             //obeter el primer resultado
             $firstResult = reset($evaluation);
@@ -517,7 +521,7 @@ function filterRecentUpdate($event)
             }
          }
    } catch (moodle_exception $e) {
-      error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+      error_log('Excepción capturada: '. $e->getMessage(). "\n");
    }
 }
 
@@ -612,7 +616,7 @@ function validateAccessTypeEvent(array $data) : bool
         return $event_access_validator->validateTypeEvent($data);
    }
    catch (moodle_exception $e) {
-      error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+      error_log('Excepción capturada: '. $e->getMessage(). "\n");
    }
 }
 
@@ -636,7 +640,7 @@ function validateAccesFaculty($data) : bool
          return $event_access_validator->validateAccessByFaculty($eventData['courseid']);
    }
    catch (moodle_exception $e) {
-      error_log('Excepción capturada: ',  $e->getMessage(), "\n");
+      error_log('Excepción capturada: '. $e->getMessage(). "\n");
    }
    return false;
 }
