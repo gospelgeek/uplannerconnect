@@ -242,8 +242,8 @@ class course_utils
         $weight = 0;
         if (property_exists($gradeItem, 'aggregationcoef2')) {
             $weight = $gradeItem->aggregationcoef2;
-            if ($gradeItem->aggregationcoef2 === 0 ||
-                $gradeItem->aggregationcoef2 === 0.0) {
+            if ($gradeItem->aggregationcoef2 == 0 ||
+                $gradeItem->aggregationcoef2 == 0.00000) {
                 $weight = $gradeItem->aggregationcoef;
             }
         }
