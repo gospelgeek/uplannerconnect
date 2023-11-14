@@ -127,7 +127,7 @@ class abstract_uplanner_client
             $headers = [
                 'Content-Type: application/json'
             ];
-            $this->add_log_before_request('POST', $headers, $data);
+            //$this->add_log_before_request('POST', $headers, $data);
             $this->curl_wrapper->set_header($headers);
             $response = $this->curl_wrapper->post($this->token_url, $data);
             $code = $this->curl_wrapper->get_code();
@@ -165,7 +165,7 @@ class abstract_uplanner_client
             'Customer: AllMessages'
         ];
         $endpoint = $this->get_endpoint();
-        $this->add_log_before_request('POST', $headers, $data);
+        //$this->add_log_before_request('POST', $headers, $data);
         $this->curl_wrapper->set_header($headers);
         $response = $this->curl_wrapper->post($endpoint, $data);
         $code = $this->curl_wrapper->get_code();

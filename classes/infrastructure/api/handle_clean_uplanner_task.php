@@ -88,6 +88,13 @@ class handle_clean_uplanner_task
         $this->general_repository->add_log_errors_data($log_id);
         foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
             $repository = new $repository_class($type);
+            // Remove registers with operation complete
+            $condition = [
+                'success' => 1,
+                'is_sucessful' => 1
+            ];
+            $this->general_repository->delete_rows($repository::TABLE, $condition);
+            // Remove registers with operation incomplete
             $condition = [
                 'success' => 1,
                 'is_sucessful' => 0
