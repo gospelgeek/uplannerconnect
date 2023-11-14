@@ -26,6 +26,8 @@ define('CLI_SCRIPT', true);
 
 require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/clilib.php');
+
+use local_uplannerconnect\application\repository\general_repository;
 use local_uplannerconnect\application\repository\repository_type;
 use local_uplannerconnect\infrastructure\api\factory\uplanner_client_factory;
 
@@ -55,25 +57,20 @@ if ($options['help']) {
     exit(2);
 }
 
-$uplanner_client_factory = new uplanner_client_factory();
-
-foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
-    $repository = new $repository_class($type);
-    $uplanner_client = $uplanner_client_factory->create($type);
-    foreach (repository_type::LIST_STATES as $state) {
-        while (true) {
-            $dataQuery = [
-                'state' => $state,
-                'limit' => 500,
-                'offset' => 0,
+try {
+    $uplanner_client_factory = new uplanner_client_factory();
+    $general_repository = new general_repository();
+    $list_states = [0, 1, 2];
+    foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
+        $repository = new $repository_class($type);
+        $uplanner_client = $uplanner_client_factory->create($type);
+        foreach ($list_states as $state) {
+            $condition = [
+                'success' => $state
             ];
-            $rows = $repository->getDataBD($dataQuery);
-            if (!$rows) {
-                break;
-            }
-            foreach ($rows as $row) {
-                $repository->delete_row($row->id);
-            }
+            $general_repository->delete_rows($repository::TABLE, $condition);
         }
     }
+} catch (\Exception $e) {
+    error_log('clean_uplanner_logs_cli: ' . $e->getMessage() . "\n");
 }
