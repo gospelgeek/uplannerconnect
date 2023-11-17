@@ -481,10 +481,24 @@ class handle_event_course_notes
 function filterRecentUpdate($event)
 {
    try {
+         // Get last register
          $query = new moodle_query_handler();
          $evaluation = $query->executeQuery(LAST_INSERT_EVALUATION);
-         
-         if (!empty($evaluation)) { 
+         // Is category Father
+         $isCategoryFather = true;
+         // data of item
+         $grade_item_load =   $event->get_grade_item();
+         $get_data_category = $grade_item_load->get_item_category();
+
+         // Verificate if is category father
+         if (isset($get_data_category->depth)) {
+            $depth_category = $get_data_category->depth;
+            if ($depth_category == 1) {
+               $isCategoryFather = false;
+            }
+         }
+
+         if (!empty($evaluation) && $isCategoryFather) { 
             //obeter el primer resultado
             $firstResult = reset($evaluation);
             //obtener el json
@@ -535,8 +549,7 @@ function isTotalItem($grade_item)
       $categoryId = $grade_item_load->categoryid ?? 0;
       $itemType = $grade_item_load->itemtype ?? '';
       // Verificate if the grade item is total
-      $isTotalItem = !($categoryId === 0 &&
-                       $itemType === ITEMTYPE_UPDATE);
+      $isTotalItem = !($categoryId === 0 && $itemType === ITEMTYPE_UPDATE);
    }
 
    return $isTotalItem;
