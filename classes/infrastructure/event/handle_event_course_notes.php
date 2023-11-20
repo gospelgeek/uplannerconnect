@@ -10,6 +10,7 @@ namespace local_uplannerconnect\infrastructure\event;
 use local_uplannerconnect\domain\management_factory;
 use local_uplannerconnect\application\service\event_access_validator;
 use local_uplannerconnect\application\repository\moodle_query_handler;
+use local_uplannerconnect\domain\service\recalculate_item_weight; 
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -656,4 +657,20 @@ function validateAccesFaculty($data) : bool
       error_log('Excepción capturada: '. $e->getMessage(). "\n");
    }
    return false;
+}
+
+/**
+ * Recalculate weight
+ */
+function recalculatesWeight($data) : void
+{
+   try {
+         $recalculate_item_weight = new recalculate_item_weight();
+         $recalculate_item_weight->recalculate_weight_evaluation([
+            "event" => $data
+         ]);
+   }
+   catch (moodle_exception $e) {
+      error_log('Excepción capturada: '. $e->getMessage(). "\n");
+   }
 }
