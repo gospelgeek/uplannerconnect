@@ -429,5 +429,20 @@ function xmldb_local_uplannerconnect_upgrade($oldversion): bool {
         upgrade_plugin_savepoint(true,2023111315, 'local', 'uplannerconnect');
     }
 
+    if ($oldversion < 2023112000) {
+
+        // Define field aggregation to be added to uplanner_grades.
+        $table = new xmldb_table('uplanner_grades');
+        $field = new xmldb_field('aggregation', XMLDB_TYPE_INTEGER, '20', null, null, null, null, 'is_sucessful');
+
+        // Conditionally launch add field aggregation.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Uplannerconnect savepoint reached.
+        upgrade_plugin_savepoint(true, 2023112000, 'local', 'uplannerconnect');
+    }
+
     return true;
 }
