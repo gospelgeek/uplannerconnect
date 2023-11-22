@@ -5,7 +5,6 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-
 namespace local_uplannerconnect\domain\service; 
 
 use local_uplannerconnect\application\repository\moodle_query_handler;
@@ -23,12 +22,30 @@ class recalculate_item_weight
     const ITEM_TYPE_CATEGORY = 'category';
     const ALL_CATEGORY = "SELECT * FROM mdl_grade_categories WHERE courseid='%s' AND hidden = 0";
     const ITEMS_CATEGORY = "SELECT * FROM mdl_grade_items WHERE courseid='%s' AND categoryid = '%s' AND hidden = 0";
-    const TOTAL_ITEMS = "SELECT SUM(t1.finalgrade) as total FROM mdl_grade_grades as t1 INNER JOIN mdl_grade_items as t2 ON t1.itemid = t2.id WHERE t2.courseid='%s' AND t2.itemtype NOT IN ('course', 'category') AND t2.hidden = 0 AND t1.userid = '%s'";
     const ALL_STUNDET_COURSE_QUALIFIED = "SELECT DISTINCT (t1.userid) FROM mdl_grade_grades as t1 INNER JOIN mdl_grade_items as t2 ON t1.itemid = t2.id WHERE t2.courseid='%s'";
     const MAX_ITEM_COURSE = "SELECT DISTINCT COUNT(t2.id) as count FROM mdl_grade_items as t2 WHERE t2.courseid='%s' AND t2.itemtype NOT IN ('course', 'category') AND t2.hidden = 0";
+    const TOTAL_ITEMS = "SELECT
+                            SUM(t1.finalgrade) OVER (ORDER BY t1.finalgrade DESC) AS total,
+                            t2.id AS idGradeItem,
+                            t2.timecreated AS timecreatedGradeItem,
+                            t2.timemodified AS timemodifiedGradeItem,
+                            t2.itemname AS itemnameGradeItem,
+                            t2.grademax AS grademaxGradeItem,
+                            t1.finalgrade AS finalgradeGrades,
+                            t1.userid AS useridGrades,
+                            t2.courseid AS courseidGradeItem
+                        FROM
+                            mdl_grade_grades AS t1
+                            INNER JOIN mdl_grade_items AS t2 ON t1.itemid = t2.id
+                        WHERE
+                            t2.courseid = '%s'
+                            AND t2.itemtype NOT IN ('course', 'category')
+                            AND t2.hidden = 0
+                            AND t1.userid = '%s'";
 
     private $moodle_query_handler;
     private $manageEntity;
+    private $custom_event;
 
     /**
      * Constructor
@@ -78,14 +95,29 @@ class recalculate_item_weight
                             $idCourse,
                             $student->userid
                         ));
-
+                        
                         if (!empty($sumTotalQualified)
                         ) {
-                            $firstTotalQualified = reset($sumTotalQualified);
-                            $sumTotalQualified  = $firstTotalQualified->total;
-                            $newWeight = ($sumTotalQualified / $maxItemCourse);
-                            error_log('sumTotalQualified: '. print_r($sumTotalQualified, true). "\n");
-                            error_log('newWeight: '. print_r($newWeight, true). "\n");
+
+                            foreach ($sumTotalQualified as $value) {
+
+                                if (isset($value->finalgradegrades)) {
+                                    error_log('*********************************************');
+                                    $totalQualified = end($sumTotalQualified);
+                                    $sumTotal  = $totalQualified->total;
+                                    $newWeight = ($sumTotal / $maxItemCourse) / 100;
+                                    $value->newWeightGradeItem = $newWeight;
+                                    $event_ = new custom_event($value);
+
+                                    $this->manageEntity->create([
+                                            "dataEvent" => $event_,
+                                            "typeEvent" => "user_graded",
+                                            "dispatch" => 'update',
+                                            "enum_etities" => 'course_notes'
+                                    ]);
+                                    error_log('value: '. print_r($event_, true). "\n");
+                                }
+                            }
                         } 
                     }
                 }
@@ -93,25 +125,6 @@ class recalculate_item_weight
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
-    }
-
-    private function contruct_event(array $data)
-    {
-        $event = new \stdClass();
-        try {
-            if (!empty($data)) {
-                $event->get_data =[
-                    'courseid' => $data['courseid'],
-                    'categoryid' => $data['categoryid']
-                ];
-                $event->get_grade_item = $data['get_grade_item'];
-                $event->get_grade_item->aggregationcoef2 = $data['aggregationcoef2'];
-                //get_grade
-            }
-        } catch (moodle_exception $e) {
-            error_log('Excepción capturada: '. $e->getMessage(). "\n");
-        }
-        return $event;
     }
 
     /**
