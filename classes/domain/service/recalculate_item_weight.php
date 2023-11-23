@@ -82,51 +82,51 @@ class recalculate_item_weight
                     $idCourse
                 ));
                
-                if (!empty($allStudentsCourse) &&
-                    is_array($allStudentsCourse) &&
-                    !empty($maxItemCourse)
-                ) {
-                    $firstMaxItemCourse = reset($maxItemCourse);
-                    $maxItemCourse  = $firstMaxItemCourse->count;
-                   
-                    foreach ($allStudentsCourse as $student) {
-                       // Get Sum Total Qualified
-                       $sumTotalQualified = $this->execute_query_sql(sprintf(
-                            self::TOTAL_ITEMS,
-                            $idCourse,
-                            $student->userid
-                        ));
-                        
-                        if (empty($sumTotalQualified)) { continue; }
+                if (empty($allStudentsCourse) &&
+                    !(is_array($allStudentsCourse)) &&
+                    empty($maxItemCourse)
+                ) { return; }
 
-                        foreach ($sumTotalQualified as $value) {
-                            //error_log('sumTotalQualified: 1'. print_r($sumTotalQualified, true). "\n");
-                            if (isset($value->finalgradegrades)) {
-                                $totalQualified = end($sumTotalQualified);
-                                $sumTotal  = $totalQualified->total;
-                                $newWeight = ($sumTotal / $maxItemCourse) / 100;
-                            
-                                $event_ = new custom_event([
-                                    'finalgradeGrades' => $value->finalgradegrades,
-                                    'idGradeItem' => $value->idgradeitem,
-                                    'timecreatedGradeItem' => $value->timecreatedgradeitem,
-                                    'timemodifiedGradeItem' => $value->timemodifiedgradeitem,
-                                    'itemnameGradeItem' => $value->itemnamegradeitem,
-                                    'grademaxGradeItem' => $value->grademaxgradeitem,
-                                    'useridGrades' => $value->useridgrades,
-                                    'courseidGradeItem' => $value->courseidgradeitem,
-                                    'newWeightGradeItem' => $newWeight
-                                ]);
+                $firstMaxItemCourse = reset($maxItemCourse);
+                $maxItemCourse  = $firstMaxItemCourse->count;
+                
+                foreach ($allStudentsCourse as $student) {
+                    // Get Sum Total Qualified
+                    $sumTotalQualified = $this->execute_query_sql(sprintf(
+                        self::TOTAL_ITEMS,
+                        $idCourse,
+                        $student->userid
+                    ));
+                    
+                    if (empty($sumTotalQualified)) { continue; }
 
-                                $this->manageEntity->create([
-                                        "dataEvent" => $event_,
-                                        "typeEvent" => "user_graded",
-                                        "dispatch" => 'update',
-                                        "enum_etities" => 'course_notes'
-                                ]);
-                            }
-                        } 
-                    }
+                    foreach ($sumTotalQualified as $value) {
+                     
+                        if (!isset($value->finalgradegrades)) { continue; }
+
+                        $totalQualified = end($sumTotalQualified);
+                        $sumTotal  = $totalQualified->total;
+                        $newWeight = ($sumTotal / $maxItemCourse) / 100;
+                    
+                        $event_ = new custom_event([
+                            'finalgradeGrades' => $value->finalgradegrades,
+                            'idGradeItem' => $value->idgradeitem,
+                            'timecreatedGradeItem' => $value->timecreatedgradeitem,
+                            'timemodifiedGradeItem' => $value->timemodifiedgradeitem,
+                            'itemnameGradeItem' => $value->itemnamegradeitem,
+                            'grademaxGradeItem' => $value->grademaxgradeitem,
+                            'useridGrades' => $value->useridgrades,
+                            'courseidGradeItem' => $value->courseidgradeitem,
+                            'newWeightGradeItem' => $newWeight
+                        ]);
+
+                        $this->manageEntity->create([
+                                "dataEvent" => $event_,
+                                "typeEvent" => "user_graded",
+                                "dispatch" => 'update',
+                                "enum_etities" => 'course_notes'
+                        ]);
+                    } 
                 }
             }
         } catch (moodle_exception $e) {
