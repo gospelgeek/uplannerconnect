@@ -132,6 +132,7 @@ class handle_event_course_notes
             //valida si la facultad tiene acceso
             if (!validateAccesFaculty($event)) { return; }
                if ($isTotalItem) {
+                  //recalculatesWeight($event);
                   //Instanciar la clase management_factory
                   instantiatemanagement_factory([
                      "dataEvent" => $event,

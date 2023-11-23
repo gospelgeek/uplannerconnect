@@ -41,7 +41,8 @@ class recalculate_item_weight
                             t2.courseid = '%s'
                             AND t2.itemtype NOT IN ('course', 'category')
                             AND t2.hidden = 0
-                            AND t1.userid = '%s'";
+                            AND t1.userid = '%s'
+                            AND t1.finalgrade IS NOT NULL";
 
     private $moodle_query_handler;
     private $manageEntity;
@@ -75,7 +76,7 @@ class recalculate_item_weight
                     self::ALL_STUNDET_COURSE_QUALIFIED,
                     $idCourse
                 ));
-
+                error_log('allStudentsCourse: '. print_r($allStudentsCourse, true). "\n");
                 $maxItemCourse = $this->execute_query_sql(sprintf(
                     self::MAX_ITEM_COURSE,
                     $idCourse
@@ -96,27 +97,33 @@ class recalculate_item_weight
                             $student->userid
                         ));
                         
-                        if (!empty($sumTotalQualified)
-                        ) {
+                        if (empty($sumTotalQualified)) { continue; }
 
-                            foreach ($sumTotalQualified as $value) {
+                        foreach ($sumTotalQualified as $value) {
+                            //error_log('sumTotalQualified: 1'. print_r($sumTotalQualified, true). "\n");
+                            if (isset($value->finalgradegrades)) {
+                                $totalQualified = end($sumTotalQualified);
+                                $sumTotal  = $totalQualified->total;
+                                $newWeight = ($sumTotal / $maxItemCourse) / 100;
+                            
+                                $event_ = new custom_event([
+                                    'finalgradeGrades' => $value->finalgradegrades,
+                                    'idGradeItem' => $value->idgradeitem,
+                                    'timecreatedGradeItem' => $value->timecreatedgradeitem,
+                                    'timemodifiedGradeItem' => $value->timemodifiedgradeitem,
+                                    'itemnameGradeItem' => $value->itemnamegradeitem,
+                                    'grademaxGradeItem' => $value->grademaxgradeitem,
+                                    'useridGrades' => $value->useridgrades,
+                                    'courseidGradeItem' => $value->courseidgradeitem,
+                                    'newWeightGradeItem' => $newWeight
+                                ]);
 
-                                if (isset($value->finalgradegrades)) {
-                                    error_log('*********************************************');
-                                    $totalQualified = end($sumTotalQualified);
-                                    $sumTotal  = $totalQualified->total;
-                                    $newWeight = ($sumTotal / $maxItemCourse) / 100;
-                                    $value->newWeightGradeItem = $newWeight;
-                                    $event_ = new custom_event($value);
-
-                                    $this->manageEntity->create([
-                                            "dataEvent" => $event_,
-                                            "typeEvent" => "user_graded",
-                                            "dispatch" => 'update',
-                                            "enum_etities" => 'course_notes'
-                                    ]);
-                                    error_log('value: '. print_r($event_, true). "\n");
-                                }
+                                $this->manageEntity->create([
+                                        "dataEvent" => $event_,
+                                        "typeEvent" => "user_graded",
+                                        "dispatch" => 'update',
+                                        "enum_etities" => 'course_notes'
+                                ]);
                             }
                         } 
                     }
@@ -125,59 +132,6 @@ class recalculate_item_weight
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
-    }
-
-    /**
-     * Verify if the item is a category
-     * 
-     * @param string $typeItem
-     * @return bool
-     */
-    private function isItemCategory($typeItem) : bool
-    {
-        if (empty($typeItem)) {
-            error_log('isItemCategory: There is no type item' . "\n");
-            return false;
-        }
-        return $typeItem === self::ITEM_TYPE_CATEGORY;
-    }
-
-    private function get_grade_item(array $data)
-    {
-        $gradeItem = new \stdClass();
-        try {
-            $courseId = $data['courseid'];
-            $idcategory = $data['categoryid'];
-            $result = $this->execute_query_sql(sprintf(
-                self::ITEMS_CATEGORY,
-                $courseId,
-                $idcategory
-            ));
-
-            if (!empty($result)) {
-                $gradeItem = $result;
-            }
-        } catch (moodle_exception $e) {
-            error_log('Excepción capturada: '. $e->getMessage(). "\n");
-        }
-        return $gradeItem;
-    }
-
-    private function get_categories($courseId)
-    {
-        $categories =  new \stdClass();
-        try {
-            $result = $this->execute_query_sql(sprintf(
-                self::ALL_CATEGORY,
-                $courseId
-            ));
-            if (!empty($result)) {
-                $categories = $result;
-            }
-        } catch (moodle_exception $e) {
-            error_log('Excepción capturada: '. $e->getMessage(). "\n");
-        }
-        return $categories;
     }
 
     private function execute_query_sql($sql)

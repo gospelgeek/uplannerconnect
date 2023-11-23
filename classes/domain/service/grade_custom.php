@@ -21,11 +21,11 @@ class grade_custom
     public function __construct($data)
     {
         $this->data = $data;
-        $this->id = $this->data->idGradeGrades;
-        $this->finalgrade = $this->data->finalgradeGrades ?? 0;
-        $this->userid = $this->data->useridGrades;
+        $this->id = $data['idGradeGrades'] ?? 0;
+        $this->finalgrade = $data['finalgradeGrades'] ?? 0;
+        $this->userid = $data['useridGrades'];
         $this->grade_item = new \stdClass();
-        $this->grade_item->courseid = $this->data->courseidGradeItem;
+        $this->grade_item->courseid = $data['courseidGradeItem'];
     }
 
     /**
@@ -42,13 +42,13 @@ class grade_custom
     public function load_grade_item()
     {
         $gradeItem = new \stdClass();
-        $gradeItem->id = $this->data->idGradeItem;
-        $gradeItem->timecreated = $this->data->timecreatedGradeItem;
-        $gradeItem->timemodified = $this->data->timemodifiedGradeItem;
-        $gradeItem->itemname = $this->data->itemnameGradeItem;
-        $gradeItem->aggregationcoef2 = $this->data->newWeightGradeItem;
+        $gradeItem->id = $this->data['idGradeItem'] ?? 0;
+        $gradeItem->timecreated = $this->data['timecreatedGradeItem'] ?? 0;
+        $gradeItem->timemodified = $this->data['timemodifiedGradeItem'] ?? 0;
+        $gradeItem->itemname = $this->data['itemnameGradeItem'] ?? '';
+        $gradeItem->aggregationcoef2 = $this->data['newWeightGradeItem'] ?? 0;
         $gradeItem->aggregationcoef = 0;
-        $gradeItem->grademax = $this->data->grademaxGradeItem;
+        $gradeItem->grademax = $this->data['grademaxGradeItem'];
         return $gradeItem;
     }
 }

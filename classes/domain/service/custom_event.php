@@ -10,16 +10,15 @@ namespace local_uplannerconnect\domain\service;
 
 class custom_event
 {
-    private $data;
-
+    protected $data;
+    public $finalgradeGrades;
     /**
      * Construct
      */
     public function __construct($data)
     {
-        error_log('custom_event');
-        error_log(print_r($data, true));
         $this->data = $data;
+        $this->finalgradeGrades = $data['finalgradeGrades'] ?? 0;
     }
 
     /**
@@ -29,7 +28,7 @@ class custom_event
     {
         return [
             'other' => [
-                'finalgrade' => $this->data->finalgradeGrades ?? 0,
+                'finalgrade' => $this->finalgradeGrades ?? 0,
             ]
         ];
     }
