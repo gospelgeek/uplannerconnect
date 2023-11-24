@@ -8,7 +8,7 @@
 namespace local_uplannerconnect\domain\materials;
 
 use local_uplannerconnect\application\service\data_validator;
-use local_uplannerconnect\plugin_config\plugin_config;
+use local_uplannerconnect\plugin_config\estruture_types;
 use moodle_exception;
 
 /**
@@ -66,7 +66,7 @@ class material_translation_data
         $arraySend = [];
         try {
             $dataSend = $this->validator->verifyArrayKeyExist([
-                'array_verification' => plugin_config::UPLANNER_MATERIALS_ESTRUTURE,
+                'array_verification' => estruture_types::UPLANNER_MATERIALS_ESTRUTURE,
                 'data' => $data
             ]);
             

@@ -21,6 +21,7 @@ class course_utils
     const TABLE_CATEGORY = 'grade_categories';
     const TABLE_ITEMS = 'grade_items';
     const ITEM_TYPE_CATEGORY = 'category';
+    const RECALCULATE_AGGREATIONS = [13];
 
     private $validator;
     private $moodle_query_handler;
@@ -78,10 +79,18 @@ class course_utils
                 ])
             ]))['result'];
 
+            $aggregationCategory = $this->validator->isIsset($this->getAggreationCategory($grade->grade_item->courseid));
+
             $timestamp =  $this->validator->isIsset(($gradeLoadItem->timecreated));
             $formattedDateCreated = date('Y-m-d', $timestamp);
             $timestampMod =  $this->validator->isIsset(($gradeLoadItem->timemodified));
             $formattedDateModified = date('Y-m-d', $timestampMod);
+            $weightGrade = $this->validator->isIsset($this->getWeightGrade([
+                'gradeItem' => $gradeLoadItem,
+                'aggregation' => $aggregationCategory,
+                'idCourse' => $grade->grade_item->courseid,
+                'student' => $grade->userid
+            ]));
 
             //información a guardar
             $dataToSave = [
@@ -89,7 +98,7 @@ class course_utils
                 'studentCode' => $this->validator->isIsset($queryStudent->username),
                 'evaluationGroupCode' => $this->validator->isIsset($categoryFullName), //Bien
                 'evaluationId' => $this->validator->isIsset($gradeLoadItem->id),
-                'average' => $this->validator->isIsset($this->getWeight($gradeLoadItem)),
+                'average' => $this->validator->isIsset($weightGrade),
                 'isApproved' => $this->validator->isIsset($aproved),
                 'value' => $this->validator->isIsset(($getData['other'])['finalgrade']),
                 'evaluationName' => $this->validator->isIsset($gradeLoadItem->itemname),
@@ -97,6 +106,7 @@ class course_utils
                 'lastModifiedDate' => $this->validator->isIsset($formattedDateModified),
                 'action' => strtoupper($data['dispatch']),
                 'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($grade->grade_item->courseid)),
+                'aggregation' => $this->validator->isIsset($aggregationCategory),
             ];
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: '. $e->getMessage(). "\n");
@@ -180,9 +190,7 @@ class course_utils
     {
         $boolean = false;
         if ($gradeItem->grademax) {
-            if ($gradeItem->grademax <= $gradesGrades->finalgrade) {
-                $boolean = true;
-            }
+            $boolean = ($gradesGrades->finalgrade / $gradeItem->grademax) >= 0.6;
         }
         return $boolean;
     }
@@ -250,6 +258,52 @@ class course_utils
         return $weight;
     }
 
+        /**
+     * Return weight of category
+     * 
+     * @param object $gradeItem
+     * @return float
+     */
+    private function getWeightGrade(array $data)
+    {
+        $weight = 0;
+        $gradeItem = $data['gradeItem'];
+        $aggration = $data['aggregation'];
+        $idCourse = $data['idCourse'];
+        $student = $data['student'];
+
+        if (in_array($aggration, self::RECALCULATE_AGGREATIONS)) {
+            // Execute query sql
+            $maxItemsCourse =  $this->moodle_query_handler->executeQuery((sprintf(
+                plugin_config::MAX_ITEM_COURSE,
+                $idCourse
+            )));
+
+            // Get Max Item Course
+            $firstMaxItemCourse = reset($maxItemsCourse);
+            $maxItemsCourse  = $firstMaxItemCourse->count;
+
+            // Get Sum Total Qualified
+            $sumTotalQualified = $this->moodle_query_handler->executeQuery(sprintf(
+                plugin_config::SUM_TOTAL_GRADE,
+                $idCourse,
+                $student
+            ));
+
+            $resulTotalGrades = reset($sumTotalQualified);
+            $sumTotalQualified  = $resulTotalGrades->total;
+            $weight = ($sumTotalQualified / $maxItemsCourse) / 100;
+        } 
+        else if (property_exists($gradeItem, 'aggregationcoef2')) {
+            $weight = $gradeItem->aggregationcoef2;
+            if ($gradeItem->aggregationcoef2 == 0 ||
+                $gradeItem->aggregationcoef2 == 0.00000) {
+                $weight = $gradeItem->aggregationcoef;
+            }
+        }
+        return $weight;
+    }
+
     /**
      * Retorna el nombre de la categoria
      * 
@@ -296,5 +350,28 @@ class course_utils
             error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $objectClass;
+    }
+
+    /**
+     * Return aggregation category
+     */
+    private function getAggreationCategory($idCourse)
+    {
+        $aggregationCategory = 0;
+        try {
+            if (!empty($idCourse)) {
+                // Ejecutar la consulta.
+                $queryResult = $this->moodle_query_handler->executeQuery(sprintf(
+                    plugin_config::AGGREGATION_CATEGORY_FATHER, 
+                    $idCourse
+                ));
+                // Obtener el primer elemento del resultado utilizando reset()
+                $firstResult = reset($queryResult);
+                $aggregationCategory = $firstResult->aggregation ?? 0;
+            }
+        } catch (moodle_exception $e) {
+            error_log('Excepción capturada: '. $e->getMessage(). "\n");
+        }
+        return $aggregationCategory;
     }
 }

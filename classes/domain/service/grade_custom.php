@@ -7,6 +7,9 @@
 
 namespace local_uplannerconnect\domain\service; 
 
+/**
+ * Class grade_custom
+ */
 class grade_custom
 {
     private $data;
@@ -46,7 +49,7 @@ class grade_custom
         $gradeItem->timecreated = $this->data['timecreatedGradeItem'] ?? 0;
         $gradeItem->timemodified = $this->data['timemodifiedGradeItem'] ?? 0;
         $gradeItem->itemname = $this->data['itemnameGradeItem'] ?? '';
-        $gradeItem->aggregationcoef2 = $this->data['newWeightGradeItem'] ?? 0;
+        $gradeItem->aggregationcoef2 = $this->data['newWeightGradeItem'];
         $gradeItem->aggregationcoef = 0;
         $gradeItem->grademax = $this->data['grademaxGradeItem'];
         return $gradeItem;

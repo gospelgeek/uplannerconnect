@@ -5,9 +5,11 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-
 namespace local_uplannerconnect\domain\service; 
 
+/**
+ * Class custom_event
+ */
 class custom_event
 {
     protected $data;

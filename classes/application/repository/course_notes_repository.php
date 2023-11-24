@@ -62,12 +62,16 @@ class course_notes_repository
      */
     public function saveDataBD(array $data) : void
     {
+        $aggregation = $data['aggregation'];
+        //remove the date field from the array
+        unset($data['aggregation']);
         $this->general_repository->saveDataBD([
             'data' => [
                 'json' => json_encode($data),
                 'response' => '{"status": "Default response"}',
                 'success' => repository_type::STATE_DEFAULT,
                 'request_type' => $data['action'],
+                'aggregation' => $aggregation
             ],
             'table' => self::TABLE
         ]);

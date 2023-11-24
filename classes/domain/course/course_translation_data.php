@@ -8,7 +8,7 @@
 namespace local_uplannerconnect\domain\course;
 
 use local_uplannerconnect\application\service\data_validator;
-use local_uplannerconnect\plugin_config\plugin_config;
+use local_uplannerconnect\plugin_config\estruture_types;
 use moodle_exception;
 
 /**
@@ -70,7 +70,7 @@ class course_translation_data
         $arraySend = [];
         try {
             $dataSend = $this->validator->verifyArrayKeyExist([
-                'array_verification' => plugin_config::UPLANNER_EVALUATION_ESTRUTURE,
+                'array_verification' => estruture_types::UPLANNER_EVALUATION_ESTRUTURE,
                 'data' => $data
             ]);
             
@@ -112,7 +112,7 @@ class course_translation_data
         $arraySend = [];
         try {
             $dataSend = $this->validator->verifyArrayKeyExist([ 
-                'array_verification' => plugin_config::UPLANNER_GRADES,
+                'array_verification' => estruture_types::UPLANNER_GRADES,
                 'data' => $data 
             ]);
             
@@ -140,7 +140,8 @@ class course_translation_data
                 ],
                 "lastModifiedDate" => $dataSend['lastModifiedDate'],
                 "action" =>  $dataSend['action'],
-                "transactionId" => $dataSend['transactionId']
+                "transactionId" => $dataSend['transactionId'],
+                "aggregation" => $dataSend['aggregation']
             ];
       }
       catch (moodle_exception $e) {
