@@ -94,7 +94,7 @@ class handle_clean_uplanner_task
                 'is_sucessful' => 1
             ];
             $this->general_repository->delete_rows($repository::TABLE, $condition);
-            // Remove registers with operation incomplete
+            // Remove registers with operation error
             $condition = [
                 'success' => 1,
                 'is_sucessful' => 0

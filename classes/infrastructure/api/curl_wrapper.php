@@ -22,15 +22,6 @@ class curl_wrapper
     private $ch;
 
     /**
-     * Construct
-     */
-    public function __construct()
-    {
-        $this->ch = curl_init();
-        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
-    }
-
-    /**
      * Send get request
      *
      * @param $url
@@ -102,6 +93,8 @@ class curl_wrapper
      */
     public function set_header($header)
     {
+        $this->ch = curl_init();
+        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $header);
 
         return $this;
@@ -171,13 +164,5 @@ class curl_wrapper
         }
 
         return $response;
-    }
-
-    /**
-     * Destruct
-     */
-    public function __destruct()
-    {
-        curl_close($this->ch);
     }
 }
