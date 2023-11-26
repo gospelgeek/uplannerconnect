@@ -143,7 +143,7 @@ class handle_send_uplanner_task
         $response = $json = [];
         try {
             foreach ($rows as $row) {
-                $json[] = $row->json;
+                $json[] = json_decode($row->json, true);
             }
             $response = $uplanner_client->request($json);
         } catch (\Exception $e) {

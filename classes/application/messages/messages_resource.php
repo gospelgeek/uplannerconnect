@@ -72,7 +72,6 @@ class messages_resource
                 if ($get_results) {
                     while ($row = sqlsrv_fetch_array($get_results, SQLSRV_FETCH_ASSOC)) {
                         $messages[] = $row;
-                        break;
                     }
                     sqlsrv_free_stmt($get_results);
                 }
