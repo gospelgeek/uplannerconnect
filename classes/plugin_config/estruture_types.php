@@ -31,7 +31,8 @@ class estruture_types
         ['name' => 'lastModifiedDate', 'type' => 'string'],
         ['name' => 'action', 'type' => 'string'],
         ['name' => 'transactionId', 'type' => 'numeric'],
-        ['name' => 'aggregation', 'type' => 'numeric']
+        ['name' => 'aggregation', 'type' => 'numeric'],
+        ['name' => 'courseid' ,  'type' => 'numeric']
     ];
 
     // Estruturas de datos uPlanner.

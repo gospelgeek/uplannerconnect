@@ -32,4 +32,6 @@ class plugin_config
     const AGGREGATION_CATEGORY_FATHER = "SELECT aggregation FROM mdl_grade_categories WHERE courseid = '%s' and depth = 1";
     const MAX_ITEM_COURSE = "SELECT DISTINCT COUNT(t2.id) as count FROM mdl_grade_items as t2 WHERE t2.courseid='%s' AND t2.itemtype NOT IN ('course', 'category') AND t2.hidden = 0";
     const SUM_TOTAL_GRADE = "SELECT SUM(t1.finalgrade) AS total FROM mdl_grade_grades AS t1 INNER JOIN mdl_grade_items AS t2 ON t1.itemid = t2.id WHERE t2.courseid = '%s' AND t2.itemtype NOT IN ('course', 'category') AND t2.hidden = 0 AND t1.userid = '%s' AND t1.finalgrade IS NOT NULL";
+    const MAX_STUDENT_GRADE = "SELECT MAX(t1.finalgrade) AS nota_maxima FROM mdl_grade_grades AS t1 INNER JOIN mdl_grade_items AS t2 ON t1.itemid = t2.id WHERE t2.courseid = '%s' AND t2.itemtype NOT IN ('course', 'category') AND t2.hidden = 0 AND t1.userid = '%s' AND t1.finalgrade IS NOT NULL";
+    const LAST_GRADE_UPLANNER = "SELECT aggregation FROM {uplanner_grades} WHERE courseid = :courseid ORDER BY id DESC LIMIT 1";
 }

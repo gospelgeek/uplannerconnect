@@ -21,7 +21,8 @@ class course_utils
     const TABLE_CATEGORY = 'grade_categories';
     const TABLE_ITEMS = 'grade_items';
     const ITEM_TYPE_CATEGORY = 'category';
-    const RECALCULATE_AGGREATIONS = [13];
+    const RECALCULATE_AGGREATIONS = [11,6];
+    const IS_SIMPLE = 11;
 
     private $validator;
     private $moodle_query_handler;
@@ -107,6 +108,7 @@ class course_utils
                 'action' => strtoupper($data['dispatch']),
                 'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($grade->grade_item->courseid)),
                 'aggregation' => $this->validator->isIsset($aggregationCategory),
+                'courseid' => $this->validator->isIsset($grade->grade_item->courseid),
             ];
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: '. $e->getMessage(). "\n");
@@ -283,16 +285,22 @@ class course_utils
             $firstMaxItemCourse = reset($maxItemsCourse);
             $maxItemsCourse  = $firstMaxItemCourse->count;
 
+            $isAggreationSimple = $aggration == self::IS_SIMPLE;
+            $query = ($isAggreationSimple)? plugin_config::SUM_TOTAL_GRADE : plugin_config::MAX_STUDENT_GRADE;
             // Get Sum Total Qualified
             $sumTotalQualified = $this->moodle_query_handler->executeQuery(sprintf(
-                plugin_config::SUM_TOTAL_GRADE,
+                $query,
                 $idCourse,
                 $student
             ));
 
             $resulTotalGrades = reset($sumTotalQualified);
-            $sumTotalQualified  = $resulTotalGrades->total;
-            $weight = ($sumTotalQualified / $maxItemsCourse) / 100;
+            if ($isAggreationSimple) {  
+                $weight = ($resulTotalGrades->total / $maxItemsCourse) / 100;
+            }
+            else {
+                $weight = ($resulTotalGrades->nota_maxima / $gradeItem->grademax);
+            }
         } 
         else if (property_exists($gradeItem, 'aggregationcoef2')) {
             $weight = $gradeItem->aggregationcoef2;

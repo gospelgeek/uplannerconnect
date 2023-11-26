@@ -141,7 +141,8 @@ class course_translation_data
                 "lastModifiedDate" => $dataSend['lastModifiedDate'],
                 "action" =>  $dataSend['action'],
                 "transactionId" => $dataSend['transactionId'],
-                "aggregation" => $dataSend['aggregation']
+                "aggregation" => $dataSend['aggregation'],
+                "courseid" => $dataSend['courseid'],
             ];
       }
       catch (moodle_exception $e) {

@@ -662,15 +662,49 @@ function validateAccesFaculty($data) : bool
 }
 
 /**
+ * Is category father
+ */
+function isCategoryFatherRecalculate(array $data)
+{
+  try {
+       $category = $data['category'];
+       $event = $data['event'];
+       $dataItem = $event->get_data();
+       $idCourse = $dataItem ['courseid'];
+       $recalculate_aggreations = [11 , 6];
+       $aggregationCategory = $category->aggregation ?? 0;
+
+       //LAST_GRADE_UPLANNER
+       $moodle_query_handler = new moodle_query_handler();
+       $queryResult = $moodle_query_handler->executeQuery(
+         plugin_config::AGGREGATION_CATEGORY_FATHER, 
+         [
+            "courseid" => $idCourse
+         ]
+      );
+      // Obtener el primer elemento del resultado utilizando reset()
+      $firstResult = reset($queryResult);
+      $aggregationGrade = $firstResult->aggregation ?? 0;
+
+      if ($aggregationGrade !== $aggregationCategory &&
+          in_array($aggregationCategory, $recalculate_aggreations)
+      ) {
+            recalculatesWeight($event);
+      }
+  } catch (moodle_exception $e) {
+     error_log('Excepción capturada: '. $e->getMessage(). "\n");
+  }
+}
+
+/**
  * Recalculate weight
  */
 function recalculatesWeight($data) : void
 {
    try {
-
          $dataItem = $data->get_data();
          $idCourse = $dataItem['courseid'];
-         $recalculate_aggreations = [13];
+         $recalculate_aggreations = [11 , 6];
          $aggregationCategory = getAggreationCategory($idCourse);
          $get_grade_item = ($data->get_grade_item());
 
@@ -679,7 +713,8 @@ function recalculatesWeight($data) : void
          ) {
             $recalculate_item_weight = new recalculate_item_weight();
             $recalculate_item_weight->recalculate_weight_evaluation([
-               "event" => $data
+               "event" => $data,
+               "aggregationCategory" => $aggregationCategory,
             ]);
          }
    }
