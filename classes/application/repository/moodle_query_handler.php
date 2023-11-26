@@ -32,14 +32,14 @@ class moodle_query_handler
      *  @return array
      *  @throws dml_exception 
     */
-    public function executeQuery($sql) : array
+    public function executeQuery($sql,  $params = []) : array
     {
         if (empty($sql)) {
             error_log('execute_query: No sql statement found' . "\n");
             return [];
         }
 
-        return $this->db->get_records_sql($sql);
+        return $this->db->get_records_sql($sql , $params);
     }
 
     /**

@@ -8,7 +8,7 @@
 namespace local_uplannerconnect\domain\announcements;
 
 use local_uplannerconnect\application\service\data_validator;
-use local_uplannerconnect\plugin_config\plugin_config;
+use local_uplannerconnect\plugin_config\estruture_types;
 use moodle_exception;
 
 /**
@@ -66,7 +66,7 @@ class announcements_translation_data
         $arraySend = [];
         try {
             $dataSend = $this->validator->verifyArrayKeyExist([
-                'array_verification' => plugin_config::UPLANNER_ANNOUNCEMENTS_ESTRUTURE,
+                'array_verification' => estruture_types::UPLANNER_ANNOUNCEMENTS_ESTRUTURE,
                 'data' => $data
             ]);
             
