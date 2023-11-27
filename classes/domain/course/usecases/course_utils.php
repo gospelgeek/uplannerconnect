@@ -49,7 +49,7 @@ class course_utils
         try {
             if (empty($data['dataEvent'])) {
                 error_log('No le llego la información del evento user_graded');
-                return $arraySend;
+                return $dataToSave;
             }
 
             //Traer la información
@@ -60,7 +60,7 @@ class course_utils
             $gradeLoadItem = $this->validator->isObjectData($grade->load_grade_item());
             $categoryItem = $this->getInstanceCategoryName($gradeLoadItem);
             $categoryFullName = $this->shortCategoryName($categoryItem); 
-            $aproved = $this->getAprovedItem($gradeLoadItem, $grade);
+            $approved = $this->getApprovedItem($gradeLoadItem, $grade);
 
             $queryStudent = $this->validator->verifyQueryResult([
                 'data' => $this->moodle_query_handler->extract_data_db([
@@ -100,7 +100,7 @@ class course_utils
                 'evaluationGroupCode' => $this->validator->isIsset($categoryFullName), //Bien
                 'evaluationId' => $this->validator->isIsset($gradeLoadItem->id),
                 'average' => $this->validator->isIsset($weightGrade),
-                'isApproved' => $this->validator->isIsset($aproved),
+                'isApproved' => $this->validator->isIsset($approved),
                 'value' => $this->validator->isIsset(($getData['other'])['finalgrade']),
                 'evaluationName' => $this->validator->isIsset($gradeLoadItem->itemname),
                 'date' => $this->validator->isIsset($formattedDateCreated),
@@ -127,7 +127,7 @@ class course_utils
         try {
             if (empty($data['dataEvent'])) {
                 error_log('No le llego la información del evento user_graded');
-                return $arraySend;
+                return $dataToSave;
             }
 
             //Traer la información
@@ -188,7 +188,7 @@ class course_utils
      * @param object $gradeItem
      * @return bool
      */
-    private function getAprovedItem($gradeItem , $gradesGrades) : bool
+    private function getApprovedItem($gradeItem , $gradesGrades) : bool
     {
         $boolean = false;
         if ($gradeItem->grademax) {

@@ -36,8 +36,9 @@ class announcements_utils
     }
 
     /**
-     * Retorna los datos del evento user_graded
+     * Return data user_graded
      *
+     * @param array $data
      * @return array
      */
     public function createdAnnouncementResources(array $data) : array
@@ -46,7 +47,7 @@ class announcements_utils
         try {
             if (empty($data['dataEvent'])) {
                 error_log('No le llego la información del evento user_graded');
-                return $arraySend;
+                return $dataToSave;
             }
 
             // Get data.
@@ -56,12 +57,12 @@ class announcements_utils
             $dataCourse = $this->getDataCourse($courseid);
             $dateCreated = $this->validator->isIsset($dataEvent['timecreated']);
             $idForum = $this->validator->isIsset($dataEvent['objectid']);
-            $isMensaage = $this->isMessageCreated($dataEvent);
+            $isMessage = $this->isMessageCreated($dataEvent);
             $createdDate = date('Y-m-d', $dateCreated);
             $createdTime = date('H:i:s', $dateCreated);
             $dataForum = $this->getDataForum([
                 'forumid' => $idForum,
-                'key' => $isMensaage ? 'id' : 'discussion',
+                'key' => $isMessage ? 'id' : 'discussion',
             ]);
 
             // Get data user.
@@ -81,7 +82,7 @@ class announcements_utils
                 'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($courseid)),
             ];
         } catch (moodle_exception $e) {
-            error_log('Excepción capturada: '. $e->getMessage(). "\n");
+            error_log('Exception capturada: '. $e->getMessage(). "\n");
         }
         return $dataToSave;
     }
@@ -144,7 +145,7 @@ class announcements_utils
                 }
             }
         } catch (moodle_exception $e) {
-            error_log('Excepción capturada: '. $e->getMessage(). "\n");
+            error_log('Exception capturada: '. $e->getMessage(). "\n");
         }
         return $data;
     }
@@ -172,7 +173,7 @@ class announcements_utils
                 }
             }
         } catch (moodle_exception $e) {
-            error_log('Excepción capturada: '. $e->getMessage(). "\n");
+            error_log('Exception capturada: '. $e->getMessage(). "\n");
         }
         return $name;
     }
