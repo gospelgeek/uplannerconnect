@@ -95,10 +95,10 @@ class course_utils
 
             //información a guardar
             $dataToSave = [
-                'sectionId' => $this->validator->isIsset($queryCourse->shortname),
+                'sectionId' => $this->validator->isIsset($this->convertirFormato($queryCourse->shortname)),
                 'studentCode' => $this->validator->isIsset($queryStudent->username),
                 'evaluationGroupCode' => $this->validator->isIsset($categoryFullName), //Bien
-                'evaluationId' => $this->validator->isIsset($gradeLoadItem->id),
+                'evaluationId' => $this->validator->isIsset(intval($gradeLoadItem->id)),
                 'average' => $this->validator->isIsset($weightGrade),
                 'isApproved' => $this->validator->isIsset($approved),
                 'value' => $this->validator->isIsset(($getData['other'])['finalgrade']),
@@ -166,7 +166,7 @@ class course_utils
             ]))['result'];
 
             $dataToSave = [
-                'sectionId' => $this->validator->isIsset($queryCourse->shortname),
+                'sectionId' => $this->validator->isIsset($this->convertirFormato($queryCourse->shortname)),
                 'evaluationGroupCode' => $this->validator->isIsset($categoryFullName),
                 'evaluationGroupName' => $this->validator->isIsset(substr($categoryItem, 0, 50)),
                 'evaluationId' => $this->validator->isIsset($get_grade_item->id),
@@ -382,4 +382,21 @@ class course_utils
         }
         return $aggregationCategory;
     }
+
+    private function convertirFormato($cadenaOriginal)
+    {
+        $patron = '/^(\d{2})-(\d{6}[A-Za-z])-(\d{2})-(\d{9})$/';
+        $nuevaCadena = $cadenaOriginal;
+        if (preg_match($patron, $cadenaOriginal, $coincidencias)) {
+            
+            $parte1 = $coincidencias[1];
+            $parte2 = $coincidencias[2];
+            $parte3 = $coincidencias[3];
+            $parte4 = $coincidencias[4];
+    
+            // Construir la nueva cadena en el formato deseado
+            $nuevaCadena = "$parte1-$parte4-$parte2-$parte3";
+        }
+        return $nuevaCadena;
+    }   
 }
