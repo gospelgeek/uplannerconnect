@@ -70,7 +70,7 @@ class announcements_utils
             $nameUser = $this->getNameUser($idUserForum);
 
             $dataToSave = [
-                'blackboardSectionId' => $this->validator->isIsset($dataCourse->shortname),
+                'blackboardSectionId' => $this->validator->isIsset($this->convertirFormato($dataCourse->shortname)),
                 'id' => $this->validator->isIsset(strval($idForum)),
                 'createdDate' => $this->validator->isIsset($createdDate),
                 'createdTime' => $this->validator->isIsset($createdTime),
@@ -193,4 +193,21 @@ class announcements_utils
         }
         return $isCreated;
     }
+
+    private function convertirFormato($cadenaOriginal)
+    {
+        $patron = '/^(\d{2})-(\d{6}[A-Za-z])-(\d{2})-(\d{9})$/';
+        $nuevaCadena = $cadenaOriginal;
+        if (preg_match($patron, $cadenaOriginal, $coincidencias)) {
+            
+            $parte1 = $coincidencias[1];
+            $parte2 = $coincidencias[2];
+            $parte3 = $coincidencias[3];
+            $parte4 = $coincidencias[4];
+    
+            // Construir la nueva cadena en el formato deseado
+            $nuevaCadena = "$parte1-$parte4-$parte2-$parte3";
+        }
+        return $nuevaCadena;
+    }  
 }
