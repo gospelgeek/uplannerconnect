@@ -100,22 +100,6 @@ class curl_wrapper
         return $this;
     }
 
-
-    /**
-     * Set basic auth in request
-     *
-     * @param $username
-     * @param $password
-     * @return $this
-     */
-    public function set_basic_auth($username, $password)
-    {
-        curl_setopt($this->ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_setopt($this->ch, CURLOPT_USERPWD, "$username:$password");
-
-        return $this;
-    }
-
     /**
      * Add option in curl
      *
