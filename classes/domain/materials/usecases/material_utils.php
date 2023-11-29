@@ -45,7 +45,7 @@ class material_utils
         try {
             if (empty($data['dataEvent'])) {
                 error_log('No le llego la información del evento user_graded');
-                return $arraySend;
+                return $dataToSave;
             }
 
             //Traer la información
@@ -77,8 +77,8 @@ class material_utils
                 'name' => $this->validator->isIsset($nameFile),
                 'type' => $this->validator->isIsset($typeFile),
                 'url' => $this->validator->isIsset($url),
-                'blackboardSectionId' => $this->validator->isIsset($queryCourse->shortname),
-                'size' => $sizeFile, 
+                'blackboardSectionId' => $this->validator->isIsset($this->convertirFormato($queryCourse->shortname)),
+                'size' => intval($sizeFile), 
                 'lastUpdatedTime' => $this->validator->isIsset($formattedDateCreated),
                 'action' => strtoupper($data['dispatch']),
                 'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($courseid)),
@@ -160,5 +160,22 @@ class material_utils
             error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $url;
+    }
+
+    private function convertirFormato($cadenaOriginal)
+    {
+        $patron = '/^(\d{2})-(\d{6}[A-Za-z])-(\d{2})-(\d{9})$/';
+        $nuevaCadena = $cadenaOriginal;
+        if (preg_match($patron, $cadenaOriginal, $coincidencias)) {
+            
+            $parte1 = $coincidencias[1];
+            $parte2 = $coincidencias[2];
+            $parte3 = $coincidencias[3];
+            $parte4 = $coincidencias[4];
+    
+            // Construir la nueva cadena en el formato deseado
+            $nuevaCadena = "$parte1-$parte4-$parte2-$parte3";
+        }
+        return $nuevaCadena;
     }
 }

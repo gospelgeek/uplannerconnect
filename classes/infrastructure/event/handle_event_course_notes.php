@@ -187,7 +187,7 @@ class handle_event_course_notes
     * Resource created
     */
    public static function course_module_created($event)
-   {  
+   {
       try {
             if (validateAccessTypeEvent([
                "dataEvent" => $event,

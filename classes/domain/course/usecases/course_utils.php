@@ -49,7 +49,7 @@ class course_utils
         try {
             if (empty($data['dataEvent'])) {
                 error_log('No le llego la información del evento user_graded');
-                return $arraySend;
+                return $dataToSave;
             }
 
             //Traer la información
@@ -60,7 +60,7 @@ class course_utils
             $gradeLoadItem = $this->validator->isObjectData($grade->load_grade_item());
             $categoryItem = $this->getInstanceCategoryName($gradeLoadItem);
             $categoryFullName = $this->shortCategoryName($categoryItem); 
-            $aproved = $this->getAprovedItem($gradeLoadItem, $grade);
+            $approved = $this->getApprovedItem($gradeLoadItem, $grade);
 
             $queryStudent = $this->validator->verifyQueryResult([
                 'data' => $this->moodle_query_handler->extract_data_db([
@@ -95,13 +95,13 @@ class course_utils
 
             //información a guardar
             $dataToSave = [
-                'sectionId' => $this->validator->isIsset($queryCourse->shortname),
+                'sectionId' => $this->validator->isIsset($this->convertirFormato($queryCourse->shortname)),
                 'studentCode' => $this->validator->isIsset($queryStudent->username),
                 'evaluationGroupCode' => $this->validator->isIsset($categoryFullName), //Bien
-                'evaluationId' => $this->validator->isIsset($gradeLoadItem->id),
-                'average' => $this->validator->isIsset($weightGrade),
-                'isApproved' => $this->validator->isIsset($aproved),
-                'value' => $this->validator->isIsset(($getData['other'])['finalgrade']),
+                'evaluationId' => $this->validator->isIsset(intval($gradeLoadItem->id)),
+                'average' => $this->validator->isIsset(strval($weightGrade)),
+                'isApproved' => $this->validator->isIsset($approved),
+                'value' => $this->validator->isIsset(strval(($getData['other'])['finalgrade'])),
                 'evaluationName' => $this->validator->isIsset($gradeLoadItem->itemname),
                 'date' => $this->validator->isIsset($formattedDateCreated),
                 'lastModifiedDate' => $this->validator->isIsset($formattedDateModified),
@@ -127,7 +127,7 @@ class course_utils
         try {
             if (empty($data['dataEvent'])) {
                 error_log('No le llego la información del evento user_graded');
-                return $arraySend;
+                return $dataToSave;
             }
 
             //Traer la información
@@ -166,12 +166,12 @@ class course_utils
             ]))['result'];
 
             $dataToSave = [
-                'sectionId' => $this->validator->isIsset($queryCourse->shortname),
+                'sectionId' => $this->validator->isIsset($this->convertirFormato($queryCourse->shortname)),
                 'evaluationGroupCode' => $this->validator->isIsset($categoryFullName),
                 'evaluationGroupName' => $this->validator->isIsset(substr($categoryItem, 0, 50)),
-                'evaluationId' => $this->validator->isIsset($get_grade_item->id),
+                'evaluationId' => $this->validator->isIsset(intval($get_grade_item->id)),
                 'evaluationName' => $this->validator->isIsset($itemName),
-                'weight' => $weight,
+                'weight' => floatval($weight),
                 'action' => strtoupper($data['dispatch']),
                 "date" => $this->validator->isIsset(strval($dataEvent['timecreated'])),
                 'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($get_grade_item->courseid)),
@@ -188,7 +188,7 @@ class course_utils
      * @param object $gradeItem
      * @return bool
      */
-    private function getAprovedItem($gradeItem , $gradesGrades) : bool
+    private function getApprovedItem($gradeItem , $gradesGrades) : bool
     {
         $boolean = false;
         if ($gradeItem->grademax) {
@@ -382,4 +382,21 @@ class course_utils
         }
         return $aggregationCategory;
     }
+
+    private function convertirFormato($cadenaOriginal)
+    {
+        $patron = '/^(\d{2})-(\d{6}[A-Za-z])-(\d{2})-(\d{9})$/';
+        $nuevaCadena = $cadenaOriginal;
+        if (preg_match($patron, $cadenaOriginal, $coincidencias)) {
+            
+            $parte1 = $coincidencias[1];
+            $parte2 = $coincidencias[2];
+            $parte3 = $coincidencias[3];
+            $parte4 = $coincidencias[4];
+    
+            // Construir la nueva cadena en el formato deseado
+            $nuevaCadena = "$parte1-$parte4-$parte2-$parte3";
+        }
+        return $nuevaCadena;
+    }   
 }
