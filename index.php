@@ -27,7 +27,6 @@ $PAGE->set_url($url);
 $PAGE->set_pagelayout('admin');
 
 //Incluir JS
-$PAGE->requires->js_call_amd(''.plugin_config::PLUGIN_NAME_LOCAL.'/main', 'init');
 
 //Objeto de datos
 $data = new \stdClass();
