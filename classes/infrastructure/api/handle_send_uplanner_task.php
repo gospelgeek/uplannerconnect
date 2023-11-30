@@ -61,7 +61,9 @@ class handle_send_uplanner_task
         $num_rows = 100
     ) {
         $current_date = date("F j, Y, g:i:s a");
+        error_log("-------------- process - foreach repositories: \n");
         foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
+            error_log($type . " - " . $repository_class . "\n");
             $repository = new $repository_class();
             $uplanner_client = $this->uplanner_client_factory->create($type);
             $this->process_request(
@@ -97,6 +99,7 @@ class handle_send_uplanner_task
         }
         $index_row = 0;
         $offset = 0;
+        error_log("-------------- process_request - while: \n");
         while ($index_row < $num_request_by_endpoint) {
             $dataQuery = [
                 'state' => $state,
@@ -104,18 +107,23 @@ class handle_send_uplanner_task
                 'offset' => $offset,
             ];
             $rows = $repository->getDataBD($dataQuery);
+            error_log("rows: " . json_encode($rows) . "\n");
             if (!$rows) {
                 break;
             }
             $response = $this->request($uplanner_client, $rows);
+            error_log("response: " . json_encode($response) . "\n");
             $status = (empty($response) || in_array('error', $response))
                 ? repository_type::STATE_ERROR : repository_type::STATE_SEND;
-            $this->create_file($uplanner_client->get_file_name(), $rows, $status);
-            $response = $this->send_email(
-                $uplanner_client->get_email_subject(),
-                $current_date
-            );
+            //$fileCreated = $this->create_file($uplanner_client->get_file_name(), $rows, $status);
+            /*if ($fileCreated) {
+                $this->send_email(
+                    $uplanner_client->get_email_subject(),
+                    $current_date
+                );
+            }*/
             $numRows = 0;
+            error_log("update registers status: " . $status . "\n");
             foreach ($rows as $row) {
                 $dataQuery = [
                     'response' => $response,
@@ -127,10 +135,13 @@ class handle_send_uplanner_task
                     $numRows++;
                 }
             }
-            $this->file->delete_csv();
+            /*if ($fileCreated) {
+                $this->file->delete_csv();
+            }*/
             $index_row++;
             $offset += $numRows;
         }
+        error_log("END \n");
     }
 
     /**
@@ -159,19 +170,23 @@ class handle_send_uplanner_task
      * @param $file_name
      * @param $rows
      * @param $status
-     * @return void
+     * @return bool
      */
     private function create_file($file_name, $rows, $status)
     {
         $this->file = new file($file_name);
-        $this->file->create_csv(abstract_uplanner_client::FILE_HEADERS);
-        foreach ($rows as $row) {
-            $data = [
-                $row->json,
-                $status
-            ];
-            $this->file->add_row($data);
+        $fileCreated = $this->file->create_csv(abstract_uplanner_client::FILE_HEADERS);
+        if ($fileCreated) {
+            foreach ($rows as $row) {
+                $data = [
+                    $row->json,
+                    $status
+                ];
+                $this->file->add_row($data);
+            }
         }
+
+        return $fileCreated;
     }
 
     /**

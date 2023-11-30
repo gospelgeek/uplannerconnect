@@ -120,7 +120,7 @@ class handle_clean_uplanner_task
             if ($page_size <= 0) {
                 return;
             }
-            $this->create_file(self::PREFIX . $uplanner_client->get_file_name());
+            //$fileCreated = $this->create_file(self::PREFIX . $uplanner_client->get_file_name());
             $offset = 0;
             while (true) {
                 $data = [
@@ -133,18 +133,20 @@ class handle_clean_uplanner_task
                     break;
                 }
                 $this->message_repository->process($repository, $rows);
-                $data = [
+                /*$data = [
                     'state' => repository_type::STATE_SEND,
                     'limit' => $page_size,
                     'offset' => $offset,
                 ];
                 $rows = $repository->getDataBD($data);
-                $this->add_rows_in_file($rows);
-                $this->send_email(
-                    self::PREFIX . $uplanner_client->get_email_subject(),
-                    $current_date
-                );
-                $this->file->delete_csv();
+                if ($fileCreated) {
+                    $this->add_rows_in_file($rows);
+                    $this->send_email(
+                        self::PREFIX . $uplanner_client->get_email_subject(),
+                        $current_date
+                    );
+                    $this->file->delete_csv();
+                }*/
                 $offset += count($rows);
             }
         } catch (moodle_exception $e) {
@@ -156,7 +158,7 @@ class handle_clean_uplanner_task
      * Create and add rows in file
      *
      * @param $file_name
-     * @return void
+     * @return bool
      */
     private function create_file($file_name)
     {
@@ -164,7 +166,7 @@ class handle_clean_uplanner_task
         $headers[] = 'is_sucessful';
         $headers[] = 'ds_error';
         $this->file = new file($file_name);
-        $this->file->create_csv($headers);
+        return $this->file->create_csv($headers);
     }
 
     /**
