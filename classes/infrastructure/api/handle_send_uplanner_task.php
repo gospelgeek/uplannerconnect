@@ -110,11 +110,13 @@ class handle_send_uplanner_task
             $response = $this->request($uplanner_client, $rows);
             $status = (empty($response) || in_array('error', $response))
                 ? repository_type::STATE_ERROR : repository_type::STATE_SEND;
-            $this->create_file($uplanner_client->get_file_name(), $rows, $status);
-            $response = $this->send_email(
-                $uplanner_client->get_email_subject(),
-                $current_date
-            );
+            $fileCreated = $this->create_file($uplanner_client->get_file_name(), $rows, $status);
+            if ($fileCreated) {
+                $this->send_email(
+                    $uplanner_client->get_email_subject(),
+                    $current_date
+                );
+            }
             $numRows = 0;
             foreach ($rows as $row) {
                 $dataQuery = [
@@ -127,7 +129,9 @@ class handle_send_uplanner_task
                     $numRows++;
                 }
             }
-            $this->file->delete_csv();
+            if ($fileCreated) {
+                $this->file->delete_csv();
+            }
             $index_row++;
             $offset += $numRows;
         }
@@ -159,19 +163,23 @@ class handle_send_uplanner_task
      * @param $file_name
      * @param $rows
      * @param $status
-     * @return void
+     * @return bool
      */
     private function create_file($file_name, $rows, $status)
     {
         $this->file = new file($file_name);
-        $this->file->create_csv(abstract_uplanner_client::FILE_HEADERS);
-        foreach ($rows as $row) {
-            $data = [
-                $row->json,
-                $status
-            ];
-            $this->file->add_row($data);
+        $fileCreated = $this->file->create_csv(abstract_uplanner_client::FILE_HEADERS);
+        if ($fileCreated) {
+            foreach ($rows as $row) {
+                $data = [
+                    $row->json,
+                    $status
+                ];
+                $this->file->add_row($data);
+            }
         }
+
+        return $fileCreated;
     }
 
     /**
