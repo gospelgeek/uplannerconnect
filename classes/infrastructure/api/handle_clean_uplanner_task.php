@@ -120,7 +120,7 @@ class handle_clean_uplanner_task
             if ($page_size <= 0) {
                 return;
             }
-            $fileCreated = $this->create_file(self::PREFIX . $uplanner_client->get_file_name());
+            //$fileCreated = $this->create_file(self::PREFIX . $uplanner_client->get_file_name());
             $offset = 0;
             while (true) {
                 $data = [
@@ -133,7 +133,7 @@ class handle_clean_uplanner_task
                     break;
                 }
                 $this->message_repository->process($repository, $rows);
-                $data = [
+                /*$data = [
                     'state' => repository_type::STATE_SEND,
                     'limit' => $page_size,
                     'offset' => $offset,
@@ -146,7 +146,7 @@ class handle_clean_uplanner_task
                         $current_date
                     );
                     $this->file->delete_csv();
-                }
+                }*/
                 $offset += count($rows);
             }
         } catch (moodle_exception $e) {

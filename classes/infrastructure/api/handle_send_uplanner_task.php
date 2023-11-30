@@ -110,13 +110,13 @@ class handle_send_uplanner_task
             $response = $this->request($uplanner_client, $rows);
             $status = (empty($response) || in_array('error', $response))
                 ? repository_type::STATE_ERROR : repository_type::STATE_SEND;
-            $fileCreated = $this->create_file($uplanner_client->get_file_name(), $rows, $status);
-            if ($fileCreated) {
+            //$fileCreated = $this->create_file($uplanner_client->get_file_name(), $rows, $status);
+            /*if ($fileCreated) {
                 $this->send_email(
                     $uplanner_client->get_email_subject(),
                     $current_date
                 );
-            }
+            }*/
             $numRows = 0;
             foreach ($rows as $row) {
                 $dataQuery = [
@@ -129,9 +129,9 @@ class handle_send_uplanner_task
                     $numRows++;
                 }
             }
-            if ($fileCreated) {
+            /*if ($fileCreated) {
                 $this->file->delete_csv();
-            }
+            }*/
             $index_row++;
             $offset += $numRows;
         }
