@@ -61,7 +61,7 @@ class file
     {
         try {
             if (!file_exists($this->directory)) {
-                mkdir($this->directory, 0777, true);
+                mkdir($this->directory, 0755, true);
             }
             $csv_file = $this->get_path_file();
             if (!file_exists($csv_file)) {
