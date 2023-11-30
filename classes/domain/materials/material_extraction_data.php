@@ -8,7 +8,7 @@
 namespace local_uplannerconnect\domain\materials;
 
 use local_uplannerconnect\application\service\data_validator;
-use local_uplannerconnect\plugin_config\plugin_config;
+use local_uplannerconnect\plugin_config\estruture_types;
 use local_uplannerconnect\domain\materials\usecases\material_utils;
 use moodle_exception;
 
@@ -41,7 +41,7 @@ class material_extraction_data
       $arraySend = [];  
       try {
             if ($this->validator->verificateKeyArrayBoolean([
-               'array_verification' => plugin_config::CREATE_EVENT_DATA,
+               'array_verification' => estruture_types::CREATE_EVENT_DATA,
                'get_data' => $data,
             ])) {
                 $typeEvent = $this->typeEvent[$data['typeEvent']];

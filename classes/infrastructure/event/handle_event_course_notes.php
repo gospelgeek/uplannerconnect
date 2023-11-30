@@ -11,6 +11,7 @@ use local_uplannerconnect\domain\management_factory;
 use local_uplannerconnect\application\service\event_access_validator;
 use local_uplannerconnect\application\repository\moodle_query_handler;
 use local_uplannerconnect\domain\service\recalculate_item_weight; 
+use local_uplannerconnect\plugin_config\plugin_config;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -132,6 +133,7 @@ class handle_event_course_notes
             //valida si la facultad tiene acceso
             if (!validateAccesFaculty($event)) { return; }
                if ($isTotalItem) {
+                  recalculatesWeight($event);
                   //Instanciar la clase management_factory
                   instantiatemanagement_factory([
                      "dataEvent" => $event,
@@ -185,7 +187,7 @@ class handle_event_course_notes
     * Resource created
     */
    public static function course_module_created($event)
-   {  
+   {
       try {
             if (validateAccessTypeEvent([
                "dataEvent" => $event,
@@ -660,17 +662,87 @@ function validateAccesFaculty($data) : bool
 }
 
 /**
+ * Is category father
+ */
+function isCategoryFatherRecalculate(array $data)
+{
+  try {
+       $category = $data['category'];
+       $event = $data['event'];
+       $dataItem = $event->get_data();
+       $idCourse = $dataItem ['courseid'];
+       $recalculate_aggreations = [11 , 6];
+       $aggregationCategory = $category->aggregation ?? 0;
+
+       //LAST_GRADE_UPLANNER
+       $moodle_query_handler = new moodle_query_handler();
+       $queryResult = $moodle_query_handler->executeQuery(
+         plugin_config::AGGREGATION_CATEGORY_FATHER, 
+         [
+            "courseid" => $idCourse
+         ]
+      );
+      // Obtener el primer elemento del resultado utilizando reset()
+      $firstResult = reset($queryResult);
+      $aggregationGrade = $firstResult->aggregation ?? 0;
+
+      if ($aggregationGrade !== $aggregationCategory &&
+          in_array($aggregationCategory, $recalculate_aggreations)
+      ) {
+            recalculatesWeight($event);
+      }
+  } catch (moodle_exception $e) {
+     error_log('Excepción capturada: '. $e->getMessage(). "\n");
+  }
+}
+
+/**
  * Recalculate weight
  */
 function recalculatesWeight($data) : void
 {
    try {
-         $recalculate_item_weight = new recalculate_item_weight();
-         $recalculate_item_weight->recalculate_weight_evaluation([
-            "event" => $data
-         ]);
+         $dataItem = $data->get_data();
+         $idCourse = $dataItem['courseid'];
+         $recalculate_aggreations = [11 , 6];
+         $aggregationCategory = getAggreationCategory($idCourse);
+         $get_grade_item = ($data->get_grade_item());
+
+         if (in_array($aggregationCategory, $recalculate_aggreations) &&
+            $get_grade_item->itemtype !== 'category'
+         ) {
+            $recalculate_item_weight = new recalculate_item_weight();
+            $recalculate_item_weight->recalculate_weight_evaluation([
+               "event" => $data,
+               "aggregationCategory" => $aggregationCategory,
+            ]);
+         }
    }
    catch (moodle_exception $e) {
       error_log('Excepción capturada: '. $e->getMessage(). "\n");
    }
+}
+
+/**
+ * Return aggregation category
+   */
+function getAggreationCategory($idCourse)
+{
+   $aggregationCategory = 0;
+   try {
+      if (!empty($idCourse)) {
+            // Ejecutar la consulta.
+            $moodle_query_handler = new moodle_query_handler();
+            $queryResult = $moodle_query_handler->executeQuery(sprintf(
+               plugin_config::AGGREGATION_CATEGORY_FATHER, 
+               $idCourse
+            ));
+            // Obtener el primer elemento del resultado utilizando reset()
+            $firstResult = reset($queryResult);
+            $aggregationCategory = $firstResult->aggregation ?? 0;
+      }
+   } catch (moodle_exception $e) {
+      error_log('Excepción capturada: '. $e->getMessage(). "\n");
+   }
+   return $aggregationCategory;
 }

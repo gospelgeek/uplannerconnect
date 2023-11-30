@@ -38,8 +38,8 @@ class email
             $user = new \stdClass();
             $user->email = $recipient_email;
             $user->id = '000001';
+            $user->username = 'univalle';
             $admin = get_admin();
-
             $subject = get_string($subject, 'local_uplannerconnect');
 
             $body = 'Dear administrator,

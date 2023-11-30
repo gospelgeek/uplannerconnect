@@ -77,8 +77,9 @@ class event_access_validator
                 //Obtener el shortname del curso
                 $shortname = $this->courseDataRepository->getCourseShortname($courseid);
                 //verifica si tiene algun dato en la posición 4
-                if (isset($shortname[3])) {
-                    $result = in_array($shortname[3], self::FACULTY_ACTIVE);
+                if (isset($shortname)) {
+                    $patron = '/^\d{2}-\d{6}[A-Za-z]-\d{2}-\d{9}$/';
+                    $result = preg_match($patron, $shortname);
                 }
             }
         }

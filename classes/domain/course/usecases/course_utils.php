@@ -21,6 +21,8 @@ class course_utils
     const TABLE_CATEGORY = 'grade_categories';
     const TABLE_ITEMS = 'grade_items';
     const ITEM_TYPE_CATEGORY = 'category';
+    const RECALCULATE_AGGREATIONS = [11,6];
+    const IS_SIMPLE = 11;
 
     private $validator;
     private $moodle_query_handler;
@@ -47,7 +49,7 @@ class course_utils
         try {
             if (empty($data['dataEvent'])) {
                 error_log('No le llego la información del evento user_graded');
-                return $arraySend;
+                return $dataToSave;
             }
 
             //Traer la información
@@ -58,7 +60,7 @@ class course_utils
             $gradeLoadItem = $this->validator->isObjectData($grade->load_grade_item());
             $categoryItem = $this->getInstanceCategoryName($gradeLoadItem);
             $categoryFullName = $this->shortCategoryName($categoryItem); 
-            $aproved = $this->getAprovedItem($gradeLoadItem, $grade);
+            $approved = $this->getApprovedItem($gradeLoadItem, $grade);
 
             $queryStudent = $this->validator->verifyQueryResult([
                 'data' => $this->moodle_query_handler->extract_data_db([
@@ -78,25 +80,35 @@ class course_utils
                 ])
             ]))['result'];
 
+            $aggregationCategory = $this->validator->isIsset($this->getAggreationCategory($grade->grade_item->courseid));
+
             $timestamp =  $this->validator->isIsset(($gradeLoadItem->timecreated));
             $formattedDateCreated = date('Y-m-d', $timestamp);
             $timestampMod =  $this->validator->isIsset(($gradeLoadItem->timemodified));
             $formattedDateModified = date('Y-m-d', $timestampMod);
+            $weightGrade = $this->validator->isIsset($this->getWeightGrade([
+                'gradeItem' => $gradeLoadItem,
+                'aggregation' => $aggregationCategory,
+                'idCourse' => $grade->grade_item->courseid,
+                'student' => $grade->userid
+            ]));
 
             //información a guardar
             $dataToSave = [
-                'sectionId' => $this->validator->isIsset($queryCourse->shortname),
+                'sectionId' => $this->validator->isIsset($this->convertirFormato($queryCourse->shortname)),
                 'studentCode' => $this->validator->isIsset($queryStudent->username),
                 'evaluationGroupCode' => $this->validator->isIsset($categoryFullName), //Bien
-                'evaluationId' => $this->validator->isIsset($gradeLoadItem->id),
-                'average' => $this->validator->isIsset($this->getWeight($gradeLoadItem)),
-                'isApproved' => $this->validator->isIsset($aproved),
-                'value' => $this->validator->isIsset(($getData['other'])['finalgrade']),
+                'evaluationId' => $this->validator->isIsset(intval($gradeLoadItem->id)),
+                'average' => $this->validator->isIsset(strval($weightGrade)),
+                'isApproved' => $this->validator->isIsset($approved),
+                'value' => $this->validator->isIsset(strval(($getData['other'])['finalgrade'])),
                 'evaluationName' => $this->validator->isIsset($gradeLoadItem->itemname),
                 'date' => $this->validator->isIsset($formattedDateCreated),
                 'lastModifiedDate' => $this->validator->isIsset($formattedDateModified),
                 'action' => strtoupper($data['dispatch']),
                 'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($grade->grade_item->courseid)),
+                'aggregation' => $this->validator->isIsset($aggregationCategory),
+                'courseid' => $this->validator->isIsset($grade->grade_item->courseid),
             ];
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: '. $e->getMessage(). "\n");
@@ -115,7 +127,7 @@ class course_utils
         try {
             if (empty($data['dataEvent'])) {
                 error_log('No le llego la información del evento user_graded');
-                return $arraySend;
+                return $dataToSave;
             }
 
             //Traer la información
@@ -154,12 +166,12 @@ class course_utils
             ]))['result'];
 
             $dataToSave = [
-                'sectionId' => $this->validator->isIsset($queryCourse->shortname),
+                'sectionId' => $this->validator->isIsset($this->convertirFormato($queryCourse->shortname)),
                 'evaluationGroupCode' => $this->validator->isIsset($categoryFullName),
                 'evaluationGroupName' => $this->validator->isIsset(substr($categoryItem, 0, 50)),
-                'evaluationId' => $this->validator->isIsset($get_grade_item->id),
+                'evaluationId' => $this->validator->isIsset(intval($get_grade_item->id)),
                 'evaluationName' => $this->validator->isIsset($itemName),
-                'weight' => $weight,
+                'weight' => floatval($weight),
                 'action' => strtoupper($data['dispatch']),
                 "date" => $this->validator->isIsset(strval($dataEvent['timecreated'])),
                 'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($get_grade_item->courseid)),
@@ -176,13 +188,11 @@ class course_utils
      * @param object $gradeItem
      * @return bool
      */
-    private function getAprovedItem($gradeItem , $gradesGrades) : bool
+    private function getApprovedItem($gradeItem , $gradesGrades) : bool
     {
         $boolean = false;
         if ($gradeItem->grademax) {
-            if ($gradeItem->grademax <= $gradesGrades->finalgrade) {
-                $boolean = true;
-            }
+            $boolean = ($gradesGrades->finalgrade / $gradeItem->grademax) >= 0.6;
         }
         return $boolean;
     }
@@ -250,6 +260,58 @@ class course_utils
         return $weight;
     }
 
+        /**
+     * Return weight of category
+     * 
+     * @param object $gradeItem
+     * @return float
+     */
+    private function getWeightGrade(array $data)
+    {
+        $weight = 0;
+        $gradeItem = $data['gradeItem'];
+        $aggration = $data['aggregation'];
+        $idCourse = $data['idCourse'];
+        $student = $data['student'];
+
+        if (in_array($aggration, self::RECALCULATE_AGGREATIONS)) {
+            // Execute query sql
+            $maxItemsCourse =  $this->moodle_query_handler->executeQuery((sprintf(
+                plugin_config::MAX_ITEM_COURSE,
+                $idCourse
+            )));
+
+            // Get Max Item Course
+            $firstMaxItemCourse = reset($maxItemsCourse);
+            $maxItemsCourse  = $firstMaxItemCourse->count;
+
+            $isAggreationSimple = $aggration == self::IS_SIMPLE;
+            $query = ($isAggreationSimple)? plugin_config::SUM_TOTAL_GRADE : plugin_config::MAX_STUDENT_GRADE;
+            // Get Sum Total Qualified
+            $sumTotalQualified = $this->moodle_query_handler->executeQuery(sprintf(
+                $query,
+                $idCourse,
+                $student
+            ));
+
+            $resulTotalGrades = reset($sumTotalQualified);
+            if ($isAggreationSimple) {  
+                $weight = ($resulTotalGrades->total / $maxItemsCourse) / 100;
+            }
+            else {
+                $weight = ($resulTotalGrades->nota_maxima / $gradeItem->grademax);
+            }
+        } 
+        else if (property_exists($gradeItem, 'aggregationcoef2')) {
+            $weight = $gradeItem->aggregationcoef2;
+            if ($gradeItem->aggregationcoef2 == 0 ||
+                $gradeItem->aggregationcoef2 == 0.00000) {
+                $weight = $gradeItem->aggregationcoef;
+            }
+        }
+        return $weight;
+    }
+
     /**
      * Retorna el nombre de la categoria
      * 
@@ -297,4 +359,44 @@ class course_utils
         }
         return $objectClass;
     }
+
+    /**
+     * Return aggregation category
+     */
+    private function getAggreationCategory($idCourse)
+    {
+        $aggregationCategory = 0;
+        try {
+            if (!empty($idCourse)) {
+                // Ejecutar la consulta.
+                $queryResult = $this->moodle_query_handler->executeQuery(sprintf(
+                    plugin_config::AGGREGATION_CATEGORY_FATHER, 
+                    $idCourse
+                ));
+                // Obtener el primer elemento del resultado utilizando reset()
+                $firstResult = reset($queryResult);
+                $aggregationCategory = $firstResult->aggregation ?? 0;
+            }
+        } catch (moodle_exception $e) {
+            error_log('Excepción capturada: '. $e->getMessage(). "\n");
+        }
+        return $aggregationCategory;
+    }
+
+    private function convertirFormato($cadenaOriginal)
+    {
+        $patron = '/^(\d{2})-(\d{6}[A-Za-z])-(\d{2})-(\d{9})$/';
+        $nuevaCadena = $cadenaOriginal;
+        if (preg_match($patron, $cadenaOriginal, $coincidencias)) {
+            
+            $parte1 = $coincidencias[1];
+            $parte2 = $coincidencias[2];
+            $parte3 = $coincidencias[3];
+            $parte4 = $coincidencias[4];
+    
+            // Construir la nueva cadena en el formato deseado
+            $nuevaCadena = "$parte1-$parte4-$parte2-$parte3";
+        }
+        return $nuevaCadena;
+    }   
 }

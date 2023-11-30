@@ -36,8 +36,9 @@ class announcements_utils
     }
 
     /**
-     * Retorna los datos del evento user_graded
+     * Return data user_graded
      *
+     * @param array $data
      * @return array
      */
     public function createdAnnouncementResources(array $data) : array
@@ -46,7 +47,7 @@ class announcements_utils
         try {
             if (empty($data['dataEvent'])) {
                 error_log('No le llego la información del evento user_graded');
-                return $arraySend;
+                return $dataToSave;
             }
 
             // Get data.
@@ -56,12 +57,12 @@ class announcements_utils
             $dataCourse = $this->getDataCourse($courseid);
             $dateCreated = $this->validator->isIsset($dataEvent['timecreated']);
             $idForum = $this->validator->isIsset($dataEvent['objectid']);
-            $isMensaage = $this->isMessageCreated($dataEvent);
+            $isMessage = $this->isMessageCreated($dataEvent);
             $createdDate = date('Y-m-d', $dateCreated);
             $createdTime = date('H:i:s', $dateCreated);
             $dataForum = $this->getDataForum([
                 'forumid' => $idForum,
-                'key' => $isMensaage ? 'id' : 'discussion',
+                'key' => $isMessage ? 'id' : 'discussion',
             ]);
 
             // Get data user.
@@ -69,7 +70,7 @@ class announcements_utils
             $nameUser = $this->getNameUser($idUserForum);
 
             $dataToSave = [
-                'blackboardSectionId' => $this->validator->isIsset($dataCourse->shortname),
+                'blackboardSectionId' => $this->validator->isIsset($this->convertirFormato($dataCourse->shortname)),
                 'id' => $this->validator->isIsset(strval($idForum)),
                 'createdDate' => $this->validator->isIsset($createdDate),
                 'createdTime' => $this->validator->isIsset($createdTime),
@@ -81,7 +82,7 @@ class announcements_utils
                 'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($courseid)),
             ];
         } catch (moodle_exception $e) {
-            error_log('Excepción capturada: '. $e->getMessage(). "\n");
+            error_log('Exception capturada: '. $e->getMessage(). "\n");
         }
         return $dataToSave;
     }
@@ -144,7 +145,7 @@ class announcements_utils
                 }
             }
         } catch (moodle_exception $e) {
-            error_log('Excepción capturada: '. $e->getMessage(). "\n");
+            error_log('Exception capturada: '. $e->getMessage(). "\n");
         }
         return $data;
     }
@@ -172,7 +173,7 @@ class announcements_utils
                 }
             }
         } catch (moodle_exception $e) {
-            error_log('Excepción capturada: '. $e->getMessage(). "\n");
+            error_log('Exception capturada: '. $e->getMessage(). "\n");
         }
         return $name;
     }
@@ -192,4 +193,21 @@ class announcements_utils
         }
         return $isCreated;
     }
+
+    private function convertirFormato($cadenaOriginal)
+    {
+        $patron = '/^(\d{2})-(\d{6}[A-Za-z])-(\d{2})-(\d{9})$/';
+        $nuevaCadena = $cadenaOriginal;
+        if (preg_match($patron, $cadenaOriginal, $coincidencias)) {
+            
+            $parte1 = $coincidencias[1];
+            $parte2 = $coincidencias[2];
+            $parte3 = $coincidencias[3];
+            $parte4 = $coincidencias[4];
+    
+            // Construir la nueva cadena en el formato deseado
+            $nuevaCadena = "$parte1-$parte4-$parte2-$parte3";
+        }
+        return $nuevaCadena;
+    }  
 }

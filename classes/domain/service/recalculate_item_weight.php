@@ -5,11 +5,11 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-
 namespace local_uplannerconnect\domain\service; 
 
 use local_uplannerconnect\application\repository\moodle_query_handler;
 use local_uplannerconnect\domain\management_factory;
+use local_uplannerconnect\plugin_config\plugin_config;
 use moodle_exception;
 
 /**
@@ -17,18 +17,38 @@ use moodle_exception;
  */
 class recalculate_item_weight
 {    
-    const IS_NATURAL = 13;
+    const IS_HIGHEST = 6;
     const IS_SIMPLE = 11;
     const TABLE_CATEGORY = 'course_categories';
     const ITEM_TYPE_CATEGORY = 'category';
-    const ALL_CATEGORY = "SELECT * FROM mdl_grade_categories WHERE courseid='%s' AND hidden = 0";
-    const ITEMS_CATEGORY = "SELECT * FROM mdl_grade_items WHERE courseid='%s' AND categoryid = '%s' AND hidden = 0";
-    const TOTAL_ITEMS = "SELECT SUM(t1.finalgrade) as total FROM mdl_grade_grades as t1 INNER JOIN mdl_grade_items as t2 ON t1.itemid = t2.id WHERE t2.courseid='%s' AND t2.itemtype NOT IN ('course', 'category') AND t2.hidden = 0 AND t1.userid = '%s'";
-    const ALL_STUNDET_COURSE_QUALIFIED = "SELECT DISTINCT (t1.userid) FROM mdl_grade_grades as t1 INNER JOIN mdl_grade_items as t2 ON t1.itemid = t2.id WHERE t2.courseid='%s'";
-    const MAX_ITEM_COURSE = "SELECT DISTINCT COUNT(t2.id) as count FROM mdl_grade_items as t2 WHERE t2.courseid='%s' AND t2.itemtype NOT IN ('course', 'category') AND t2.hidden = 0";
+    const TOTAL_ITEMS = "SELECT
+                            t1.id AS idGrade,
+                            t2.id AS idGradeItem,
+                            t2.timecreated AS timecreatedGradeItem,
+                            t2.timemodified AS timemodifiedGradeItem,
+                            t2.itemname AS itemnameGradeItem,
+                            t2.grademax AS grademaxGradeItem,
+                            t1.finalgrade AS finalgradeGrades,
+                            t1.userid AS useridGrades,
+                            t2.courseid AS courseidGradeItem,
+                            t2.grademax AS grademaxGradeItem
+                        FROM
+                            {grade_grades} AS t1
+                            INNER JOIN {grade_items} AS t2 ON t1.itemid = t2.id
+                        WHERE
+                            t2.courseid = :courseid
+                            AND t2.itemtype NOT IN ('course', 'category')
+                            AND t2.hidden = 0
+                            AND EXISTS (
+                                SELECT 1
+                                FROM {grade_grades} AS t3
+                                WHERE t3.userid = t1.userid
+                            )
+                            AND t1.finalgrade IS NOT NULL";
 
     private $moodle_query_handler;
     private $manageEntity;
+    private $custom_event;
 
     /**
      * Constructor
@@ -51,128 +71,97 @@ class recalculate_item_weight
             if (!empty($data)) {
                 // Get data.
                 $event = $data['event'];
+                $aggregationCategory =  $data['aggregationCategory'];
                 $data = $event->get_data();
                 $idCourse = $data['courseid'];
                 
-                $allStudentsCourse = $this->execute_query_sql(sprintf(
-                    self::ALL_STUNDET_COURSE_QUALIFIED,
-                    $idCourse
-                ));
+                $maxItemCourse = $this->execute_query_sql([
+                    'sql' => sprintf(
+                        plugin_config::MAX_ITEM_COURSE,
+                        $idCourse
+                    )
+                ]);
 
-                $maxItemCourse = $this->execute_query_sql(sprintf(
-                    self::MAX_ITEM_COURSE,
-                    $idCourse
-                ));
-               
-                if (!empty($allStudentsCourse) &&
-                    is_array($allStudentsCourse) &&
-                    !empty($maxItemCourse)
-                ) {
-                    $firstMaxItemCourse = reset($maxItemCourse);
-                    $maxItemCourse  = $firstMaxItemCourse->count;
+                // Get Sum Total Qualified
+                $sumTotalQualified = $this->execute_query_sql([
+                    'sql' => self::TOTAL_ITEMS,
+                    'params' => [
+                        'courseid' => $idCourse
+                    ]
+                ]);
+
+                if (empty($sumTotalQualified) &&
+                    !(is_array($sumTotalQualified)) &&
+                    empty($maxItemCourse)
+                ) { return; }
+                
+                $firstMaxItemCourse = reset($maxItemCourse);
+                $maxItemCourse  = $firstMaxItemCourse->count;
+
+                $isAggreationSimple = $aggregationCategory == self::IS_SIMPLE;
+                $query = ($isAggreationSimple)? plugin_config::SUM_TOTAL_GRADE : plugin_config::MAX_STUDENT_GRADE;
+                
+                foreach ($sumTotalQualified as $value) {
+                    
+                    if (!isset($value->finalgradegrades)) { continue; }
                    
-                    foreach ($allStudentsCourse as $student) {
-                       // Get Sum Total Qualified
-                       $sumTotalQualified = $this->execute_query_sql(sprintf(
-                            self::TOTAL_ITEMS,
+                    // Get Sum Total Qualified
+                    $sumTotalResult = $this->execute_query_sql([
+                        'sql' => sprintf(
+                            $query,
                             $idCourse,
-                            $student->userid
-                        ));
+                            $value->useridgrades
+                        )
+                    ]);
 
-                        if (!empty($sumTotalQualified)
-                        ) {
-                            $firstTotalQualified = reset($sumTotalQualified);
-                            $sumTotalQualified  = $firstTotalQualified->total;
-                            $newWeight = ($sumTotalQualified / $maxItemCourse);
-                            error_log('sumTotalQualified: '. print_r($sumTotalQualified, true). "\n");
-                            error_log('newWeight: '. print_r($newWeight, true). "\n");
-                        } 
+                    $totalQualified = reset($sumTotalResult);
+                    if ($isAggreationSimple) {
+                        $newWeight = ($totalQualified->total / $maxItemCourse) / 100;
                     }
-                }
-            }
-        } catch (moodle_exception $e) {
-            error_log('Excepción capturada: '. $e->getMessage(). "\n");
-        }
-    }
+                    else {
+                        $newWeight = $totalQualified->nota_maxima / $value->grademaxgradeitem;
+                    }
+                    
+                    
+                    $event_ = new custom_event([
+                        'finalgradeGrades' => $value->finalgradegrades,
+                        'idGradeItem' => $value->idgradeitem,
+                        'timecreatedGradeItem' => $value->timecreatedgradeitem,
+                        'timemodifiedGradeItem' => $value->timemodifiedgradeitem,
+                        'itemnameGradeItem' => $value->itemnamegradeitem,
+                        'grademaxGradeItem' => $value->grademaxgradeitem,
+                        'useridGrades' => $value->useridgrades,
+                        'courseidGradeItem' => $value->courseidgradeitem,
+                        'newWeightGradeItem' => $newWeight
+                    ]);
 
-    private function contruct_event(array $data)
-    {
-        $event = new \stdClass();
-        try {
-            if (!empty($data)) {
-                $event->get_data =[
-                    'courseid' => $data['courseid'],
-                    'categoryid' => $data['categoryid']
-                ];
-                $event->get_grade_item = $data['get_grade_item'];
-                $event->get_grade_item->aggregationcoef2 = $data['aggregationcoef2'];
-                //get_grade
+                    $this->manageEntity->create([
+                            "dataEvent" => $event_,
+                            "typeEvent" => "user_graded",
+                            "dispatch" => 'update',
+                            "enum_etities" => 'course_notes'
+                    ]);
+                } 
             }
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
-        return $event;
     }
 
     /**
-     * Verify if the item is a category
+     * Execute query sql
      * 
-     * @param string $typeItem
-     * @return bool
+     * @param string $sql
+     * @return object
      */
-    private function isItemCategory($typeItem) : bool
-    {
-        if (empty($typeItem)) {
-            error_log('isItemCategory: There is no type item' . "\n");
-            return false;
-        }
-        return $typeItem === self::ITEM_TYPE_CATEGORY;
-    }
-
-    private function get_grade_item(array $data)
-    {
-        $gradeItem = new \stdClass();
-        try {
-            $courseId = $data['courseid'];
-            $idcategory = $data['categoryid'];
-            $result = $this->execute_query_sql(sprintf(
-                self::ITEMS_CATEGORY,
-                $courseId,
-                $idcategory
-            ));
-
-            if (!empty($result)) {
-                $gradeItem = $result;
-            }
-        } catch (moodle_exception $e) {
-            error_log('Excepción capturada: '. $e->getMessage(). "\n");
-        }
-        return $gradeItem;
-    }
-
-    private function get_categories($courseId)
-    {
-        $categories =  new \stdClass();
-        try {
-            $result = $this->execute_query_sql(sprintf(
-                self::ALL_CATEGORY,
-                $courseId
-            ));
-            if (!empty($result)) {
-                $categories = $result;
-            }
-        } catch (moodle_exception $e) {
-            error_log('Excepción capturada: '. $e->getMessage(). "\n");
-        }
-        return $categories;
-    }
-
-    private function execute_query_sql($sql)
+    private function execute_query_sql(array $data)
     {
         $result = new \stdClass();
         try {
-            if (!empty($sql)) {
-                $queryResult = $this->moodle_query_handler->executeQuery($sql);
+            if (!empty($data)) {
+                $sql = $data['sql'];
+                $params = $data['params'] ?? [];
+                $queryResult = $this->moodle_query_handler->executeQuery($sql, $params);
                 if (!empty($queryResult)) {
                     $result = ($queryResult);
                 }
@@ -183,7 +172,12 @@ class recalculate_item_weight
         return $result;
     }
 
-    private function instantiatemanagement()
+    /**
+     * Instantiatemanagement
+     * 
+     * @return void
+     */
+    private function instantiatemanagement() : void
     {
         try {
             // Verificar si existe el método
