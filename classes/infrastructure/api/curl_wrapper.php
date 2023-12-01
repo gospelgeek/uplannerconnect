@@ -8,6 +8,8 @@
 
 namespace local_uplannerconnect\infrastructure\api;
 
+use Exception;
+
 /**
  * @package uPlannerConnect
  * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
@@ -22,11 +24,16 @@ class curl_wrapper
     private $ch;
 
     /**
+     * @var int
+     */
+    private $code = 404;
+
+    /**
      * Send get request
      *
      * @param $url
      * @return bool|string
-     * @throws \Exception
+     * @throws Exception
      */
     public function get($url)
     {
@@ -42,7 +49,7 @@ class curl_wrapper
      * @param $url
      * @param $data
      * @return bool|string
-     * @throws \Exception
+     * @throws Exception
      */
     public function post($url, $data)
     {
@@ -59,7 +66,7 @@ class curl_wrapper
      * @param $url
      * @param $data
      * @return bool|string
-     * @throws \Exception
+     * @throws Exception
      */
     public function put($url, $data)
     {
@@ -75,7 +82,7 @@ class curl_wrapper
      *
      * @param $url
      * @return bool|string
-     * @throws \Exception
+     * @throws Exception
      */
     public function delete($url)
     {
@@ -96,6 +103,8 @@ class curl_wrapper
         $this->ch = curl_init();
         curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, 3);
+        curl_setopt($this->ch, CURLOPT_TIMEOUT, 4);
 
         return $this;
     }
@@ -117,11 +126,11 @@ class curl_wrapper
     /**
      * Get code response
      *
-     * @return mixed
+     * @return int
      */
     public function get_code()
     {
-        return curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
+        return $this->code;
     }
 
     /**
@@ -134,18 +143,35 @@ class curl_wrapper
         return curl_error($this->ch);
     }
 
+
+    /**
+     * Close curl connection
+     *
+     * @return void
+     */
+    public function close()
+    {
+        if ($this->ch) {
+            curl_close($this->ch);
+        }
+    }
+
     /**
      * Send request
      *
      * @return bool|string
-     * @throws \Exception
+     * @throws Exception
      */
     private function execute()
     {
         $response = curl_exec($this->ch);
         if ($response === false) {
-            throw new \Exception(curl_error($this->ch));
+            $response = curl_error($this->ch);
+            $this->code = 404;
+        } else {
+            $this->code = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
         }
+        $this->close();
 
         return $response;
     }
