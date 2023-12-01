@@ -60,10 +60,10 @@ class handle_send_uplanner_task
         $num_request_by_endpoint = 1,
         $num_rows = 100
     ) {
+        error_log("------------------------------------------  PROCESS START - FOREACH REPOSITORIES ------------------------------------------ \n");
         $current_date = date("F j, Y, g:i:s a");
-        error_log("-------------- process - foreach repositories: \n");
         foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
-            error_log($type . " - " . $repository_class . "\n");
+            error_log("------- CREATE REPOSITORY OBJECT: " . $type . " - " . $repository_class . "\n");
             $repository = new $repository_class();
             $uplanner_client = $this->uplanner_client_factory->create($type);
             $this->process_request(
@@ -75,6 +75,7 @@ class handle_send_uplanner_task
                 $num_rows
             );
         }
+        error_log("------------------------------------------            PROCESS FINISHED             ------------------------------------------ \n");
     }
 
     /**
@@ -99,21 +100,22 @@ class handle_send_uplanner_task
         }
         $index_row = 0;
         $offset = 0;
-        error_log("-------------- process_request - while: \n");
+        error_log("********** PROCESS REQUEST - WHILE: \n");
         while ($index_row < $num_request_by_endpoint) {
             $dataQuery = [
                 'state' => $state,
                 'limit' => $num_rows,
                 'offset' => $offset,
             ];
+            error_log("DATA QUERY: " . json_encode($dataQuery) . "\n");
             $rows = $repository->getDataBD($dataQuery);
-            error_log("rows: " . json_encode($rows) . "\n");
+            error_log("DATA ROWS: " . json_encode($rows) . "\n");
             if (!$rows) {
                 break;
             }
             $response = $this->request($uplanner_client, $rows);
-            error_log("response: " . json_encode($response) . "\n");
-            $status = (empty($response) || in_array('error', $response))
+            error_log("RESPONSE: " . json_encode($response) . "\n");
+            $status = (empty($response) || array_key_exists('error', $response))
                 ? repository_type::STATE_ERROR : repository_type::STATE_SEND;
             //$fileCreated = $this->create_file($uplanner_client->get_file_name(), $rows, $status);
             /*if ($fileCreated) {
@@ -123,7 +125,7 @@ class handle_send_uplanner_task
                 );
             }*/
             $numRows = 0;
-            error_log("update registers status: " . $status . "\n");
+            error_log("UPDATE REGISTER STATUS: " . $status . "\n");
             foreach ($rows as $row) {
                 $dataQuery = [
                     'response' => $response,
@@ -141,7 +143,6 @@ class handle_send_uplanner_task
             $index_row++;
             $offset += $numRows;
         }
-        error_log("END \n");
     }
 
     /**

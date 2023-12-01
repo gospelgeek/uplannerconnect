@@ -73,6 +73,7 @@ class handle_clean_uplanner_task
      * @return void
      */
     public function process($page_size = 1000) {
+        error_log("------------------------------------------  PROCESS START - FOREACH REPOSITORIES ------------------------------------------ \n");
         $current_date = date("F j, Y, g:i:s a");
         $log_id = $this->general_repository->add_log_data();
         foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
@@ -85,7 +86,9 @@ class handle_clean_uplanner_task
                 $current_date
             );
         }
+        error_log("------------------------------------------            ADD LOGS (COUNT LOGS)     ------------------------------------------ \n");
         $this->general_repository->add_log_errors_data($log_id);
+        error_log("--------------------------------------DELETE LOGS (success and is_sucessful = 1)------------------------------------------ \n");
         foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
             $repository = new $repository_class($type);
             // Remove registers with operation complete
@@ -101,6 +104,7 @@ class handle_clean_uplanner_task
             ];
             $this->general_repository->delete_rows($repository::TABLE, $condition);*/
         }
+        error_log("------------------------------------------            PROCESS FINISHED             ------------------------------------------ \n");
     }
 
     /**
