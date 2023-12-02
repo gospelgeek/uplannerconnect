@@ -18,6 +18,8 @@ defined('MOODLE_INTERNAL') || die();
  */
 class main_handle_clean_uplanner_task extends \core\task\scheduled_task
 {
+    const TASKS_ID = 'clean';
+
     /**
      * @inerhitdoc
      * @throws coding_exception
@@ -34,7 +36,7 @@ class main_handle_clean_uplanner_task extends \core\task\scheduled_task
         $time_now = time();
         $start_time = microtime();
         mtrace("Update cron started at: " . date('r', $time_now) . "\n");
-        $handle_task = new handle_clean_uplanner_task();
+        $handle_task = new handle_clean_uplanner_task(self::TASKS_ID);
         $handle_task->process();
         mtrace("\n" . 'Cron completed at: ' . date('r', time()) . "\n");
         mtrace('Memory used: ' . display_size(memory_get_usage())."\n");

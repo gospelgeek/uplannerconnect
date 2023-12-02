@@ -56,10 +56,25 @@ class handle_clean_uplanner_task
     private $general_repository;
 
     /**
-     * Construct
+     * @var $task_di
      */
-    public function __construct()
-    {
+    private $task_id;
+
+    /**
+     * @var $current_date
+     */
+    private $current_date;
+
+    /**
+     * Construct
+     *
+     * @param $tasks_id
+     */
+    public function __construct(
+        $tasks_id
+    ) {
+        $this->task_id = $tasks_id;
+        $this->current_date = date("F j, Y, g:i:s a");
         $this->uplanner_client_factory = new uplanner_client_factory();
         $this->email = new email();
         $this->message_repository = new messages_status_repository();
@@ -74,7 +89,6 @@ class handle_clean_uplanner_task
      */
     public function process($page_size = 1000) {
         error_log("------------------------------------------  PROCESS START - FOREACH REPOSITORIES ------------------------------------------ \n");
-        $current_date = date("F j, Y, g:i:s a");
         $log_id = $this->general_repository->add_log_data();
         foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
             $repository = new $repository_class($type);
@@ -82,8 +96,7 @@ class handle_clean_uplanner_task
             $this->start_process_per_repository(
                 $repository,
                 $uplanner_client,
-                $page_size,
-                $current_date
+                $page_size
             );
         }
         error_log("------------------------------------------            ADD LOGS (COUNT LOGS)     ------------------------------------------ \n");
@@ -111,20 +124,18 @@ class handle_clean_uplanner_task
      * @param $repository
      * @param $uplanner_client
      * @param $page_size
-     * @param $current_date
      * @return void
      */
     private function start_process_per_repository(
         $repository,
         $uplanner_client,
-        $page_size,
-        $current_date
+        $page_size
     ) {
         try {
             if ($page_size <= 0) {
                 return;
             }
-            //$fileCreated = $this->create_file(self::PREFIX . $uplanner_client->get_file_name());
+            $fileCreated = $this->create_file(self::PREFIX . $uplanner_client->get_file_name());
             $offset = 0;
             while (true) {
                 $data = [
@@ -137,7 +148,7 @@ class handle_clean_uplanner_task
                     break;
                 }
                 $this->message_repository->process($repository, $rows);
-                /*$data = [
+                $data = [
                     'state' => repository_type::STATE_SEND,
                     'limit' => $page_size,
                     'offset' => $offset,
@@ -145,12 +156,8 @@ class handle_clean_uplanner_task
                 $rows = $repository->getDataBD($data);
                 if ($fileCreated) {
                     $this->add_rows_in_file($rows);
-                    $this->send_email(
-                        self::PREFIX . $uplanner_client->get_email_subject(),
-                        $current_date
-                    );
-                    $this->file->delete_csv();
-                }*/
+                    $this->send_email(self::PREFIX . $uplanner_client->get_email_subject());
+                }
                 $offset += count($rows);
             }
         } catch (moodle_exception $e) {
@@ -169,7 +176,7 @@ class handle_clean_uplanner_task
         $headers = abstract_uplanner_client::FILE_HEADERS;
         $headers[] = 'is_sucessful';
         $headers[] = 'ds_error';
-        $this->file = new file($file_name);
+        $this->file = new file($this->task_id, $file_name);
         return $this->file->create_csv($headers);
     }
 
@@ -196,17 +203,17 @@ class handle_clean_uplanner_task
      * Send email
      *
      * @param $subject
-     * @param $current_date
      * @return bool
      */
-    private function send_email($subject, $current_date): bool
+    private function send_email($subject): bool
     {
         $recipient_email = 'samuel.ramirez@correounivalle.edu.co';
         return $this->email->send(
             $recipient_email,
             $subject,
-            $current_date,
-            $this->file->get_path_file()
+            $this->current_date,
+            $this->file->get_path_file(),
+        $this->file->get_virtual_name()
         );
     }
 }
