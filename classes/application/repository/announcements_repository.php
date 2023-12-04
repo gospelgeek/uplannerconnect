@@ -83,7 +83,7 @@ class announcements_repository
         return $this->general_repository->getDataBD([
             'data' => $data,
             'query' => plugin_config::QUERY_SELECT_COURSE_GRADES,
-            'table' => '{'. self::TABLE.'}'
+            'table' => self::TABLE
         ]);
     }
 }
