@@ -66,7 +66,7 @@ class event_access_validator
     }
 
     /**
-     *  Valida si la facultad puede usar el evento
+     *  Validate if the course is active
      *
     */
     public function validateAccessByFaculty($courseid) : bool

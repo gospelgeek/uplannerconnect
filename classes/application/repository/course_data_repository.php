@@ -25,7 +25,7 @@ class course_data_repository
     }
 
     /**
-     * Trae el shortname de un curso
+     * Return the shortname of the course
      *
      * @param $courseId
      * @return string
@@ -38,16 +38,16 @@ class course_data_repository
                 return $short_name;
             }
 
-            //Ejecutar la consulta
+            // Execute query.
             $result = $this->moodle_query_handler->executeQuery(
                 sprintf(
                 plugin_config::QUERY_SHORNAME_COURSE_BY_ID,
-                plugin_config::TABLE_COURSE_MOODLE,
-                $courseId
-                )
+                '{'.plugin_config::TABLE_COURSE.'}',
+                ),
+                ['id' => $courseId]
             );
 
-            //Verificar si la información llega vacía
+            // Validate result.
             if (!empty($result)) {
                 $shortname = reset($result);
                 if (!empty($shortname)) {

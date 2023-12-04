@@ -107,10 +107,12 @@ class general_repository
                 sprintf(
                     $data['query'],
                     $data['table'],
-                    $dataJson['state'],
-                    $dataJson['limit'],
-                    $dataJson['offset']
-                )
+                ),
+                [
+                    "success" => $dataJson['state'],
+                    "max_result" => $dataJson['limit'],
+                    "offset" => $dataJson['offset']
+                ]
             );
         }
         catch (moodle_exception $e) {

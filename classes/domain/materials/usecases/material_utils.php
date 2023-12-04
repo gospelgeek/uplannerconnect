@@ -11,6 +11,7 @@ use local_uplannerconnect\application\service\data_validator;
 use local_uplannerconnect\application\repository\moodle_query_handler;
 use local_uplannerconnect\plugin_config\plugin_config;
 use local_uplannerconnect\domain\service\transition_endpoint;
+use local_uplannerconnect\domain\service\utils;
 use moodle_exception;
 
 /**
@@ -22,7 +23,8 @@ class material_utils
 
     private $validator;
     private $moodle_query_handler;
-    private $transition_endpoint; 
+    private $transition_endpoint;
+    private $utils_service;
 
     /**
      *  Construct
@@ -32,6 +34,7 @@ class material_utils
         $this->validator = new data_validator();
         $this->moodle_query_handler = new moodle_query_handler();
         $this->transition_endpoint = new transition_endpoint();
+        $this->utils_service = new utils();
     }
 
     /**
@@ -77,7 +80,7 @@ class material_utils
                 'name' => $this->validator->isIsset($nameFile),
                 'type' => $this->validator->isIsset($typeFile),
                 'url' => $this->validator->isIsset($url),
-                'blackboardSectionId' => $this->validator->isIsset($this->convertirFormato($queryCourse->shortname)),
+                'blackboardSectionId' => $this->validator->isIsset($this->utils_service->convertFormatUplanner($queryCourse->shortname)),
                 'size' => intval($sizeFile), 
                 'lastUpdatedTime' => $this->validator->isIsset($formattedDateCreated),
                 'action' => strtoupper($data['dispatch']),
@@ -160,22 +163,5 @@ class material_utils
             error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
         return $url;
-    }
-
-    private function convertirFormato($cadenaOriginal)
-    {
-        $patron = '/^(\d{2})-(\d{6}[A-Za-z])-(\d{2})-(\d{9})$/';
-        $nuevaCadena = $cadenaOriginal;
-        if (preg_match($patron, $cadenaOriginal, $coincidencias)) {
-            
-            $parte1 = $coincidencias[1];
-            $parte2 = $coincidencias[2];
-            $parte3 = $coincidencias[3];
-            $parte4 = $coincidencias[4];
-    
-            // Construir la nueva cadena en el formato deseado
-            $nuevaCadena = "$parte1-$parte4-$parte2-$parte3";
-        }
-        return $nuevaCadena;
     }
 }

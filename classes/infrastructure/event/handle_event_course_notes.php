@@ -733,10 +733,12 @@ function getAggreationCategory($idCourse)
       if (!empty($idCourse)) {
             // Ejecutar la consulta.
             $moodle_query_handler = new moodle_query_handler();
-            $queryResult = $moodle_query_handler->executeQuery(sprintf(
+            $queryResult = $moodle_query_handler->executeQuery(
                plugin_config::AGGREGATION_CATEGORY_FATHER, 
-               $idCourse
-            ));
+               [
+                  "courseid" => $idCourse
+               ]
+            );
             // Obtener el primer elemento del resultado utilizando reset()
             $firstResult = reset($queryResult);
             $aggregationCategory = $firstResult->aggregation ?? 0;

@@ -76,10 +76,10 @@ class recalculate_item_weight
                 $idCourse = $data['courseid'];
                 
                 $maxItemCourse = $this->execute_query_sql([
-                    'sql' => sprintf(
-                        plugin_config::MAX_ITEM_COURSE,
-                        $idCourse
-                    )
+                    'sql' => plugin_config::MAX_ITEM_COURSE,
+                    'params' => [
+                        'courseid' => $idCourse
+                    ]
                 ]);
 
                 // Get Sum Total Qualified
@@ -107,11 +107,11 @@ class recalculate_item_weight
                    
                     // Get Sum Total Qualified
                     $sumTotalResult = $this->execute_query_sql([
-                        'sql' => sprintf(
-                            $query,
-                            $idCourse,
-                            $value->useridgrades
-                        )
+                        'sql' => $query,
+                        'params' => [
+                            'courseid' => $idCourse,
+                            'userid' => $value->useridgrades
+                        ]
                     ]);
 
                     $totalQualified = reset($sumTotalResult);
