@@ -146,6 +146,9 @@ class handle_send_uplanner_task
                     $numRows++;
                 }
             }
+            if ($fileCreated) {
+                $this->file->reset_csv(abstract_uplanner_client::FILE_HEADERS);
+            }
             $index_row++;
             $offset += $numRows;
         }
