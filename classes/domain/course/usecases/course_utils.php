@@ -109,9 +109,7 @@ class course_utils
                 'date' => $this->validator->isIsset($formattedDateCreated),
                 'lastModifiedDate' => $this->validator->isIsset($formattedDateModified),
                 'action' => strtoupper($data['dispatch']),
-                'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($grade->grade_item->courseid)),
-                'aggregation' => $this->validator->isIsset($aggregationCategory),
-                'courseid' => $this->validator->isIsset($grade->grade_item->courseid),
+                'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($grade->grade_item->courseid))
             ];
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: '. $e->getMessage(). "\n");
@@ -170,8 +168,8 @@ class course_utils
 
             $dataToSave = [
                 'sectionId' => $this->validator->isIsset($this->utils_service->convertFormatUplanner($queryCourse->shortname)),
-                'evaluationGroupCode' => $this->validator->isIsset($categoryFullName),
-                'evaluationGroupName' => $this->validator->isIsset(substr($categoryItem, 0, 50)),
+                'evaluationGroupCode' => $this->validator->isIsset(strtoupper($categoryFullName)),
+                'evaluationGroupName' => $this->validator->isIsset(strtoupper(substr($categoryItem, 0, 50))),
                 'evaluationId' => $this->validator->isIsset(intval($get_grade_item->id)),
                 'evaluationName' => $this->validator->isIsset($itemName),
                 'weight' => floatval($weight),
