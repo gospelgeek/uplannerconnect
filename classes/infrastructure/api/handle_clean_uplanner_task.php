@@ -157,12 +157,27 @@ class handle_clean_uplanner_task
                 if ($fileCreated) {
                     $this->add_rows_in_file($rows);
                     $this->send_email(self::PREFIX . $uplanner_client->get_email_subject());
+                    $this->file->reset_csv($this->getHeaders());
                 }
                 $offset += count($rows);
             }
         } catch (moodle_exception $e) {
             error_log('handle_remove_success_uplanner_task - process: ' . $e->getMessage() . "\n");
         }
+    }
+
+    /**
+     * Get headers
+     *
+     * @return string[]
+     */
+    private function getHeaders()
+    {
+        $headers = abstract_uplanner_client::FILE_HEADERS;
+        $headers[] = 'is_sucessful';
+        $headers[] = 'ds_error';
+
+        return $headers;
     }
 
     /**
@@ -173,9 +188,7 @@ class handle_clean_uplanner_task
      */
     private function create_file($file_name)
     {
-        $headers = abstract_uplanner_client::FILE_HEADERS;
-        $headers[] = 'is_sucessful';
-        $headers[] = 'ds_error';
+        $headers = $this->getHeaders();
         $this->file = new file($this->task_id, $file_name);
         return $this->file->create_csv($headers);
     }
