@@ -101,16 +101,18 @@ class general_repository
             }
 
             $dataJson = $data['data'];
-
+            $tableName = '{'.$data['table'].'}';
             //Obtener datos en la base de datos
             $dataQuery = $this->moodle_query_handler->executeQuery(
                 sprintf(
                     $data['query'],
-                    $data['table'],
-                    $dataJson['state'],
-                    $dataJson['limit'],
-                    $dataJson['offset']
-                )
+                    $tableName,
+                ),
+                [
+                    "success" => $dataJson['state'],
+                    "max_result" => $dataJson['limit'],
+                    "offset" => $dataJson['offset']
+                ]
             );
         }
         catch (moodle_exception $e) {

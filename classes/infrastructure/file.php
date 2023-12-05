@@ -7,6 +7,8 @@
 
 namespace local_uplannerconnect\infrastructure;
 
+use Exception;
+
 /**
  *  @package  uPlannerConnect
  *  @author Cristian Machado <cristian.machado@correounivalle.edu.co>
@@ -15,6 +17,8 @@ namespace local_uplannerconnect\infrastructure;
  */
 class file
 {
+    const BASE_NAME = '%s_uplanner_template.csv';
+
     /**
      * Directory path files
      *
@@ -30,15 +34,36 @@ class file
     private string $filename;
 
     /**
+     * Virtual name
+     *
+     * @var string $virtual_name
+     */
+    private $virtual_name;
+
+    /**
      * Construct
      *
      * @param $filename
+     * @param $virtual_name
      */
     public function __construct(
-        $filename
+        $filename,
+        $virtual_name
     ) {
         $millis = round(microtime(true) * 1000);
-        $this->filename = str_replace("date", $millis, $filename);
+        $this->filename = sprintf(self::BASE_NAME, $filename);
+        $this->virtual_name = str_replace("date", $millis, $virtual_name);
+
+    }
+
+    /**
+     * Get virtual name
+     *
+     * @return string
+     */
+    public function get_virtual_name()
+    {
+        return $this->virtual_name;
     }
 
     /**
@@ -64,13 +89,11 @@ class file
                 mkdir($this->directory, 0755, true);
             }
             $csv_file = $this->get_path_file();
-            if (!file_exists($csv_file)) {
-                $fp = fopen($csv_file, 'w');
-                fputcsv($fp, $headers);
-                fclose($fp);
-                return true;
-            }
-        } catch (\Exception $e) {
+            $fp = fopen($csv_file, 'w');
+            fputcsv($fp, $headers);
+            fclose($fp);
+            return true;
+        } catch (Exception $e) {
             error_log('create_csv: '. $e->getMessage(). "\n");
         }
 
@@ -93,7 +116,7 @@ class file
                 fclose($fp);
                 return true;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             error_log('add_row: '. $e->getMessage(). "\n");
         }
 
@@ -111,13 +134,16 @@ class file
         try {
             $csv_file = $this->get_path_file();
             if (file_exists($csv_file)) {
-                unlink($csv_file);
+                $fp = fopen($csv_file, 'w');
+                fputcsv($fp, $headers);
+                fclose($fp);
             }
-        } catch (\Exception $e) {
+            return true;
+        } catch (Exception $e) {
             error_log('reset_csv: '.  $e->getMessage(). "\n");
         }
 
-        return $this->create_csv($headers);
+        return false;
     }
 
     /**
@@ -132,7 +158,7 @@ class file
             if (file_exists($csv_file)) {
                 unlink($csv_file);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             error_log('delete_csv: '.  $e->getMessage(). "\n");
         }
     }

@@ -39,10 +39,25 @@ class handle_send_uplanner_task
     private $email;
 
     /**
-     * Construct
+     * @var $task_di
      */
-    public function __construct()
-    {
+    private $task_id;
+
+    /**
+     * @var $current_date
+     */
+    private $current_date;
+
+    /**
+     * Construct
+     *
+     * @param $tasks_id
+     */
+    public function __construct(
+        $tasks_id
+    ) {
+        $this->task_id = $tasks_id;
+        $this->current_date = date("F j, Y, g:i:s a");
         $this->uplanner_client_factory = new uplanner_client_factory();
         $this->email = new email();
     }
@@ -50,9 +65,9 @@ class handle_send_uplanner_task
     /**
      * Handle process send information to uPlanner
      *
-     * @param $state
+     * @param int $state
      * @param int $num_request_by_endpoint
-     * @param $num_rows MAXVALUE: 100
+     * @param int $num_rows MAXVALUE: 100
      * @return void
      */
     public function process(
@@ -60,14 +75,12 @@ class handle_send_uplanner_task
         $num_request_by_endpoint = 1,
         $num_rows = 100
     ) {
-        error_log("------------------------------------------  PROCESS START - FOREACH REPOSITORIES ------------------------------------------ \n");
-        $current_date = date("F j, Y, g:i:s a");
+        error_log('------------------------------------------  PROCESS START - FOREACH REPOSITORIES ------------------------------------------' . PHP_EOL);
         foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
-            error_log("------- CREATE REPOSITORY OBJECT: " . $type . " - " . $repository_class . "\n");
+            error_log('------- CREATE REPOSITORY OBJECT: ' . $type . ' - ' . $repository_class  . PHP_EOL);
             $repository = new $repository_class();
             $uplanner_client = $this->uplanner_client_factory->create($type);
             $this->process_request(
-                $current_date,
                 $uplanner_client,
                 $repository,
                 $state,
@@ -75,11 +88,10 @@ class handle_send_uplanner_task
                 $num_rows
             );
         }
-        error_log("------------------------------------------            PROCESS FINISHED             ------------------------------------------ \n");
+        error_log('------------------------------------------            PROCESS FINISHED             ------------------------------------------' . PHP_EOL);
     }
 
     /**
-     * @param $current_date
      * @param $uplanner_client
      * @param $repository
      * @param $state
@@ -88,7 +100,6 @@ class handle_send_uplanner_task
      * @return void
      */
     public function process_request(
-        $current_date,
         $uplanner_client,
         $repository,
         $state,
@@ -100,32 +111,30 @@ class handle_send_uplanner_task
         }
         $index_row = 0;
         $offset = 0;
-        error_log("********** PROCESS REQUEST - WHILE: \n");
+        error_log('********** PROCESS REQUEST - WHILE: ' . PHP_EOL);
         while ($index_row < $num_request_by_endpoint) {
             $dataQuery = [
                 'state' => $state,
                 'limit' => $num_rows,
-                'offset' => $offset,
+                'offset' => $offset
             ];
-            error_log("DATA QUERY: " . json_encode($dataQuery) . "\n");
+            error_log('DATA QUERY: ' . json_encode($dataQuery)  . PHP_EOL);
             $rows = $repository->getDataBD($dataQuery);
-            error_log("DATA ROWS: " . json_encode($rows) . "\n");
+            error_log('DATA ROWS: ' . json_encode($rows)  . PHP_EOL);
             if (!$rows) {
                 break;
             }
             $response = $this->request($uplanner_client, $rows);
-            error_log("RESPONSE: " . json_encode($response) . "\n");
+            error_log('RESPONSE: ' . json_encode($response)  . PHP_EOL);
             $status = (empty($response) || array_key_exists('error', $response))
                 ? repository_type::STATE_ERROR : repository_type::STATE_SEND;
-            //$fileCreated = $this->create_file($uplanner_client->get_file_name(), $rows, $status);
-            /*if ($fileCreated) {
-                $this->send_email(
-                    $uplanner_client->get_email_subject(),
-                    $current_date
-                );
-            }*/
+            $fileCreated = $this->create_file($uplanner_client->get_file_name(), $rows, $status);
+            error_log('FILE WAS CREATED: ' . $fileCreated  . PHP_EOL);
+            if ($fileCreated) {
+                $this->send_email($uplanner_client->get_email_subject());
+            }
             $numRows = 0;
-            error_log("UPDATE REGISTER STATUS: " . $status . "\n");
+            error_log('UPDATE REGISTER STATUS: ' . $status  . PHP_EOL);
             foreach ($rows as $row) {
                 $dataQuery = [
                     'response' => $response,
@@ -137,9 +146,9 @@ class handle_send_uplanner_task
                     $numRows++;
                 }
             }
-            /*if ($fileCreated) {
-                $this->file->delete_csv();
-            }*/
+            if ($fileCreated) {
+                $this->file->reset_csv(abstract_uplanner_client::FILE_HEADERS);
+            }
             $index_row++;
             $offset += $numRows;
         }
@@ -159,7 +168,7 @@ class handle_send_uplanner_task
             }
             $response = $uplanner_client->request($json);
         } catch (\Exception $e) {
-            error_log('handle_send_uplanner_task - request: ' . $e->getMessage() . "\n");
+            error_log('handle_send_uplanner_task - request: ' . $e->getMessage() . PHP_EOL);
         }
 
         return $response ?? [];
@@ -175,7 +184,7 @@ class handle_send_uplanner_task
      */
     private function create_file($file_name, $rows, $status)
     {
-        $this->file = new file($file_name);
+        $this->file = new file($this->task_id, $file_name);
         $fileCreated = $this->file->create_csv(abstract_uplanner_client::FILE_HEADERS);
         if ($fileCreated) {
             foreach ($rows as $row) {
@@ -194,17 +203,17 @@ class handle_send_uplanner_task
      * Send email
      *
      * @param $subject
-     * @param $current_date
      * @return bool
      */
-    private function send_email($subject, $current_date)
+    private function send_email($subject)
     {
         $recipient_email = 'samuel.ramirez@correounivalle.edu.co';
         return $this->email->send(
             $recipient_email,
             $subject,
-            $current_date,
-            $this->file->get_path_file()
+            $this->current_date,
+            $this->file->get_path_file(),
+            $this->file->get_virtual_name()
         );
     }
 }

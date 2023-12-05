@@ -25,16 +25,17 @@ class email
      * @param $subject
      * @param $current_date
      * @param $attachment_path
+     * @param $attachment_name
      * @return bool
      */
     public function send(
         $recipient_email,
         $subject,
         $current_date,
-        $attachment_path
+        $attachment_path,
+        $attachment_name
     ): bool {
         try {
-            $filename = basename($attachment_path);
             $user = new \stdClass();
             $user->email = $recipient_email;
             $user->id = '000001';
@@ -56,7 +57,7 @@ class email
                 $body,
                 '',
                 $attachment_path,
-                $filename
+                $attachment_name
             );
         } catch (coding_exception $e) {
             error_log('send: '. $e->getMessage(). "\n");

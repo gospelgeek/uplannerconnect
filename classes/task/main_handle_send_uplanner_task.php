@@ -20,6 +20,8 @@ defined('MOODLE_INTERNAL') || die();
 */
 class main_handle_send_uplanner_task extends \core\task\scheduled_task
 {
+    const TASKS_ID = 'send';
+
     /**
      * @inerhitdoc
      * @throws coding_exception
@@ -37,7 +39,7 @@ class main_handle_send_uplanner_task extends \core\task\scheduled_task
         $start_time = microtime();
         mtrace("Update cron started at: " . date('r', $time_now) . "\n");
         try {
-            $handle_task = new handle_send_uplanner_task();
+            $handle_task = new handle_send_uplanner_task(self::TASKS_ID);
             $handle_task->process(repository_type::STATE_DEFAULT);
         } catch (Exception $e) {
             error_log('main_handle_send_uplanner_task - execute: ' . $e->getMessage() . "\n");

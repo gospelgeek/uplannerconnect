@@ -88,7 +88,7 @@ class course_evaluation_structure_repository
         return $this->general_repository->getDataBD([
             'data' => $data,
             'query' => plugin_config::QUERY_SELECT_COURSE_GRADES,
-            'table' => 'mdl_' . self::TABLE
+            'table' => self::TABLE
         ]);
     }
 }

@@ -458,5 +458,36 @@ function xmldb_local_uplannerconnect_upgrade($oldversion): bool {
         // Uplannerconnect savepoint reached.
         upgrade_plugin_savepoint(true, 2023112600, 'local', 'uplannerconnect');
     }
+
+    if ($oldversion < 2023120500) {
+
+        // Define field aggregation to be dropped from uplanner_grades.
+        $table = new xmldb_table('uplanner_grades');
+        $field = new xmldb_field('aggregation');
+
+        // Conditionally launch drop field aggregation.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Uplannerconnect savepoint reached.
+        upgrade_plugin_savepoint(true, 2023120500, 'local', 'uplannerconnect');
+    }
+
+    if ($oldversion < 2023120502) {
+
+        // Define field courseid to be dropped from uplanner_grades.
+        $table = new xmldb_table('uplanner_grades');
+        $field = new xmldb_field('courseid');
+
+        // Conditionally launch drop field courseid.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Uplannerconnect savepoint reached.
+        upgrade_plugin_savepoint(true, 2023120502, 'local', 'uplannerconnect');
+    }
+
     return true;
 }

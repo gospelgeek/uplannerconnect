@@ -11,6 +11,7 @@ use local_uplannerconnect\application\service\data_validator;
 use local_uplannerconnect\application\repository\moodle_query_handler;
 use local_uplannerconnect\plugin_config\plugin_config;
 use local_uplannerconnect\domain\service\transition_endpoint;
+use local_uplannerconnect\domain\service\utils;
 use moodle_exception;
 
 /**
@@ -27,6 +28,7 @@ class course_utils
     private $validator;
     private $moodle_query_handler;
     private $transition_endpoint;
+    private $utils_service;
 
     /**
      *  Construct
@@ -36,6 +38,7 @@ class course_utils
         $this->validator = new data_validator();
         $this->moodle_query_handler = new moodle_query_handler();
         $this->transition_endpoint = new transition_endpoint();
+        $this->utils_service = new utils();
     }
 
     /**
@@ -95,7 +98,7 @@ class course_utils
 
             //información a guardar
             $dataToSave = [
-                'sectionId' => $this->validator->isIsset($this->convertirFormato($queryCourse->shortname)),
+                'sectionId' => $this->validator->isIsset($this->utils_service->convertFormatUplanner($queryCourse->shortname)),
                 'studentCode' => $this->validator->isIsset($queryStudent->username),
                 'evaluationGroupCode' => $this->validator->isIsset($categoryFullName), //Bien
                 'evaluationId' => $this->validator->isIsset(intval($gradeLoadItem->id)),
@@ -106,9 +109,7 @@ class course_utils
                 'date' => $this->validator->isIsset($formattedDateCreated),
                 'lastModifiedDate' => $this->validator->isIsset($formattedDateModified),
                 'action' => strtoupper($data['dispatch']),
-                'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($grade->grade_item->courseid)),
-                'aggregation' => $this->validator->isIsset($aggregationCategory),
-                'courseid' => $this->validator->isIsset($grade->grade_item->courseid),
+                'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($grade->grade_item->courseid))
             ];
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: '. $e->getMessage(). "\n");
@@ -166,9 +167,9 @@ class course_utils
             ]))['result'];
 
             $dataToSave = [
-                'sectionId' => $this->validator->isIsset($this->convertirFormato($queryCourse->shortname)),
-                'evaluationGroupCode' => $this->validator->isIsset($categoryFullName),
-                'evaluationGroupName' => $this->validator->isIsset(substr($categoryItem, 0, 50)),
+                'sectionId' => $this->validator->isIsset($this->utils_service->convertFormatUplanner($queryCourse->shortname)),
+                'evaluationGroupCode' => $this->validator->isIsset(strtoupper($categoryFullName)),
+                'evaluationGroupName' => $this->validator->isIsset(strtoupper(substr($categoryItem, 0, 50))),
                 'evaluationId' => $this->validator->isIsset(intval($get_grade_item->id)),
                 'evaluationName' => $this->validator->isIsset($itemName),
                 'weight' => floatval($weight),
@@ -198,7 +199,7 @@ class course_utils
     }
 
     /**
-     * Retorna el nombre de la categoria
+     * Return name of category
      * 
      * @param object $gradeItem
      * @return string
@@ -206,22 +207,23 @@ class course_utils
     private function getInstanceCategoryName($gradeItem) : string
     {
         $categoryFullName = 'NIVEL000';
-        //validar si existe el metodo
+        // Validate if property exists
         if (property_exists($gradeItem, 'id')) {
             // Ejecutar la consulta.
             $queryResult = $this->moodle_query_handler->executeQuery(sprintf(
                 plugin_config::QUERY_NAME_CATEGORY_GRADE, 
-                'mdl_'.self::TABLE_ITEMS, 
-                'mdl_'.self::TABLE_CATEGORY, 
-                $gradeItem->id
-            ));
-            // Obtener el primer elemento del resultado utilizando reset()
+                '{'.self::TABLE_ITEMS.'}', 
+                '{'.self::TABLE_CATEGORY.'}', 
+                )
+                , ['id' => $gradeItem->id]
+            );
+            // Get first result.
             $firstResult = reset($queryResult);
             if (isset($firstResult->fullname) && 
                 strlen($firstResult->fullname) !== 0 && 
                 $firstResult->fullname !== '?')
             {
-              // Luego, obtén el valor de 'fullname'
+              // get value of 'fullname'
               $categoryFullName = $firstResult->fullname;
             }
         }
@@ -276,10 +278,12 @@ class course_utils
 
         if (in_array($aggration, self::RECALCULATE_AGGREATIONS)) {
             // Execute query sql
-            $maxItemsCourse =  $this->moodle_query_handler->executeQuery((sprintf(
+            $maxItemsCourse =  $this->moodle_query_handler->executeQuery(
                 plugin_config::MAX_ITEM_COURSE,
-                $idCourse
-            )));
+                [
+                    'courseid' => $idCourse
+                ]
+            );
 
             // Get Max Item Course
             $firstMaxItemCourse = reset($maxItemsCourse);
@@ -288,11 +292,13 @@ class course_utils
             $isAggreationSimple = $aggration == self::IS_SIMPLE;
             $query = ($isAggreationSimple)? plugin_config::SUM_TOTAL_GRADE : plugin_config::MAX_STUDENT_GRADE;
             // Get Sum Total Qualified
-            $sumTotalQualified = $this->moodle_query_handler->executeQuery(sprintf(
+            $sumTotalQualified = $this->moodle_query_handler->executeQuery(
                 $query,
-                $idCourse,
-                $student
-            ));
+                [
+                    'courseid' => $idCourse,
+                    'userid' => $student
+                ]
+            );
 
             $resulTotalGrades = reset($sumTotalQualified);
             if ($isAggreationSimple) {  
@@ -369,10 +375,12 @@ class course_utils
         try {
             if (!empty($idCourse)) {
                 // Ejecutar la consulta.
-                $queryResult = $this->moodle_query_handler->executeQuery(sprintf(
-                    plugin_config::AGGREGATION_CATEGORY_FATHER, 
-                    $idCourse
-                ));
+                $queryResult = $this->moodle_query_handler->executeQuery(
+                    plugin_config::AGGREGATION_CATEGORY_FATHER,
+                    [
+                        'courseid' => $idCourse
+                    ]
+                );
                 // Obtener el primer elemento del resultado utilizando reset()
                 $firstResult = reset($queryResult);
                 $aggregationCategory = $firstResult->aggregation ?? 0;
@@ -382,21 +390,4 @@ class course_utils
         }
         return $aggregationCategory;
     }
-
-    private function convertirFormato($cadenaOriginal)
-    {
-        $patron = '/^(\d{2})-(\d{6}[A-Za-z])-(\d{2})-(\d{9})$/';
-        $nuevaCadena = $cadenaOriginal;
-        if (preg_match($patron, $cadenaOriginal, $coincidencias)) {
-            
-            $parte1 = $coincidencias[1];
-            $parte2 = $coincidencias[2];
-            $parte3 = $coincidencias[3];
-            $parte4 = $coincidencias[4];
-    
-            // Construir la nueva cadena en el formato deseado
-            $nuevaCadena = "$parte1-$parte4-$parte2-$parte3";
-        }
-        return $nuevaCadena;
-    }   
 }

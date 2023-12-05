@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/uplannerconnect/db" VERSION="2023113002" COMMENT="XMLDB file for local/uplannerconnect">
+<XMLDB PATH="local/uplannerconnect/db" VERSION="2023120504" COMMENT="XMLDB file for local/uplannerconnect">
     <TABLES>
         <TABLE NAME="uplanner_grades" COMMENT="Se Guardará la información generada por el evento">
             <FIELDS>
@@ -10,8 +10,6 @@
                 <FIELD NAME="success" SEQUENCE="false" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" COMMENT="Éxito (0 o 1)" />
                 <FIELD NAME="ds_error" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Has value when an error occurred while processing the uPlanner record."/>
                 <FIELD NAME="is_sucessful" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="If the uPlanner record was processed successfully it is displayed as 1, otherwise 0"/>
-                <FIELD NAME="aggregation" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="courseid" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id" />
