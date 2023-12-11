@@ -34,6 +34,11 @@ class connection
             $this->getServerName(),
             $this->getOptions()
         );
+        if ($this->connection ) {
+            error_log('********** CONNECTION ESTABLISHED : ' . PHP_EOL);
+        } else{
+            error_log('********** CONNECTION NOT BE ESTABLISHED : ' . json_encode(sqlsrv_errors())  . PHP_EOL);
+        }
     }
 
     /**
