@@ -91,6 +91,7 @@ class handle_clean_uplanner_task
         error_log("------------------------------------------  PROCESS START - FOREACH REPOSITORIES ------------------------------------------ \n");
         $log_id = $this->general_repository->add_log_data();
         foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
+            error_log('------- CREATE REPOSITORY OBJECT: ' . $type . ' - ' . $repository_class  . PHP_EOL);
             $repository = new $repository_class($type);
             $uplanner_client = $this->uplanner_client_factory->create($type);
             $this->start_process_per_repository(
@@ -136,17 +137,22 @@ class handle_clean_uplanner_task
                 return;
             }
             $fileCreated = $this->create_file(self::PREFIX . $uplanner_client->get_file_name());
+            error_log('********** FILE IS CREATED: ' . $fileCreated . PHP_EOL);
             $offset = 0;
+            error_log('********** PROCESS PER REPOSITORY - WHILE: ' . PHP_EOL);
             while (true) {
                 $data = [
                     'state' => repository_type::STATE_SEND,
                     'limit' => $page_size,
                     'offset' => $offset,
                 ];
+                error_log('DATA QUERY: ' . json_encode($data)  . PHP_EOL);
                 $rows = $repository->getDataBD($data);
+                error_log('DATA ROWS: ' . json_encode($rows)  . PHP_EOL);
                 if (!$rows) {
                     break;
                 }
+                error_log('PROCESS - COMPARE LOGS '. PHP_EOL);
                 $this->message_repository->process($repository, $rows);
                 $data = [
                     'state' => repository_type::STATE_SEND,
@@ -155,8 +161,11 @@ class handle_clean_uplanner_task
                 ];
                 $rows = $repository->getDataBD($data);
                 if ($fileCreated) {
+                    error_log('ADD ROWS IN FILE '. PHP_EOL);
                     $this->add_rows_in_file($rows);
+                    error_log('SEND EMAIL '. PHP_EOL);
                     $this->send_email(self::PREFIX . $uplanner_client->get_email_subject());
+                    error_log('RESET FILE '. PHP_EOL);
                     $this->file->reset_csv($this->getHeaders());
                 }
                 $offset += count($rows);
