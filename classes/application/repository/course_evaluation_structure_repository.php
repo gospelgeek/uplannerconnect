@@ -63,15 +63,19 @@ class course_evaluation_structure_repository
     public function saveDataBD(array $data) : void
     {
         $date = $data['date'];
+        $courseid = $data['courseid'];
+
         //remove the date field from the array
         unset($data['date']);
+        unset($data['courseid']);
         $this->general_repository->saveDataBD([
             'data' => [
                 'json' => json_encode($data),
                 'response' => '{"status": "Default response"}',
                 'success' => repository_type::STATE_DEFAULT,
                 'request_type' => $data['action'],
-                'date' => $date
+                'date' => $date,
+                'courseid' =>  $courseid
             ],
             'table' => self::TABLE
         ]);
@@ -88,7 +92,7 @@ class course_evaluation_structure_repository
         return $this->general_repository->getDataBD([
             'data' => $data,
             'query' => plugin_config::QUERY_SELECT_COURSE_GRADES,
-            'table' => 'mdl_' . self::TABLE
+            'table' => self::TABLE
         ]);
     }
 }

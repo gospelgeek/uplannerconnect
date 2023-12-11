@@ -429,5 +429,80 @@ function xmldb_local_uplannerconnect_upgrade($oldversion): bool {
         upgrade_plugin_savepoint(true,2023111315, 'local', 'uplannerconnect');
     }
 
+    if ($oldversion < 2023112000) {
+
+        // Define field aggregation to be added to uplanner_grades.
+        $table = new xmldb_table('uplanner_grades');
+        $field = new xmldb_field('aggregation', XMLDB_TYPE_INTEGER, '20', null, null, null, null, 'is_sucessful');
+
+        // Conditionally launch add field aggregation.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Uplannerconnect savepoint reached.
+        upgrade_plugin_savepoint(true, 2023112000, 'local', 'uplannerconnect');
+    }
+    
+    if ($oldversion < 2023112600) {
+
+        // Define field aggregation to be added to uplanner_grades.
+        $table = new xmldb_table('uplanner_grades');
+        $field = new xmldb_field('courseid', XMLDB_TYPE_INTEGER, '20', null, null, null, null, 'is_sucessful');
+
+        // Conditionally launch add field aggregation.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Uplannerconnect savepoint reached.
+        upgrade_plugin_savepoint(true, 2023112600, 'local', 'uplannerconnect');
+    }
+
+    if ($oldversion < 2023120500) {
+
+        // Define field aggregation to be dropped from uplanner_grades.
+        $table = new xmldb_table('uplanner_grades');
+        $field = new xmldb_field('aggregation');
+
+        // Conditionally launch drop field aggregation.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Uplannerconnect savepoint reached.
+        upgrade_plugin_savepoint(true, 2023120500, 'local', 'uplannerconnect');
+    }
+
+    if ($oldversion < 2023120502) {
+
+        // Define field courseid to be dropped from uplanner_grades.
+        $table = new xmldb_table('uplanner_grades');
+        $field = new xmldb_field('courseid');
+
+        // Conditionally launch drop field courseid.
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        // Uplannerconnect savepoint reached.
+        upgrade_plugin_savepoint(true, 2023120502, 'local', 'uplannerconnect');
+    }
+
+    if ($oldversion < 2023120800) {
+
+        // Define field courseid to be added to uplanner_evaluation.
+        $table = new xmldb_table('uplanner_evaluation');
+        $field = new xmldb_field('courseid', XMLDB_TYPE_INTEGER, '20', null, null, null, null, 'is_sucessful');
+
+        // Conditionally launch add field courseid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Uplannerconnect savepoint reached.
+        upgrade_plugin_savepoint(true, 2023120800, 'local', 'uplannerconnect');
+    }
+
     return true;
 }

@@ -56,10 +56,25 @@ class handle_clean_uplanner_task
     private $general_repository;
 
     /**
-     * Construct
+     * @var $task_di
      */
-    public function __construct()
-    {
+    private $task_id;
+
+    /**
+     * @var $current_date
+     */
+    private $current_date;
+
+    /**
+     * Construct
+     *
+     * @param $tasks_id
+     */
+    public function __construct(
+        $tasks_id
+    ) {
+        $this->task_id = $tasks_id;
+        $this->current_date = date("F j, Y, g:i:s a");
         $this->uplanner_client_factory = new uplanner_client_factory();
         $this->email = new email();
         $this->message_repository = new messages_status_repository();
@@ -73,58 +88,71 @@ class handle_clean_uplanner_task
      * @return void
      */
     public function process($page_size = 1000) {
-        $current_date = date("F j, Y, g:i:s a");
+        error_log("------------------------------------------  PROCESS START - FOREACH REPOSITORIES ------------------------------------------ \n");
         $log_id = $this->general_repository->add_log_data();
         foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
+            error_log('------- CREATE REPOSITORY OBJECT: ' . $type . ' - ' . $repository_class  . PHP_EOL);
             $repository = new $repository_class($type);
             $uplanner_client = $this->uplanner_client_factory->create($type);
             $this->start_process_per_repository(
                 $repository,
                 $uplanner_client,
-                $page_size,
-                $current_date
+                $page_size
             );
         }
+        error_log("------------------------------------------            ADD LOGS (COUNT LOGS)     ------------------------------------------ \n");
         $this->general_repository->add_log_errors_data($log_id);
+        error_log("--------------------------------------DELETE LOGS (success and is_sucessful = 1)------------------------------------------ \n");
         foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
             $repository = new $repository_class($type);
+            // Remove registers with operation complete
             $condition = [
+                'success' => 1,
+                'is_sucessful' => 1
+            ];
+            $this->general_repository->delete_rows($repository::TABLE, $condition);
+            // Remove registers with operation error
+            /*$condition = [
                 'success' => 1,
                 'is_sucessful' => 0
             ];
-            $this->general_repository->delete_rows($repository::TABLE, $condition);
+            $this->general_repository->delete_rows($repository::TABLE, $condition);*/
         }
+        error_log("------------------------------------------            PROCESS FINISHED             ------------------------------------------ \n");
     }
 
     /**
      * @param $repository
      * @param $uplanner_client
      * @param $page_size
-     * @param $current_date
      * @return void
      */
     private function start_process_per_repository(
         $repository,
         $uplanner_client,
-        $page_size,
-        $current_date
+        $page_size
     ) {
         try {
             if ($page_size <= 0) {
                 return;
             }
-            $this->create_file(self::PREFIX . $uplanner_client->get_file_name());
+            $fileCreated = $this->create_file(self::PREFIX . $uplanner_client->get_file_name());
+            error_log('********** FILE IS CREATED: ' . $fileCreated . PHP_EOL);
             $offset = 0;
+            error_log('********** PROCESS PER REPOSITORY - WHILE: ' . PHP_EOL);
             while (true) {
                 $data = [
                     'state' => repository_type::STATE_SEND,
                     'limit' => $page_size,
                     'offset' => $offset,
                 ];
+                error_log('DATA QUERY: ' . json_encode($data)  . PHP_EOL);
                 $rows = $repository->getDataBD($data);
+                error_log('DATA ROWS: ' . json_encode($rows)  . PHP_EOL);
                 if (!$rows) {
                     break;
                 }
+                error_log('PROCESS - COMPARE LOGS '. PHP_EOL);
                 $this->message_repository->process($repository, $rows);
                 $data = [
                     'state' => repository_type::STATE_SEND,
@@ -132,12 +160,14 @@ class handle_clean_uplanner_task
                     'offset' => $offset,
                 ];
                 $rows = $repository->getDataBD($data);
-                $this->add_rows_in_file($rows);
-                $this->send_email(
-                    self::PREFIX . $uplanner_client->get_email_subject(),
-                    $current_date
-                );
-                $this->file->delete_csv();
+                if ($fileCreated) {
+                    error_log('ADD ROWS IN FILE '. PHP_EOL);
+                    $this->add_rows_in_file($rows);
+                    error_log('SEND EMAIL '. PHP_EOL);
+                    $this->send_email(self::PREFIX . $uplanner_client->get_email_subject());
+                    error_log('RESET FILE '. PHP_EOL);
+                    $this->file->reset_csv($this->getHeaders());
+                }
                 $offset += count($rows);
             }
         } catch (moodle_exception $e) {
@@ -146,18 +176,30 @@ class handle_clean_uplanner_task
     }
 
     /**
-     * Create and add rows in file
+     * Get headers
      *
-     * @param $file_name
-     * @return void
+     * @return string[]
      */
-    private function create_file($file_name)
+    private function getHeaders()
     {
         $headers = abstract_uplanner_client::FILE_HEADERS;
         $headers[] = 'is_sucessful';
         $headers[] = 'ds_error';
-        $this->file = new file($file_name);
-        $this->file->create_csv($headers);
+
+        return $headers;
+    }
+
+    /**
+     * Create and add rows in file
+     *
+     * @param $file_name
+     * @return bool
+     */
+    private function create_file($file_name)
+    {
+        $headers = $this->getHeaders();
+        $this->file = new file($this->task_id, $file_name);
+        return $this->file->create_csv($headers);
     }
 
     /**
@@ -183,17 +225,17 @@ class handle_clean_uplanner_task
      * Send email
      *
      * @param $subject
-     * @param $current_date
      * @return bool
      */
-    private function send_email($subject, $current_date): bool
+    private function send_email($subject): bool
     {
         $recipient_email = 'samuel.ramirez@correounivalle.edu.co';
         return $this->email->send(
             $recipient_email,
             $subject,
-            $current_date,
-            $this->file->get_path_file()
+            $this->current_date,
+            $this->file->get_path_file(),
+        $this->file->get_virtual_name()
         );
     }
 }

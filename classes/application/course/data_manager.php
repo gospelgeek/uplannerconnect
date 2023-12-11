@@ -53,12 +53,14 @@ class data_manager
             $dataRepository = $this->courseExtractionData->getResource($data);
             // Traducir los datos.
             $dataTrasnform = $this->courseTranslationData->converDataJsonUplanner($dataRepository);
-            // Enviar los datos a uPlanner.
-            $this->saveResource($dataTrasnform);
-            error_log('UplannerConnect: Successful event registration -'. $data['typeEvent']. "\n");
+            if ($dataTrasnform !== []) {
+              // Enviar los datos a uPlanner.
+              $this->saveResource($dataTrasnform);
+              error_log('UplannerConnect: Successful event registration -'. $data['typeEvent']. "\n");
+            }
         }
         catch (moodle_exception $e) {
-            error_log('Excepción capturada: 444444' . $e->getMessage() . "\n");
+            error_log('Excepción capturada: ' . $e->getMessage() . "\n");
         }
     }
 

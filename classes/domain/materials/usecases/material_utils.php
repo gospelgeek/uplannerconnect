@@ -11,6 +11,7 @@ use local_uplannerconnect\application\service\data_validator;
 use local_uplannerconnect\application\repository\moodle_query_handler;
 use local_uplannerconnect\plugin_config\plugin_config;
 use local_uplannerconnect\domain\service\transition_endpoint;
+use local_uplannerconnect\domain\service\utils;
 use moodle_exception;
 
 /**
@@ -22,7 +23,8 @@ class material_utils
 
     private $validator;
     private $moodle_query_handler;
-    private $transition_endpoint; 
+    private $transition_endpoint;
+    private $utils_service;
 
     /**
      *  Construct
@@ -32,6 +34,7 @@ class material_utils
         $this->validator = new data_validator();
         $this->moodle_query_handler = new moodle_query_handler();
         $this->transition_endpoint = new transition_endpoint();
+        $this->utils_service = new utils();
     }
 
     /**
@@ -45,7 +48,7 @@ class material_utils
         try {
             if (empty($data['dataEvent'])) {
                 error_log('No le llego la información del evento user_graded');
-                return $arraySend;
+                return $dataToSave;
             }
 
             //Traer la información
@@ -77,8 +80,8 @@ class material_utils
                 'name' => $this->validator->isIsset($nameFile),
                 'type' => $this->validator->isIsset($typeFile),
                 'url' => $this->validator->isIsset($url),
-                'blackboardSectionId' => $this->validator->isIsset($queryCourse->shortname),
-                'size' => $sizeFile, 
+                'blackboardSectionId' => $this->validator->isIsset($this->utils_service->convertFormatUplanner($queryCourse->shortname)),
+                'size' => intval($sizeFile), 
                 'lastUpdatedTime' => $this->validator->isIsset($formattedDateCreated),
                 'action' => strtoupper($data['dispatch']),
                 'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($courseid)),

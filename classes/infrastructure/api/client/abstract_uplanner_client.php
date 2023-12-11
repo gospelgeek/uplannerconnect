@@ -115,7 +115,7 @@ class abstract_uplanner_client
 
     /**
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
     public function get_token()
     {
@@ -127,7 +127,7 @@ class abstract_uplanner_client
             $headers = [
                 'Content-Type: application/json'
             ];
-            $this->add_log_before_request('POST', $headers, $data);
+            $this->add_log_before_request('POST', $this->token_url, $headers, $data);
             $this->curl_wrapper->set_header($headers);
             $response = $this->curl_wrapper->post($this->token_url, $data);
             $code = $this->curl_wrapper->get_code();
@@ -137,7 +137,14 @@ class abstract_uplanner_client
             } else {
                 $this->token = '';
             }
-            $this->add_log_after_request('POST', $headers, $data, $code, $response);
+            $this->add_log_after_request(
+                'POST',
+                $this->token_url,
+                $headers,
+                $data,
+                $code,
+                $response
+            );
         }
 
         return $this->token;
@@ -165,7 +172,7 @@ class abstract_uplanner_client
             'Customer: AllMessages'
         ];
         $endpoint = $this->get_endpoint();
-        $this->add_log_before_request('POST', $headers, $data);
+        $this->add_log_before_request('POST', $endpoint, $headers, $data);
         $this->curl_wrapper->set_header($headers);
         $response = $this->curl_wrapper->post($endpoint, $data);
         $code = $this->curl_wrapper->get_code();
@@ -177,7 +184,14 @@ class abstract_uplanner_client
                 'error' => json_encode($response)
             ];
         }
-        $this->add_log_after_request('POST', $headers, $data, $code, $result);
+        $this->add_log_after_request(
+            'POST',
+            $endpoint,
+            $headers,
+            $data,
+            $code,
+            $result
+        );
 
         return $result;
     }
@@ -201,22 +215,23 @@ class abstract_uplanner_client
      * Add log before request
      *
      * @param $method
-     * @param $data
+     * @param $url
      * @param $headers
+     * @param $data
      * @return void
      */
-    public function add_log_before_request($method, $headers, $data)
+    public function add_log_before_request($method, $url, $headers, $data)
     {
         try {
             $data_request = [
                 'topic' => $this->topic,
-                'url' => $this->token_url,
+                'url' => $url,
                 'method' => $method,
-                'data' => $data,
+                //'data' => $data,
                 'headers' => $headers
             ];
             $this->add_log('***** uPlanner - before request data: ', $data_request);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             error_log('add_log_before_request: ' . $e->getMessage());
         }
     }
@@ -225,6 +240,7 @@ class abstract_uplanner_client
      * Add log after request
      *
      * @param $method
+     * @param $url
      * @param $headers
      * @param $data
      * @param $code
@@ -233,6 +249,7 @@ class abstract_uplanner_client
      */
     public function add_log_after_request(
         $method,
+        $url,
         $headers,
         $data,
         $code,
@@ -240,15 +257,15 @@ class abstract_uplanner_client
     ) {
         try {
             $data_request = [
-                'url' => $this->token_url,
+                'url' => $url,
                 'method' => $method,
-                'data' => $data,
+                //'data' => $data,
                 'headers' => $headers,
                 'code' => $code,
                 'response' => $response
             ];
             $this->add_log('***** uPlanner - after request data: ', $data_request);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             error_log('add_log_after_request: ' . $e->getMessage());
         }
     }

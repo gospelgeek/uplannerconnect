@@ -9,12 +9,14 @@ namespace local_uplannerconnect\infrastructure\event;
 
 use local_uplannerconnect\domain\management_factory;
 use local_uplannerconnect\application\service\event_access_validator;
+use local_uplannerconnect\application\service\filter_evaluation_update;
 use local_uplannerconnect\application\repository\moodle_query_handler;
+use local_uplannerconnect\domain\service\recalculate_item_weight; 
+use local_uplannerconnect\plugin_config\plugin_config;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
-const LAST_INSERT_EVALUATION = "SELECT date,json FROM mdl_uplanner_evaluation ORDER BY id DESC limit 1";
 const ITEMTYPE_UPDATE = 'course';
 const IS_ITEM_UPDATE = 'UPDATED';
 
@@ -131,6 +133,7 @@ class handle_event_course_notes
             //valida si la facultad tiene acceso
             if (!validateAccesFaculty($event)) { return; }
                if ($isTotalItem) {
+                  recalculatesWeight($event);
                   //Instanciar la clase management_factory
                   instantiatemanagement_factory([
                      "dataEvent" => $event,
@@ -184,7 +187,7 @@ class handle_event_course_notes
     * Resource created
     */
    public static function course_module_created($event)
-   {  
+   {
       try {
             if (validateAccessTypeEvent([
                "dataEvent" => $event,
@@ -476,97 +479,38 @@ class handle_event_course_notes
 }
 
 /**
-  * Verifica si el evento no es un duplicado
-  */
-function filterRecentUpdate($event)
+ * Filter recent update
+ */
+function filterRecentUpdate($event) 
 {
    try {
-         $query = new moodle_query_handler();
-         $evaluation = $query->executeQuery(LAST_INSERT_EVALUATION);
-         
-         if (!empty($evaluation)) { 
-            //obeter el primer resultado
-            $firstResult = reset($evaluation);
-            //obtener el json
-            $evaluationLast = (json_decode($firstResult->json));
-            $date = intval($firstResult->date);
-            $dataEvent = $event->get_data();
-            //obtener el primer grupo de evaluaciones
-            $evaluationGroups = ($evaluationLast->evaluationGroups)[0];
-            //obtener la primera evaluacion
-            $evaluationsData  = ($evaluationGroups->evaluations)[0];
-            $validateUpdateNew = isUpdateItem([
-               "dataEvent" => $dataEvent,
-               "evaluationLast" => $evaluationLast,
-               "evaluationsData" => $evaluationsData,
-               "date" => $date
-            ]);
-            $isTotalItem = isTotalItem($event->get_grade_item());
-            $itemActions = strtolower($evaluationLast->action.'d');
+         // Instance filter_evaluation_update.
+         $filter_evaluation_update = new filter_evaluation_update();
+         $isFilter = $filter_evaluation_update->filterRecentUpdate($event);
 
-            // Validar si la evaluacion es diferente
-            if (($itemActions !== $dataEvent['action'] &&
-                 $evaluationsData->evaluationId === $dataEvent['objectid']) ||
-                 $validateUpdateNew
-            ) {
-                 if ($isTotalItem) {
-                     //Instanciar la clase management_factory
-                     instantiatemanagement_factory([
-                        "dataEvent" => $event,
-                        "typeEvent" => "grade_item_created",
-                        "dispatch" => "update",
-                        "enum_etities" => 'evaluation_structure'
-                     ]);
-                  }
-            }
-         }
+         if ($isFilter) {
+            // Instanciar la clase management_factory.
+            instantiatemanagement_factory([
+               "dataEvent" => $event,
+               "typeEvent" => "grade_item_created",
+               "dispatch" => "update",
+               "enum_etities" => 'evaluation_structure'
+            ]);
+         } 
+
    } catch (moodle_exception $e) {
       error_log('Excepción capturada: '. $e->getMessage(). "\n");
    }
 }
 
+/**
+ *  Validate if the grade item is total
+ */
 function isTotalItem($grade_item)
 {
-   $isTotalItem = true;
-   // grade item
-   $grade_item_load = $grade_item ?? null; 
-   // Verificate if the grade item is not null
-   if ($grade_item_load !== null) {
-      $categoryId = $grade_item_load->categoryid ?? 0;
-      $itemType = $grade_item_load->itemtype ?? '';
-      // Verificate if the grade item is total
-      $isTotalItem = !($categoryId === 0 &&
-                       $itemType === ITEMTYPE_UPDATE);
-   }
-
-   return $isTotalItem;
-}
-
-function isUpdateItem(array $data)
-{
-   $dataEvent = $data['dataEvent'];
-   $evaluationLast = $data['evaluationLast'];
-   $evaluationsData = $data['evaluationsData'];
-   $date = $data['date'];
-   $validateUpdateNew = false;
-
-   if (key_exists('objectid', $dataEvent) &&
-       key_exists('timecreated', $dataEvent))
-   {
-      if ($evaluationsData->evaluationId !== 
-         $dataEvent['objectid']) {
-         $validateUpdateNew = (
-            $evaluationLast->action.'D' === IS_ITEM_UPDATE
-         );
-      } else {
-         $validateUpdateNew = (
-            $evaluationLast->action.'D' === IS_ITEM_UPDATE &&
-            $date !== $dataEvent['timecreated']
-         );
-      }
-   } 
-   return $validateUpdateNew;
-}
+   $filter_evaluation_update = new filter_evaluation_update();
+   return $filter_evaluation_update->isTotalItem($grade_item);
+}  
 
 /** 
  * Instancia el factory   
@@ -643,4 +587,57 @@ function validateAccesFaculty($data) : bool
       error_log('Excepción capturada: '. $e->getMessage(). "\n");
    }
    return false;
+}
+
+/**
+ * Recalculate weight
+ */
+function recalculatesWeight($data) : void
+{
+   try {
+         $dataItem = $data->get_data();
+         $idCourse = $dataItem['courseid'];
+         $recalculate_aggreations = [11 , 6];
+         $aggregationCategory = getAggreationCategory($idCourse);
+         $get_grade_item = ($data->get_grade_item());
+
+         if (in_array($aggregationCategory, $recalculate_aggreations) &&
+            $get_grade_item->itemtype !== 'category'
+         ) {
+            $recalculate_item_weight = new recalculate_item_weight();
+            $recalculate_item_weight->recalculate_weight_evaluation([
+               "event" => $data,
+               "aggregationCategory" => $aggregationCategory,
+            ]);
+         }
+   }
+   catch (moodle_exception $e) {
+      error_log('Excepción capturada: '. $e->getMessage(). "\n");
+   }
+}
+
+/**
+ * Return aggregation category
+   */
+function getAggreationCategory($idCourse)
+{
+   $aggregationCategory = 0;
+   try {
+      if (!empty($idCourse)) {
+            // Ejecutar la consulta.
+            $moodle_query_handler = new moodle_query_handler();
+            $queryResult = $moodle_query_handler->executeQuery(
+               plugin_config::AGGREGATION_CATEGORY_FATHER, 
+               [
+                  "courseid" => $idCourse
+               ]
+            );
+            // Obtener el primer elemento del resultado utilizando reset()
+            $firstResult = reset($queryResult);
+            $aggregationCategory = $firstResult->aggregation ?? 0;
+      }
+   } catch (moodle_exception $e) {
+      error_log('Excepción capturada: '. $e->getMessage(). "\n");
+   }
+   return $aggregationCategory;
 }

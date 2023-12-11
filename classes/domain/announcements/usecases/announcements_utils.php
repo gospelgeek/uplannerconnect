@@ -10,7 +10,8 @@ namespace local_uplannerconnect\domain\announcements\usecases;
 use local_uplannerconnect\application\service\data_validator;
 use local_uplannerconnect\application\repository\moodle_query_handler;
 use local_uplannerconnect\plugin_config\plugin_config;
-use local_uplannerconnect\domain\service\transition_endpoint; 
+use local_uplannerconnect\domain\service\transition_endpoint;
+use local_uplannerconnect\domain\service\utils;
 use moodle_exception;
 
 /**
@@ -24,6 +25,7 @@ class announcements_utils
     private $validator;
     private $moodle_query_handler;
     private $transition_endpoint;
+    private $utils_service;
 
     /**
      *  Construct
@@ -33,11 +35,13 @@ class announcements_utils
         $this->validator = new data_validator();
         $this->moodle_query_handler = new moodle_query_handler();
         $this->transition_endpoint = new transition_endpoint();
+        $this->utils_service = new utils();
     }
 
     /**
-     * Retorna los datos del evento user_graded
+     * Return data user_graded
      *
+     * @param array $data
      * @return array
      */
     public function createdAnnouncementResources(array $data) : array
@@ -46,7 +50,7 @@ class announcements_utils
         try {
             if (empty($data['dataEvent'])) {
                 error_log('No le llego la información del evento user_graded');
-                return $arraySend;
+                return $dataToSave;
             }
 
             // Get data.
@@ -56,20 +60,20 @@ class announcements_utils
             $dataCourse = $this->getDataCourse($courseid);
             $dateCreated = $this->validator->isIsset($dataEvent['timecreated']);
             $idForum = $this->validator->isIsset($dataEvent['objectid']);
-            $isMensaage = $this->isMessageCreated($dataEvent);
+            $isMessage = $this->isMessageCreated($dataEvent);
             $createdDate = date('Y-m-d', $dateCreated);
             $createdTime = date('H:i:s', $dateCreated);
             $dataForum = $this->getDataForum([
                 'forumid' => $idForum,
-                'key' => $isMensaage ? 'id' : 'discussion',
+                'key' => $isMessage ? 'id' : 'discussion',
             ]);
 
             // Get data user.
             $idUserForum = $this->validator->isIsset($dataForum->userid);
-            $nameUser = $this->getNameUser($idUserForum);
+            $nameUser = $this->utils_service->getUserNameTeacher($courseid);
 
             $dataToSave = [
-                'blackboardSectionId' => $this->validator->isIsset($dataCourse->shortname),
+                'blackboardSectionId' => $this->validator->isIsset($this->utils_service->convertFormatUplanner($dataCourse->shortname)),
                 'id' => $this->validator->isIsset(strval($idForum)),
                 'createdDate' => $this->validator->isIsset($createdDate),
                 'createdTime' => $this->validator->isIsset($createdTime),
@@ -81,7 +85,7 @@ class announcements_utils
                 'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($courseid)),
             ];
         } catch (moodle_exception $e) {
-            error_log('Excepción capturada: '. $e->getMessage(). "\n");
+            error_log('Exception capturada: '. $e->getMessage(). "\n");
         }
         return $dataToSave;
     }
@@ -144,37 +148,9 @@ class announcements_utils
                 }
             }
         } catch (moodle_exception $e) {
-            error_log('Excepción capturada: '. $e->getMessage(). "\n");
+            error_log('Exception capturada: '. $e->getMessage(). "\n");
         }
         return $data;
-    }
-
-    /**
-     * Return name of user
-     */
-    private function getNameUser($userid) : string
-    {
-        $name = '';
-        try {
-            if (!empty($userid)) {
-                            
-                $data = $queryCourse = ($this->validator->verifyQueryResult([                        
-                    'data' => $this->moodle_query_handler->extract_data_db([
-                        'table' => self::TABLE_USER,
-                        'conditions' => [
-                            'id' => $this->validator->isIsset($userid)
-                        ]
-                    ])
-                ]))['result'];
-
-                if (!empty($data)) {
-                    $name = $data->firstname . ' ' . $data->lastname;
-                }
-            }
-        } catch (moodle_exception $e) {
-            error_log('Excepción capturada: '. $e->getMessage(). "\n");
-        }
-        return $name;
     }
 
     /**

@@ -8,11 +8,11 @@
 namespace local_uplannerconnect\domain\course;
 
 use local_uplannerconnect\application\service\data_validator;
-use local_uplannerconnect\plugin_config\plugin_config;
+use local_uplannerconnect\plugin_config\estruture_types;
 use moodle_exception;
 
 /**
-   * Instancia una entidad de acorde a la funcionalidad que se requiera
+   * Instantiate an entity according to the functionality required.
 */
 class course_translation_data
 {
@@ -32,7 +32,7 @@ class course_translation_data
     }
 
     /**
-     * Convierte los datos acorde al evento que se requiera
+     * Convert the data according to the required event.
      *
      * @param array $data
      * @return array
@@ -48,7 +48,7 @@ class course_translation_data
                 //Traer la información
                 $typeTransform = $this->typeTransform[$data['typeEvent']];
                 //verificar si existe el método
-                if (method_exists($this, $typeTransform)) {
+                if (method_exists($this, $typeTransform) && $data['data'] !== []) {
                     $arraySend = $this->$typeTransform($data['data']);
                 }
             }
@@ -60,7 +60,7 @@ class course_translation_data
     }
 
     /**
-     * Crea un array con la estructura que requiere uPlanner
+     * Create an array with the structure required by uPlanner
      *
      * @param array $data
      * @return array
@@ -70,7 +70,7 @@ class course_translation_data
         $arraySend = [];
         try {
             $dataSend = $this->validator->verifyArrayKeyExist([
-                'array_verification' => plugin_config::UPLANNER_EVALUATION_ESTRUTURE,
+                'array_verification' => estruture_types::UPLANNER_EVALUATION_ESTRUTURE,
                 'data' => $data
             ]);
             
@@ -92,7 +92,8 @@ class course_translation_data
             ],
             "action" => $dataSend['action'],
             "date" => $dataSend['date'],
-            "transactionId" => $dataSend['transactionId']
+            "transactionId" => $dataSend['transactionId'],
+            "courseid" => $dataSend['courseid']
             ];
         }
         catch (moodle_exception $e) {
@@ -102,7 +103,7 @@ class course_translation_data
     }
 
     /**
-     *  Crea un array con la estructura que requiere uPlanner
+     * Create an array with the structure required by uPlanner.
      *
      * @param array $data
      * @return array
@@ -112,7 +113,7 @@ class course_translation_data
         $arraySend = [];
         try {
             $dataSend = $this->validator->verifyArrayKeyExist([ 
-                'array_verification' => plugin_config::UPLANNER_GRADES,
+                'array_verification' => estruture_types::UPLANNER_GRADES,
                 'data' => $data 
             ]);
             
