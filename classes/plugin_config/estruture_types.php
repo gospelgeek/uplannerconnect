@@ -44,6 +44,7 @@ class estruture_types
         ['name' => 'action', 'type' => 'string'],
         ['name' => 'date', 'type' => 'string'],
         ['name' => 'transactionId', 'type' => 'numeric'],
+        ['name' => 'courseid', 'type' => 'numeric'],
     ];
 
     const UPLANNER_MATERIALS_ESTRUTURE = [

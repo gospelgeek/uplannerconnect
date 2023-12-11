@@ -70,7 +70,7 @@ class announcements_utils
 
             // Get data user.
             $idUserForum = $this->validator->isIsset($dataForum->userid);
-            $nameUser = $this->getNameUser($idUserForum);
+            $nameUser = $this->utils_service->getUserNameTeacher($courseid);
 
             $dataToSave = [
                 'blackboardSectionId' => $this->validator->isIsset($this->utils_service->convertFormatUplanner($dataCourse->shortname)),
@@ -151,34 +151,6 @@ class announcements_utils
             error_log('Exception capturada: '. $e->getMessage(). "\n");
         }
         return $data;
-    }
-
-    /**
-     * Return name of user
-     */
-    private function getNameUser($userid) : string
-    {
-        $name = '';
-        try {
-            if (!empty($userid)) {
-                            
-                $data = $queryCourse = ($this->validator->verifyQueryResult([                        
-                    'data' => $this->moodle_query_handler->extract_data_db([
-                        'table' => self::TABLE_USER,
-                        'conditions' => [
-                            'id' => $this->validator->isIsset($userid)
-                        ]
-                    ])
-                ]))['result'];
-
-                if (!empty($data)) {
-                    $name = $data->firstname . ' ' . $data->lastname;
-                }
-            }
-        } catch (moodle_exception $e) {
-            error_log('Exception capturada: '. $e->getMessage(). "\n");
-        }
-        return $name;
     }
 
     /**

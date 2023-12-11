@@ -64,15 +64,7 @@ class course_utils
             $categoryItem = $this->getInstanceCategoryName($gradeLoadItem);
             $categoryFullName = $this->shortCategoryName($categoryItem); 
             $approved = $this->getApprovedItem($gradeLoadItem, $grade);
-
-            $queryStudent = $this->validator->verifyQueryResult([
-                'data' => $this->moodle_query_handler->extract_data_db([
-                    'table' => plugin_config::TABLE_USER_MOODLE,
-                    'conditions' => [
-                        'id' => $this->validator->isIsset($grade->userid)
-                    ]
-                ]) 
-            ])['result'];
+            $studentCode = $this->utils_service->getIdentificationUser($this->validator->isIsset($grade->userid));
              
             $queryCourse = ($this->validator->verifyQueryResult([                        
                 'data' => $this->moodle_query_handler->extract_data_db([
@@ -96,21 +88,23 @@ class course_utils
                 'student' => $grade->userid
             ]));
 
-            //información a guardar
-            $dataToSave = [
-                'sectionId' => $this->validator->isIsset($this->utils_service->convertFormatUplanner($queryCourse->shortname)),
-                'studentCode' => $this->validator->isIsset($queryStudent->username),
-                'evaluationGroupCode' => $this->validator->isIsset($categoryFullName), //Bien
-                'evaluationId' => $this->validator->isIsset(intval($gradeLoadItem->id)),
-                'average' => $this->validator->isIsset(strval($weightGrade)),
-                'isApproved' => $this->validator->isIsset($approved),
-                'value' => $this->validator->isIsset(strval(($getData['other'])['finalgrade'])),
-                'evaluationName' => $this->validator->isIsset($gradeLoadItem->itemname),
-                'date' => $this->validator->isIsset($formattedDateCreated),
-                'lastModifiedDate' => $this->validator->isIsset($formattedDateModified),
-                'action' => strtoupper($data['dispatch']),
-                'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($grade->grade_item->courseid))
-            ];
+            if ($studentCode !== '') {
+                //información a guardar
+                $dataToSave = [
+                    'sectionId' => $this->validator->isIsset($this->utils_service->convertFormatUplanner($queryCourse->shortname)),
+                    'studentCode' => $this->validator->isIsset($studentCode),
+                    'evaluationGroupCode' => $this->validator->isIsset($categoryFullName),
+                    'evaluationId' => $this->validator->isIsset(intval($gradeLoadItem->id)),
+                    'average' => $this->validator->isIsset(strval($weightGrade)),
+                    'isApproved' => $this->validator->isIsset($approved),
+                    'value' => $this->validator->isIsset(strval(($getData['other'])['finalgrade'])),
+                    'evaluationName' => $this->validator->isIsset($gradeLoadItem->itemname),
+                    'date' => $this->validator->isIsset($formattedDateCreated),
+                    'lastModifiedDate' => $this->validator->isIsset($formattedDateModified),
+                    'action' => strtoupper($data['dispatch']),
+                    'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($grade->grade_item->courseid))
+                ];
+           }
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
@@ -176,6 +170,7 @@ class course_utils
                 'action' => strtoupper($data['dispatch']),
                 "date" => $this->validator->isIsset(strval($dataEvent['timecreated'])),
                 'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($get_grade_item->courseid)),
+                'courseid' => $this->validator->isIsset($get_grade_item->courseid)
             ];
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: '. $e->getMessage(). "\n");
