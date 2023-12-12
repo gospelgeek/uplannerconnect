@@ -70,7 +70,7 @@ class messages_status_repository
                 });
                 $message = reset($filtered_messages);
                 $is_successful = 0;
-                $ds_error = 'Error invalid data';
+                $ds_error = 'Connection failed, error invalid data';
                 if ($message) {
                     if (($message['is_successful'] === 1 || $message['is_successful'] === '1')) {
                         $ds_error = '';
