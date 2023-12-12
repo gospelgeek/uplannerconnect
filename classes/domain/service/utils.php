@@ -16,7 +16,7 @@ use moodle_exception;
  */
 class utils
 {
-    const IDENTIFICATION_USER = "SELECT fieldid FROM {user_info_data} WHERE userid = :userid ORDER BY id DESC LIMIT 1";
+    const IDENTIFICATION_USER = "SELECT data FROM {user_info_data} WHERE userid = :userid AND fieldid = 11 ORDER BY id DESC LIMIT 1";
     const GET_TEACHER_USERNAME = "SELECT username 
                                   FROM {user} AS t1 
                                   INNER JOIN {role_assignments} AS t2 
@@ -78,7 +78,7 @@ class utils
                     'userid' => $userId
                 ]
             ]);
-            if (!empty($result)) {$userIdentification = strval($result->fieldid);}
+            if (!empty($result)) {$userIdentification = strval($result->data);}
         }
         return $userIdentification;
     }
