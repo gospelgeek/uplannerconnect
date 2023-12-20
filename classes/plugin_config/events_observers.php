@@ -59,20 +59,20 @@ class events_observers
             'isForum' => true,
             'includefile' => self::ROUTE_HANDLER_EVENT_1,
         ],
-        [
-            'eventname' => '\mod_forum\event\post_created',
-            'isForum' => true,
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ],
+        // [
+        //     'eventname' => '\mod_forum\event\post_created',
+        //     'isForum' => true,
+        //     'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        // ],
         [
             'eventname' => '\mod_forum\event\post_updated',
             'isForum' => true,
             'includefile' => self::ROUTE_HANDLER_EVENT_1,
         ],
-        [
-            'eventname' => '\mod_forum\event\post_deleted',
-            'isForum' => true,
-            'includefile' => self::ROUTE_HANDLER_EVENT_1,
-        ]
+        // [
+        //     'eventname' => '\mod_forum\event\post_deleted',
+        //     'isForum' => true,
+        //     'includefile' => self::ROUTE_HANDLER_EVENT_1,
+        // ]
     ];
 }

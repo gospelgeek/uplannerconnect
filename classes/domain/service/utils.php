@@ -24,7 +24,7 @@ class utils
                                   INNER JOIN {context} AS t3 
                                   ON t2.contextid = t3.id 
                                   WHERE t3.instanceid = :courseid
-                                  AND t2.roleid = 3 
+                                  AND t2.roleid IN (2, 3)
                                   ORDER BY t2.id DESC LIMIT 1";
 
     private $moodle_query_handler;
