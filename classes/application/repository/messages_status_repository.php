@@ -66,7 +66,7 @@ class messages_status_repository
                 $message = reset($filtered_messages);
                 $is_successful = 0;
                 $ds_error = 'Connection failed, error invalid data';
-                $state = $json->success;
+                $state = $row->success;
                 if ($message) {
                     if (($message['is_successful'] === 1 || $message['is_successful'] === '1')) {
                         $ds_error = '';
@@ -76,7 +76,7 @@ class messages_status_repository
                         $state = repository_type::STATE_UP_ERROR;
                     }
                 }
-                error_log(' --- UV LOG: ' . json_encode($json)  . PHP_EOL);
+                error_log(' --- UV LOG: ' . json_encode($row)  . PHP_EOL);
                 error_log(' --- UP LOG: ' . json_encode($message)  . PHP_EOL);
                 $data = [
                     'success' => $state,
