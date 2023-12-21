@@ -3,7 +3,7 @@
  * Moodle CLI script - clean_uplanner_logs.php
  *
  * @package     local_uplannerconnect
- * @copyright   2023 Daniel Eduardo Dorado Pérez <doradodaniel14@gmail.com>
+ * @copyright   Daniel Eduardo Dorado Pérez <doradodaniel14@gmail.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

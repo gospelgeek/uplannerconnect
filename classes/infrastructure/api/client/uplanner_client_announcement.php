@@ -21,7 +21,7 @@ class uplanner_client_announcement extends abstract_uplanner_client
     /**
      * @inerhitdoc
      */
-    protected string $email_subject = 'upllaner_email_subject_anounciente';
+    protected string $email_subject = 'uplanner_email_subject_anounciente';
 
     /**
      * @inerhitdoc

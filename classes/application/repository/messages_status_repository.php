@@ -45,21 +45,21 @@ class messages_status_repository
      *
      * @return void
      */
-    public function process($repository, $rows)
+    public function process($repository, $rows, $log)
     {
-        error_log('------------------------------------------  PROCESS START - UPLANNER QUERY ------------------------------------------' . PHP_EOL);
+        error_log('------------------------------------------  PROCESS START - UPLANNER QUERY ------------------------------------------');
         try {
             $uv_transactions = $this->get_uv_transactions($rows);
-            error_log(' --- UV TRANSACTIONS: ' . json_encode($uv_transactions)  . PHP_EOL);
+            $log->add_line(' --- UV TRANSACTIONS: ' . json_encode($uv_transactions));
             $up_messages = $this->get_list_by_transactions(
                 $uv_transactions
             );
-            error_log(' --- UP MESSAGES: ' . json_encode($up_messages)  . PHP_EOL);
-            error_log(' ---------------- FOREACH - COMPARE LOGS: '  . PHP_EOL);
+            $log->add_line(' --- UP MESSAGES: ' . json_encode($up_messages));
+            $log->add_line(' ---------------- FOREACH - COMPARE LOGS: ');
             foreach ($rows as $row) {
                 $json = json_decode($row->json, true);
                 $id_transaction = intval($json['transactionId']);
-                error_log(' --- TRANSACTION ID: ' . $id_transaction  . PHP_EOL);
+                $log->add_line(' --- TRANSACTION ID: ' . $id_transaction  . PHP_EOL);
                 $filtered_messages = array_filter($up_messages, function ($message) use ($id_transaction) {
                     return $message['id_transaction'] == $id_transaction;
                 });
@@ -76,19 +76,19 @@ class messages_status_repository
                         $state = repository_type::STATE_UP_ERROR;
                     }
                 }
-                error_log(' --- UV LOG: ' . json_encode($row)  . PHP_EOL);
-                error_log(' --- UP LOG: ' . json_encode($message)  . PHP_EOL);
+                $log->add_line(' --- UV LOG: ' . json_encode($row));
+                $log->add_line(' --- UP LOG: ' . json_encode($message));
                 $data = [
                     'success' => $state,
                     'is_sucessful' => $is_successful,
                     'ds_error' => $ds_error,
                     'id' => $row->id
                 ];
-                error_log(' --- UV UPDATE: ' . json_encode($data)  . PHP_EOL);
+                $log->add_line(' --- UV UPDATE: ' . json_encode($data));
                 $repository->updateDataBD($data);
             }
         } catch (\Exception $e) {
-            error_log('messages_status_repository->process: ' . $e->getMessage() . "\n");
+            error_log('messages_status_repository->process: ' . $e->getMessage() . PHP_EOL);
         }
     }
 

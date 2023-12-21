@@ -15,15 +15,13 @@ use local_uplannerconnect\infrastructure\api\client\abstract_uplanner_client;
 use local_uplannerconnect\infrastructure\api\factory\uplanner_client_factory;
 use local_uplannerconnect\infrastructure\email\email;
 use local_uplannerconnect\infrastructure\file;
+use local_uplannerconnect\infrastructure\log;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die;
 
 /**
- * @package uPlannerConnect
- * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
- * @author Daniel Eduardo Dorado <doradodaniel14@gmail.com>
- * @description Handle remove success uPlanner task
+ * Class handle_clean_uplanner_task, handle remove success uPlanner task
  */
 class handle_clean_uplanner_task
 {
@@ -36,6 +34,11 @@ class handle_clean_uplanner_task
      * @var $file
      */
     private $file;
+
+    /**
+     * @var $log
+     */
+    private $log;
 
     /**
      * @var email
@@ -91,10 +94,11 @@ class handle_clean_uplanner_task
      * @return void
      */
     public function process($page_size = 1000) {
-        error_log("------------------------------------------  UPLANNER - PROCESS START - FOREACH REPOSITORIES ------------------------------------------ \n");
+        $this->create_log($this->prefix . $this->task_id . '_log');
+        $this->log->add_line("------------------------------------------  UPLANNER - PROCESS START - FOREACH REPOSITORIES ------------------------------------------ ");
         $log_id = $this->general_repository->add_log_data();
         foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
-            error_log('------- CREATE REPOSITORY OBJECT: ' . $type . ' - ' . $repository_class  . PHP_EOL);
+            $this->log->add_line('------- CREATE REPOSITORY OBJECT: ' . $type . ' - ' . $repository_class  . PHP_EOL);
             $repository = new $repository_class($type);
             $uplanner_client = $this->uplanner_client_factory->create($type);
             $this->start_process_per_repository(
@@ -103,9 +107,9 @@ class handle_clean_uplanner_task
                 $page_size
             );
         }
-        error_log("------------------------------------------            ADD LOGS (COUNT LOGS)     ------------------------------------------ \n");
+        $this->log->add_line("------------------------------------------            ADD LOGS (COUNT LOGS)     ------------------------------------------ ");
         $this->general_repository->add_log_errors_data($log_id);
-        error_log("-------------------------------------- UPLANNER - DELETE LOGS (success and is_sucessful = 1)------------------------------------------ \n");
+        $this->log->add_line("-------------------------------------- UPLANNER - DELETE LOGS (success and is_sucessful = 1)------------------------------------------ ");
         foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
             $repository = new $repository_class($type);
             // Remove registers with operation complete
@@ -115,7 +119,12 @@ class handle_clean_uplanner_task
             ];
             $this->general_repository->delete_rows($repository::TABLE, $condition);
         }
-        error_log("------------------------------------------            UPLANNER - PROCESS FINISHED             ------------------------------------------ \n");
+        $this->log->add_line("------------------------------------------            UPLANNER - PROCESS FINISHED             ------------------------------------------ ");
+        $this->send_email(
+            $this->prefix . $this->task_id . '_log',
+            $this->log
+        );
+        $this->log->reset_log();
     }
 
     /**
@@ -136,23 +145,23 @@ class handle_clean_uplanner_task
                 return;
             }
             $fileCreated = $this->create_file($this->prefix . $uplanner_client->get_file_name());
-            error_log('********** UPLANNER - FILE IS CREATED: ' . $fileCreated . PHP_EOL);
+            $this->log->add_line('********** UPLANNER - FILE IS CREATED: ' . $fileCreated);
             $offset = 0;
-            error_log('********** UPLANNER - PROCESS PER REPOSITORY - WHILE: ' . PHP_EOL);
+            $this->log->add_line('********** UPLANNER - PROCESS PER REPOSITORY - WHILE: ');
             while (true) {
                 $data = [
                     'state' => repository_type::STATE_SEND,
                     'limit' => $page_size,
                     'offset' => $offset,
                 ];
-                error_log('UPLANNER - DATA QUERY: ' . json_encode($data)  . PHP_EOL);
+                $this->log->add_line('UPLANNER - DATA QUERY: ' . json_encode($data));
                 $rows = $repository->getDataBD($data);
-                error_log('UPLANNER - DATA ROWS: ' . json_encode($rows)  . PHP_EOL);
+                $this->log->add_line('UPLANNER - DATA ROWS: ' . json_encode($rows));
                 if (!$rows) {
                     break;
                 }
-                error_log('UPLANNER - PROCESS - COMPARE LOGS '. PHP_EOL);
-                $this->message_repository->process($repository, $rows);
+                $this->log->add_line('UPLANNER - PROCESS - COMPARE LOGS ');
+                $this->message_repository->process($repository, $rows, $this->log);
                 $data = [
                     'state' => repository_type::STATE_SEND,
                     'limit' => $page_size,
@@ -160,11 +169,11 @@ class handle_clean_uplanner_task
                 ];
                 $rows = $repository->getDataBD($data);
                 if ($fileCreated) {
-                    error_log('UPLANNER - ADD ROWS IN FILE '. PHP_EOL);
+                    $this->log->add_line('UPLANNER - ADD ROWS IN FILE ');
                     $this->add_rows_in_file($rows);
-                    error_log('UPLANNER - SEND EMAIL '. PHP_EOL);
-                    $this->send_email($this->prefix . $uplanner_client->get_email_subject());
-                    error_log('UPLANNER - RESET FILE '. PHP_EOL);
+                    $this->log->add_line('UPLANNER - SEND EMAIL ');
+                    $this->send_email($this->prefix . $uplanner_client->get_email_subject(), $this->file);
+                    $this->log->add_line('UPLANNER - RESET FILE ');
                     $this->file->reset_csv($this->getHeaders());
                 }
                 $offset += count($rows);
@@ -186,6 +195,20 @@ class handle_clean_uplanner_task
         $headers[] = 'ds_error';
 
         return $headers;
+    }
+
+    /**
+     * Create and add log file
+     *
+     * @param $file_name
+     * @return void
+     */
+    private function create_log($file_name)
+    {
+        $this->log = new log($this->task_id, $file_name . '_date');
+        $this->log->create_log(
+            'TASK ' . strtoupper($this->task_id) . ' ' . $this->current_date
+        );
     }
 
     /**
@@ -224,17 +247,18 @@ class handle_clean_uplanner_task
      * Send email
      *
      * @param $subject
+     * @param $file
      * @return bool
      */
-    private function send_email($subject): bool
+    private function send_email($subject, $file): bool
     {
         $recipient_email = 'samuel.ramirez@correounivalle.edu.co';
         return $this->email->send(
             $recipient_email,
             $subject,
             $this->current_date,
-            $this->file->get_path_file(),
-        $this->file->get_virtual_name()
+            $file->get_path_file(),
+            $file->get_virtual_name()
         );
     }
 }
