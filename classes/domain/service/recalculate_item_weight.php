@@ -115,13 +115,13 @@ class recalculate_item_weight
                     ]);
 
                     $totalQualified = reset($sumTotalResult);
-                    if ($isAggreationSimple) {
+                    $newWeight = 0;
+                    if ($isAggreationSimple && $maxItemCourse > 0) {
                         $newWeight = ($totalQualified->total / $maxItemCourse) / 100;
                     }
-                    else {
+                    else if ($value->grademaxgradeitem > 0) {
                         $newWeight = $totalQualified->nota_maxima / $value->grademaxgradeitem;
                     }
-                    
                     
                     $event_ = new custom_event([
                         'finalgradeGrades' => $value->finalgradegrades,
