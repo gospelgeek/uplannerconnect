@@ -13,12 +13,30 @@ namespace local_uplannerconnect\application\repository;
 */
 class repository_type
 {
+    /**
+     * Log is created
+     */
     const STATE_DEFAULT = 0;
+
+    /**
+     * Log is send to uPlanner
+     */
     const STATE_SEND = 1;
+
+    /**
+     * Log don't send to uPlanner
+     */
     const STATE_ERROR = 2;
+
+    /**
+     * Log with error in uPlanner
+     */
+    const STATE_UP_ERROR = 3;
+
     const LIST_STATES = [
         'send' => 1
     ];
+
     const ACTIVE_REPOSITORY_TYPES = [
         'grade' => course_notes_repository::class,
         'evaluation_structure' => course_evaluation_structure_repository::class,

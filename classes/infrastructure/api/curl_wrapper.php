@@ -11,10 +11,7 @@ namespace local_uplannerconnect\infrastructure\api;
 use Exception;
 
 /**
- * @package uPlannerConnect
- * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
- * @author Daniel Dorado <doradodaniel14@gmail.com>
- * @description Implementation of curl wrapper
+ * Class curl_wrapper, implementation of curl wrapper
  */
 class curl_wrapper
 {

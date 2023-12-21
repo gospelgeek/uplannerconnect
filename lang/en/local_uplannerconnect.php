@@ -14,17 +14,24 @@ $string['generalsettingsheading_desc'] = 'General settings for the plugin';
 $string['reports'] = 'Reports for the UplannerConnect plugin';
 
 // Email
-$string['upllaner_email_subject_grades'] = 'uPlanner Grades';
-$string['upllaner_email_subject_evaluations'] = 'uPlanner Evaluations';
-$string['upllaner_email_subject_anounciente'] = 'uPlanner Anounciente';
-$string['upllaner_email_subject_materials'] = 'uPlanner Materials';
-$string['upllaner_email_subject_summary'] = 'uPlanner Summary';
+$string['send_uplanner_email_subject_grades'] = 'Send uPlanner Grades';
+$string['send_uplanner_email_subject_evaluations'] = 'Send uPlanner Evaluations';
+$string['send_uplanner_email_subject_anounciente'] = 'Send uPlanner Anounciente';
+$string['send_uplanner_email_subject_materials'] = 'Send uPlanner Materials';
 
-$string['delete_upllaner_email_subject_grades'] = 'Delete uPlanner Grades';
-$string['delete_upllaner_email_subject_evaluations'] = 'Delete uPlanner Evaluations';
-$string['delete_upllaner_email_subject_anounciente'] = 'Delete uPlanner Anounciente';
-$string['delete_upllaner_email_subject_materials'] = 'Delete uPlanner Materials';
-$string['delete_upllaner_email_subject_summary'] = 'Delete uPlanner Summary';
+$string['error_uplanner_email_subject_grades'] = 'Re Send uPlanner Grades';
+$string['error_uplanner_email_subject_evaluations'] = 'Re Send uPlanner Evaluations';
+$string['error_uplanner_email_subject_anounciente'] = 'Re Send uPlanner Anounciente';
+$string['error_uplanner_email_subject_materials'] = 'Re Send uPlanner Materials';
+
+$string['clean_uplanner_email_subject_grades'] = 'Clean uPlanner Grades';
+$string['clean_uplanner_email_subject_evaluations'] = 'Clean uPlanner Evaluations';
+$string['clean_uplanner_email_subject_anounciente'] = 'Clean uPlanner Anounciente';
+$string['clean_uplanner_email_subject_materials'] = 'Clean uPlanner Materials';
+
+$string['send_send_log'] = 'UPLANNER TASK SEND LOG';
+$string['clean_clean_log'] = 'UPLANNER TASK CLEAN LOG';
+$string['error_error_log'] = 'UPLANNER TASK ERROR LOG';
 
 // Tasks.
 $string['syncsendtuplannertask'] = 'Send uPlanner Task';

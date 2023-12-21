@@ -11,10 +11,7 @@ namespace local_uplannerconnect\infrastructure\email;
 use coding_exception;
 
 /**
- * @package uPlannerConnect
- * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
- * @author Daniel Dorado <doradodaniel14@gmail.com>
- * @description Send email with uPlaner info
+ * Class email, send email with uPlaner info
  */
 class email
 {
