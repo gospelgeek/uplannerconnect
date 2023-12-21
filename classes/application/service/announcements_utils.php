@@ -18,7 +18,7 @@ class announcements_utils
 {
     private $query;
 
-    const ROL_TEACHER = "SELECT id FROM {role_assignments} WHERE userid = :userid AND roleid IN (2,3)";
+    const ROL_TEACHER = "SELECT id FROM {role_assignments} WHERE userid = :userid AND roleid IN (2,3,30,4)";
     const PARENT_FORM_POST = "SELECT id FROM {forum_posts} WHERE id = :id AND parent = 0";
 
     /**
