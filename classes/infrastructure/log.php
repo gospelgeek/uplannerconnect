@@ -11,11 +11,11 @@ namespace local_uplannerconnect\infrastructure;
 use Exception;
 
 /**
- * Class csv file manager
+ * Class log file manager
  */
-class file
+class log
 {
-    const BASE_NAME = '%s_uplanner_template.csv';
+    const BASE_NAME = '%s_uplanner_template_log.txt';
 
     /**
      * Directory path files
@@ -75,24 +75,22 @@ class file
     }
 
     /**
-     * Create CSV file
+     * Create log file
      *
-     * @param $headers
+     * @param $title
      * @return bool
      */
-    public function create_csv($headers)
+    public function create_log($title)
     {
         try {
             if (!file_exists($this->directory)) {
                 mkdir($this->directory, 0755, true);
             }
-            $csv_file = $this->get_path_file();
-            $fp = fopen($csv_file, 'w');
-            fputcsv($fp, $headers);
-            fclose($fp);
+            $text_file = $this->get_path_file();
+            file_put_contents($text_file, PHP_EOL . $title . PHP_EOL);
             return true;
         } catch (Exception $e) {
-            error_log('create_csv: '. $e->getMessage() . PHP_EOL);
+            error_log('create_log: ' . $e->getMessage() . PHP_EOL);
         }
 
         return false;
@@ -101,63 +99,75 @@ class file
     /**
      * Add row
      *
-     * @param $data
+     * @param $line
      * @return bool
      */
-    public function add_row($data)
+    public function add_line($line)
     {
         try {
-            $csv_file = $this->get_path_file();
-            if (file_exists($csv_file)) {
-                $fp = fopen($csv_file, 'a');
-                fputcsv($fp, $data);
-                fclose($fp);
-                return true;
-            }
-        } catch (Exception $e) {
-            error_log('add_row: '. $e->getMessage() . PHP_EOL);
-        }
-
-        return false;
-    }
-
-    /**
-     * Reset CSV file
-     *
-     * @param $headers
-     * @return bool
-     */
-    public function reset_csv($headers)
-    {
-        try {
-            $csv_file = $this->get_path_file();
-            if (file_exists($csv_file)) {
-                $fp = fopen($csv_file, 'w');
-                fputcsv($fp, $headers);
-                fclose($fp);
-            }
+            error_log($line . PHP_EOL);
+            $text_file = $this->get_path_file();
+            file_put_contents($text_file, $line . PHP_EOL, FILE_APPEND);
             return true;
         } catch (Exception $e) {
-            error_log('reset_csv: '.  $e->getMessage() . PHP_EOL);
+            error_log('add_line: ' . $e->getMessage() . PHP_EOL);
         }
 
         return false;
     }
 
     /**
-     * Delete CSV file
+     * Add multiple lines to the text file
+     *
+     * @param array $lines
+     * @return bool
+     */
+    public function add_lines(array $lines)
+    {
+        try {
+            error_log(implode(PHP_EOL, $lines) . PHP_EOL);
+            $text_file = $this->get_path_file();
+            file_put_contents($text_file, implode(PHP_EOL, $lines) . PHP_EOL, FILE_APPEND);
+            return true;
+        } catch (Exception $e) {
+            error_log('add_lines: ' . $e->getMessage() . PHP_EOL);
+        }
+
+        return false;
+    }
+
+    /**
+     * Reset text file (clear content)
+     *
+     * @return bool
+     */
+    public function reset_log()
+    {
+        try {
+            $text_file = $this->get_path_file();
+            file_put_contents($text_file, '');
+            return true;
+        } catch (Exception $e) {
+            error_log('reset_log: ' . $e->getMessage() . PHP_EOL);
+        }
+
+        return false;
+    }
+
+    /**
+     * Delete text file
      *
      * @return void
      */
-    public function delete_csv()
+    public function delete_log()
     {
         try {
-            $csv_file = $this->get_path_file();
-            if (file_exists($csv_file)) {
-                unlink($csv_file);
+            $text_file = $this->get_path_file();
+            if (file_exists($text_file)) {
+                unlink($text_file);
             }
         } catch (Exception $e) {
-            error_log('delete_csv: '.  $e->getMessage() . PHP_EOL);
+            error_log('delete_log: ' . $e->getMessage() . PHP_EOL);
         }
     }
 }

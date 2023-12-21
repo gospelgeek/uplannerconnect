@@ -12,6 +12,7 @@ use local_uplannerconnect\application\service\event_access_validator;
 use local_uplannerconnect\application\service\filter_evaluation_update;
 use local_uplannerconnect\application\repository\moodle_query_handler;
 use local_uplannerconnect\domain\service\recalculate_item_weight; 
+use local_uplannerconnect\application\service\announcements_utils;
 use local_uplannerconnect\plugin_config\plugin_config;
 use moodle_exception;
 
@@ -333,7 +334,7 @@ class handle_event_course_notes
                "key" => "eventname",
                "methodName" => "get_data"
             ])) {
-               if (!validateAccesFaculty($event)) { return; }
+               if (!validateAccesFaculty($event) || !isRolTeacher($event)) { return; }
                //Instanciar la clase management_factory
                instantiatemanagement_factory([
                   "dataEvent" => $event,
@@ -359,7 +360,7 @@ class handle_event_course_notes
                 "key" => "eventname",
                 "methodName" => "get_data"
              ])) {
-                if (!validateAccesFaculty($event)) { return; }
+                if (!validateAccesFaculty($event) || !isRolTeacher($event)) { return; }
                 //Instanciar la clase management_factory
                 instantiatemanagement_factory([
                    "dataEvent" => $event,
@@ -385,7 +386,7 @@ class handle_event_course_notes
                 "key" => "eventname",
                 "methodName" => "get_data"
              ])) {
-                if (!validateAccesFaculty($event)) { return; }
+                if (!validateAccesFaculty($event) || !isRolTeacher($event)) { return; }
                 //Instanciar la clase management_factory
                 instantiatemanagement_factory([
                    "dataEvent" => $event,
@@ -437,14 +438,19 @@ class handle_event_course_notes
                 "key" => "eventname",
                 "methodName" => "get_data"
              ])) {
-                if (!validateAccesFaculty($event)) { return; }
-                //Instanciar la clase management_factory
-                instantiatemanagement_factory([
-                   "dataEvent" => $event,
-                   "typeEvent" => "created_announcements",
-                   "dispatch" => 'update',
-                   "enum_etities" => 'announcements'
-                ]);
+                if (!validateAccesFaculty($event) || !isRolTeacher($event)) { return; }
+                  $dataEvent = $event->get_data();
+                  $post = $dataEvent['objectid'];
+        
+                  if (isForumPostParent($post)) {
+                     //Instanciar la clase management_factory
+                     instantiatemanagement_factory([
+                        "dataEvent" => $event,
+                        "typeEvent" => "created_announcements",
+                        "dispatch" => 'update',
+                        "enum_etities" => 'announcements'
+                     ]);
+                  }
              }
        } catch (moodle_exception $e) {
           error_log('Excepción capturada: '. $e->getMessage(). "\n");
@@ -640,4 +646,40 @@ function getAggreationCategory($idCourse)
       error_log('Excepción capturada: '. $e->getMessage(). "\n");
    }
    return $aggregationCategory;
+}
+
+/**
+ * Validate if the user is teacher
+ */
+function isRolTeacher($event) 
+{
+   $isRolTeacher = false;
+   try {
+      if (!empty($event)) {
+         $dataEvent = $event->get_data();
+         $userId = $dataEvent['userid'];
+         $announcements_utils = new announcements_utils();
+         $isRolTeacher = $announcements_utils->isRolTeacher($userId);
+      }
+   } catch (moodle_exception $e) {
+      error_log('Excepción capturada: '. $e->getMessage(). "\n");
+   }
+   return $isRolTeacher;
+}
+
+/**
+ * Is Forum Post Parent
+ */
+function isForumPostParent($idPost)
+{
+   $isParent = false;
+   try {
+      if (!empty($idPost)) {
+         $announcements_utils = new announcements_utils();
+         $isParent = $announcements_utils->isParentFormPost($idPost);
+      }
+   } catch (moodle_exception $e) {
+      error_log('Excepción capturada: '. $e->getMessage(). "\n");
+   }
+   return $isParent;
 }

@@ -187,7 +187,7 @@ class course_utils
     private function getApprovedItem($gradeItem , $gradesGrades) : bool
     {
         $boolean = false;
-        if ($gradeItem->grademax) {
+        if ($gradeItem->grademax && $gradeItem->grademax > 0) {
             $boolean = ($gradesGrades->finalgrade / $gradeItem->grademax) >= 0.6;
         }
         return $boolean;
@@ -296,10 +296,10 @@ class course_utils
             );
 
             $resulTotalGrades = reset($sumTotalQualified);
-            if ($isAggreationSimple) {  
+            if ($isAggreationSimple && $maxItemsCourse > 0) {  
                 $weight = ($resulTotalGrades->total / $maxItemsCourse) / 100;
             }
-            else {
+            else if ($gradeItem->grademax > 0) {
                 $weight = ($resulTotalGrades->nota_maxima / $gradeItem->grademax);
             }
         } 

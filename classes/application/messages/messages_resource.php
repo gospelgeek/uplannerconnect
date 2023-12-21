@@ -13,43 +13,7 @@ namespace local_uplannerconnect\application\messages;
 class messages_resource
 {
     const TABLE = 'esb_messages_status';
-    const QUERY_SELECT = 'SELECT * FROM %s WHERE %s';
-
-    /**
-     * Get message
-     *
-     * @param $transaction_id
-     * @return array|null
-     */
-    public function get_message($transaction_id)
-    {
-        $message = null;
-
-        try {
-            $connection = connection::getInstance()->getConnection();
-            if ($connection) {
-                $where_clause = sprintf(
-                    "id_transaction = %d",
-                    implode(',', $transaction_id)
-                );
-                $query = sprintf(self::QUERY_SELECT, self::TABLE, $where_clause);
-                $get_results = sqlsrv_query($connection, $query);
-                if ($get_results) {
-                    while ($row = sqlsrv_fetch_array($get_results, SQLSRV_FETCH_ASSOC)) {
-                        $message = $row;
-                        break;
-                    }
-                    sqlsrv_free_stmt($get_results);
-                }
-            } else {
-                error_log('get_message connection fail: ' .  print_r(sqlsrv_errors(), true) . "\n");
-            }
-        } catch (\Exception $e) {
-            error_log('get_message: ' . $e->getMessage() . "\n");
-        }
-
-        return $message;
-    }
+    const QUERY_SELECT = 'SELECT * FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY id_transaction ORDER BY createdAt DESC) AS RowNum FROM %s WHERE id_transaction IN (%s)) AS RankedRows WHERE RowNum = 1';
 
     /**
      * Get messages
@@ -63,11 +27,7 @@ class messages_resource
         try {
             $connection = connection::getInstance()->getConnection();
             if ($connection) {
-                $where_clause = sprintf(
-                    "id_transaction IN (%s)",
-                    $transactions
-                );
-                $query = sprintf(self::QUERY_SELECT, self::TABLE, $where_clause);
+                $query = sprintf(self::QUERY_SELECT, self::TABLE, $transactions);
                 $get_results = sqlsrv_query($connection, $query);
                 if ($get_results) {
                     while ($row = sqlsrv_fetch_array($get_results, SQLSRV_FETCH_ASSOC)) {
@@ -76,12 +36,11 @@ class messages_resource
                     sqlsrv_free_stmt($get_results);
                 }
             } else {
-                error_log('get_messages connect fail: ' .  print_r(sqlsrv_errors(), true) . "\n");
+                error_log('get_messages connect fail: ' .  print_r(sqlsrv_errors(), true) . PHP_EOL);
             }
         } catch (\Exception $e) {
-            error_log('get_messages: ' . $e->getMessage() . "\n");
+            error_log('get_messages: ' . $e->getMessage() . PHP_EOL);
         }
-
 
         return $messages;
     }
