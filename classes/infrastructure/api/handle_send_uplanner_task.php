@@ -2,18 +2,18 @@
 /**
  * @package     uPlannerConnect
  * @copyright   Cristian Machado Mosquera <cristian.machado@correounivalle.edu.co>
- * @copyright   daniel eduardo dorado <doradodaniel14@gmail.com>
+ * @copyright   Daniel Eduardo Dorado <doradodaniel14@gmail.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
 namespace local_uplannerconnect\infrastructure\api;
 
-use coding_exception;
 use local_uplannerconnect\application\repository\repository_type;
 use local_uplannerconnect\infrastructure\api\client\abstract_uplanner_client;
 use local_uplannerconnect\infrastructure\api\factory\uplanner_client_factory;
 use local_uplannerconnect\infrastructure\email\email;
 use local_uplannerconnect\infrastructure\file;
+use local_uplannerconnect\infrastructure\log;
 
 defined('MOODLE_INTERNAL') || die;
 
@@ -34,6 +34,11 @@ class handle_send_uplanner_task
     private $file;
 
     /**
+     * @var $log
+     */
+    private $log;
+
+    /**
      * @var $email
      */
     private $email;
@@ -49,6 +54,11 @@ class handle_send_uplanner_task
     private $current_date;
 
     /**
+     * @var string
+     */
+    private $prefix = '';
+
+    /**
      * Construct
      *
      * @param $tasks_id
@@ -57,6 +67,7 @@ class handle_send_uplanner_task
         $tasks_id
     ) {
         $this->task_id = $tasks_id;
+        $this->prefix = $this->task_id . '_';
         $this->current_date = date("F j, Y, g:i:s a");
         $this->uplanner_client_factory = new uplanner_client_factory();
         $this->email = new email();
@@ -75,9 +86,10 @@ class handle_send_uplanner_task
         $num_request_by_endpoint = 1,
         $num_rows = 100
     ) {
-        error_log('------------------------------------------  PROCESS START - FOREACH REPOSITORIES ------------------------------------------' . PHP_EOL);
+        $this->create_log($this->prefix . $this->task_id . '_log');
+        $this->log->add_line('------------------------------------------  UPLANNER - PROCESS START - FOREACH REPOSITORIES ------------------------------------------');
         foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
-            error_log('------- CREATE REPOSITORY OBJECT: ' . $type . ' - ' . $repository_class  . PHP_EOL);
+            $this->log->add_line('------- CREATE REPOSITORY OBJECT: ' . $type . ' - ' . $repository_class);
             $repository = new $repository_class();
             $uplanner_client = $this->uplanner_client_factory->create($type);
             $this->process_request(
@@ -88,10 +100,17 @@ class handle_send_uplanner_task
                 $num_rows
             );
         }
-        error_log('------------------------------------------            PROCESS FINISHED             ------------------------------------------' . PHP_EOL);
+        $this->log->add_line('------------------------------------------            UPLANNER - PROCESS FINISHED             ------------------------------------------');
+        $this->send_email(
+            $this->prefix . $this->task_id . '_log',
+            $this->log
+        );
+        $this->log->reset_log();
     }
 
     /**
+     * Process request
+     *
      * @param $uplanner_client
      * @param $repository
      * @param $state
@@ -111,30 +130,30 @@ class handle_send_uplanner_task
         }
         $index_row = 0;
         $offset = 0;
-        error_log('********** PROCESS REQUEST - WHILE: ' . PHP_EOL);
+        $this->log->add_line('********** UPLANNER - PROCESS REQUEST - WHILE: ');
         while ($index_row < $num_request_by_endpoint) {
             $dataQuery = [
                 'state' => $state,
                 'limit' => $num_rows,
                 'offset' => $offset
             ];
-            error_log('DATA QUERY: ' . json_encode($dataQuery)  . PHP_EOL);
+            $this->log->add_line('UPLANNER - DATA QUERY: ' . json_encode($dataQuery));
             $rows = $repository->getDataBD($dataQuery);
-            error_log('DATA ROWS: ' . json_encode($rows)  . PHP_EOL);
+            $this->log->add_line('UPLANNER - DATA ROWS: ' . json_encode($rows));
             if (!$rows) {
                 break;
             }
             $response = $this->request($uplanner_client, $rows);
-            error_log('RESPONSE: ' . json_encode($response)  . PHP_EOL);
+            $this->log->add_line('UPLANNER - RESPONSE: ' . json_encode($response));
             $status = (empty($response) || array_key_exists('error', $response))
                 ? repository_type::STATE_ERROR : repository_type::STATE_SEND;
-            $fileCreated = $this->create_file($uplanner_client->get_file_name(), $rows, $status);
-            error_log('FILE WAS CREATED: ' . $fileCreated  . PHP_EOL);
+            $fileCreated = $this->create_file($this->prefix . $uplanner_client->get_file_name(), $rows, $status);
+            $this->log->add_line('UPLANNER - FILE WAS CREATED: ' . $fileCreated);
             if ($fileCreated) {
-                $this->send_email($uplanner_client->get_email_subject());
+                $this->send_email($this->prefix . $uplanner_client->get_email_subject(), $this->file);
             }
             $numRows = 0;
-            error_log('UPDATE REGISTER STATUS: ' . $status  . PHP_EOL);
+            $this->log->add_line('UPLANNER - UPDATE REGISTER STATUS: ' . $status);
             foreach ($rows as $row) {
                 $dataQuery = [
                     'response' => $response,
@@ -200,20 +219,35 @@ class handle_send_uplanner_task
     }
 
     /**
+     * Create and add log file
+     *
+     * @param $file_name
+     * @return void
+     */
+    private function create_log($file_name)
+    {
+        $this->log = new log($this->task_id, $file_name . '_date');
+        $this->log->create_log(
+            'TASK ' . strtoupper($this->task_id) . ' ' . $this->current_date
+        );
+    }
+
+    /**
      * Send email
      *
      * @param $subject
+     * @param $file
      * @return bool
      */
-    private function send_email($subject)
+    private function send_email($subject, $file)
     {
         $recipient_email = 'samuel.ramirez@correounivalle.edu.co';
         return $this->email->send(
             $recipient_email,
             $subject,
             $this->current_date,
-            $this->file->get_path_file(),
-            $this->file->get_virtual_name()
+            $file->get_path_file(),
+            $file->get_virtual_name()
         );
     }
 }

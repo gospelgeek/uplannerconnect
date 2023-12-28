@@ -14,10 +14,7 @@ use local_uplannerconnect\infrastructure\api\client\uplanner_client_grade;
 use local_uplannerconnect\infrastructure\api\client\uplanner_client_material;
 
 /**
- * @package uPlannerConnect
- * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
- * @author Daniel Dorado <doradodaniel14@gmail.com>
- * @description Contiene los tipos de clientes en Uplanner
+ * Class uplanner_client_type
  */
 class uplanner_client_type
 {

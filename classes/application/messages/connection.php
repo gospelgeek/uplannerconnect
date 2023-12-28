@@ -7,6 +7,8 @@
 
 namespace local_uplannerconnect\application\messages;
 
+use dml_exception;
+use Exception;
 use local_uplannerconnect\plugin_config\plugin_config;
 
 /**
@@ -31,13 +33,13 @@ class connection
      */
     private function __construct() {
         $this->connection = sqlsrv_connect(
-            $this->getServerName(),
-            $this->getOptions()
+            $this->get_server_name(),
+            $this->get_options()
         );
         if ($this->connection ) {
-            error_log('********** CONNECTION ESTABLISHED : ' . PHP_EOL);
+            error_log('********** UPLANNER - CONNECTION ESTABLISHED : ' . PHP_EOL);
         } else{
-            error_log('********** CONNECTION NOT BE ESTABLISHED : ' . json_encode(sqlsrv_errors())  . PHP_EOL);
+            error_log('********** UPLANNER - CONNECTION NOT BE ESTABLISHED : ' . json_encode(sqlsrv_errors())  . PHP_EOL);
         }
     }
 
@@ -73,16 +75,16 @@ class connection
      */
     public function __wakeup()
     {
-        throw new \Exception("Cannot unserialize a singleton.");
+        throw new Exception("Cannot unserialize a singleton.");
     }
 
     /**
      * Server host
      *
      * @return false|mixed|object|string
-     * @throws \dml_exception
+     * @throws dml_exception
      */
-    private function getServerName()
+    private function get_server_name()
     {
         $port = get_config(plugin_config::PLUGIN_NAME_LOCAL, 'messages_port') ?? '';
         $host = get_config(plugin_config::PLUGIN_NAME_LOCAL, 'messages_host') ?? '';;
@@ -97,9 +99,9 @@ class connection
      * Server options
      *
      * @return array
-     * @throws \dml_exception
+     * @throws dml_exception
      */
-    private function getOptions()
+    private function get_options()
     {
         return [
             "Database" => get_config(plugin_config::PLUGIN_NAME_LOCAL, 'messages_database') ?? '',

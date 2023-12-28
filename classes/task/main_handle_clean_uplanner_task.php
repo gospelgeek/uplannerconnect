@@ -35,12 +35,12 @@ class main_handle_clean_uplanner_task extends \core\task\scheduled_task
     public function execute() {
         $time_now = time();
         $start_time = microtime();
-        mtrace("Update cron started at: " . date('r', $time_now) . "\n");
+        mtrace('Update cron started at: ' . date('r', $time_now) . PHP_EOL);
         $handle_task = new handle_clean_uplanner_task(self::TASKS_ID);
         $handle_task->process();
-        mtrace("\n" . 'Cron completed at: ' . date('r', time()) . "\n");
-        mtrace('Memory used: ' . display_size(memory_get_usage())."\n");
+        mtrace(PHP_EOL . 'Cron completed at: ' . date('r', time()) . PHP_EOL);
+        mtrace('Memory used: ' . display_size(memory_get_usage()) . PHP_EOL);
         $diff_time = microtime_diff($start_time, microtime());
-        mtrace("Scheduled task late " . $diff_time . " seconds to finish.\n");
+        mtrace('Scheduled task late ' . $diff_time . ' seconds to finish.' . PHP_EOL);
     }
 }

@@ -28,17 +28,6 @@ class messages_status_repository
     }
 
     /**
-     * get message by transaction id
-     *
-     * @param $transaction_id
-     * @return array|null
-     */
-    public function get_by_transaction_id($transaction_id)
-    {
-        return $this->messages_resource->get_message($transaction_id);
-    }
-
-    /**
      * get list by transactions
      *
      * @param $transactions_ids
@@ -56,38 +45,50 @@ class messages_status_repository
      *
      * @return void
      */
-    public function process($repository, $rows)
+    public function process($repository, $rows, $log)
     {
+        error_log('------------------------------------------  PROCESS START - UPLANNER QUERY ------------------------------------------');
         try {
+            $uv_transactions = $this->get_uv_transactions($rows);
+            $log->add_line(' --- UV TRANSACTIONS: ' . json_encode($uv_transactions));
             $up_messages = $this->get_list_by_transactions(
-                $this->get_uv_transactions($rows)
+                $uv_transactions
             );
+            $log->add_line(' --- UP MESSAGES: ' . json_encode($up_messages));
+            $log->add_line(' ---------------- FOREACH - COMPARE LOGS: ');
             foreach ($rows as $row) {
                 $json = json_decode($row->json, true);
                 $id_transaction = intval($json['transactionId']);
+                $log->add_line(' --- TRANSACTION ID: ' . $id_transaction  . PHP_EOL);
                 $filtered_messages = array_filter($up_messages, function ($message) use ($id_transaction) {
                     return $message['id_transaction'] == $id_transaction;
                 });
                 $message = reset($filtered_messages);
                 $is_successful = 0;
                 $ds_error = 'Connection failed, error invalid data';
+                $state = $row->success;
                 if ($message) {
                     if (($message['is_successful'] === 1 || $message['is_successful'] === '1')) {
                         $ds_error = '';
                         $is_successful = 1;
                     } else {
                         $ds_error = $message['ds_error'];
+                        $state = repository_type::STATE_UP_ERROR;
                     }
                 }
+                $log->add_line(' --- UV LOG: ' . json_encode($row));
+                $log->add_line(' --- UP LOG: ' . json_encode($message));
                 $data = [
+                    'success' => $state,
                     'is_sucessful' => $is_successful,
                     'ds_error' => $ds_error,
                     'id' => $row->id
                 ];
+                $log->add_line(' --- UV UPDATE: ' . json_encode($data));
                 $repository->updateDataBD($data);
             }
         } catch (\Exception $e) {
-            error_log('messages_status_repository->process: ' . $e->getMessage() . "\n");
+            error_log('messages_status_repository->process: ' . $e->getMessage() . PHP_EOL);
         }
     }
 

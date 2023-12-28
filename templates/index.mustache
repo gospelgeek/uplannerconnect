@@ -44,9 +44,22 @@
                 "num_materials": 0,
                 "num_anouncements": 0
             }
+        ].
+        "ulItems": [
+            {
+                "url": "url",
+                "label": "label"
+            }
         ]
     }
 }}
+<section>
+   <ol>
+      {{#ulItems}}
+          <li> <a href="{{url}}"> Summarry Error </a> </li>
+       {{/ulItems}}
+   </ol>
+</section>
 <table>
    <thead>
     <tr>

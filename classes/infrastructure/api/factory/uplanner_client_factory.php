@@ -9,10 +9,7 @@
 namespace local_uplannerconnect\infrastructure\api\factory;
 
 /**
- * @package uPlannerConnect
- * @author Cristian Machado <cristian.machado@correounivalle.edu.co>
- * @author Daniel Dorado <doradodaniel14@gmail.com>
- * @description Fábrica para crear los diferentes tipos de clientes en Uplanner
+ * Class uplanner_client_factory
  */
 class uplanner_client_factory
 {
