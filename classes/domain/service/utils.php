@@ -130,4 +130,33 @@ class utils
         }
         return $response;
     }
+
+    /**
+     * Data Format send to uPlanner
+     * 
+     * @param array $data
+     * @return array
+     */
+    public function send_data_uplanner(array $data) : array
+    {
+        $arraySend = [
+            'data' => [],
+            'typeEvent' => '',
+        ]; 
+
+        try {
+            if (!empty($data)) {
+                if (is_array($data['data'])) {               
+                    $arraySend = [
+                        'data' => $data['data'],
+                        'typeEvent' => $data['typeEvent'],
+                    ];
+                }
+            }
+        }
+        catch (moodle_exception $e) {
+            error_log('Excepción capturada: '. $e->getMessage(). "\n");
+        }
+        return $arraySend;
+    }
 }
