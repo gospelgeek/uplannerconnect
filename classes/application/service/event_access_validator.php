@@ -21,7 +21,6 @@ class event_access_validator
     const EVENT_METHOD_NAME = 'methodName';
     const DATA_VERIFY_EVENT = 'typeEvent';
     // Facultade a evaluar
-    const FACULTY_ACTIVE = ['1','4','2','3','5','6','7','8','9','10'];
     private $courseDataRepository;
 
     /**
@@ -33,12 +32,12 @@ class event_access_validator
     }
 
     /**
-     *  Valida si no repite multiples veces el mismo evento 
+     *  Valida si no repite multiples veces el mismo evento
      *  con el mismo dato
-     * 
-     *  @param data $data
-     *  @return bool
-    */
+     *
+     * @param array $data $data
+     * @return bool
+     */
     public function validateTypeEvent(array $data) : bool
     {
         $boolean = false;

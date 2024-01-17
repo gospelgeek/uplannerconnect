@@ -27,6 +27,9 @@ class page_index
         $this->query = new moodle_query_handler();
     }
 
+    /**
+     *  Get data of all send to uplanner.
+    */
     public function getDataSendJsonUplanner(array $params)
     {
         $data = new \stdClass();
