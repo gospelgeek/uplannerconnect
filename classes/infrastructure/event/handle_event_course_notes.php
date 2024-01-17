@@ -18,9 +18,6 @@ use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
 
-const ITEMTYPE_UPDATE = 'course';
-const IS_ITEM_UPDATE = 'UPDATED';
-
 /**
  *  Maneja los eventos de moodle
 */
@@ -651,7 +648,7 @@ function getAggreationCategory($idCourse)
 /**
  * Validate if the user is teacher
  */
-function isRolTeacher($event) 
+function isRolTeacher($event)
 {
    $isRolTeacher = false;
    try {
