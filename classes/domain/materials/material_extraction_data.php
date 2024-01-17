@@ -10,6 +10,7 @@ namespace local_uplannerconnect\domain\materials;
 use local_uplannerconnect\application\service\data_validator;
 use local_uplannerconnect\plugin_config\estruture_types;
 use local_uplannerconnect\domain\materials\usecases\material_utils;
+use local_uplannerconnect\domain\service\utils;
 use moodle_exception;
 
 /**
@@ -20,7 +21,8 @@ class material_extraction_data
     private $typeEvent;
     private $validator;
     private $materialUtils;
-    
+    private $utils;
+
     public function __construct()
     {
         $this->typeEvent = [
@@ -28,6 +30,7 @@ class material_extraction_data
         ];
         $this->validator = new data_validator();
         $this->materialUtils = new material_utils();
+        $this->utils = new utils();
     }
 
     /**
@@ -76,24 +79,6 @@ class material_extraction_data
      */
     private function send_data_uplanner(array $data) : array
     {
-        $arraySend = [
-            'data' => [],
-            'typeEvent' => '',
-        ]; 
-
-        try {
-            if (!empty($data)) {
-                if (is_array($data['data'])) {               
-                    $arraySend = [
-                        'data' => $data['data'],
-                        'typeEvent' => $data['typeEvent'],
-                    ];
-                }
-            }
-        }
-        catch (moodle_exception $e) {
-            error_log('Excepción capturada: '. $e->getMessage(). "\n");
-        }
-        return $arraySend;
+        return $this->utils->send_data_uplanner($data);
     }
 }

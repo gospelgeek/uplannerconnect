@@ -26,12 +26,12 @@ class filter_evaluation_update
                                         AND courseid = :courseid
                                         ORDER BY id DESC limit 1";
     const MARIADB_LAST_EVALUATION = "SELECT id FROM {uplanner_evaluation}
-                                    WHERE JSON_EXTRACT(json, '$.evaluationGroups[0].evaluations[0].evaluationId') = '%s'
-                                    AND JSON_EXTRACT(json, '$.action') = '%s'
-                                    AND JSON_EXTRACT(json, '$.evaluationGroups[0].evaluations[0].evaluationName') = '%s'
-                                    AND date = :date
-                                    AND courseid = :courseid
-                                    ORDER BY id DESC LIMIT 1";
+                                     WHERE JSON_EXTRACT(json, '$.evaluationGroups[0].evaluations[0].evaluationId') = '%s'
+                                     AND JSON_EXTRACT(json, '$.action') = '%s'
+                                     AND JSON_EXTRACT(json, '$.evaluationGroups[0].evaluations[0].evaluationName') = '%s'
+                                     AND date = :date
+                                     AND courseid = :courseid
+                                     ORDER BY id DESC LIMIT 1";
 
     private $query;
 
