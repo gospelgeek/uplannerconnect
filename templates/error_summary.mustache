@@ -26,28 +26,121 @@
             {
                 "id": 1,
                 "json": {},
-                "checkbox": 0,
+                "response": "",
+                "success" => 0,
+                "ds_error" => "",
+                "is_sucessful" => 0,
             }
         ]
     }
 }}
+
 <section>
    <ol>
-      <li> <a href="#"> Summary Send </a> </li>
+      {{#ulItems}}
+          <li> <a href="{{url}}"> {{label}} </a> </li>
+       {{/ulItems}}
    </ol>
 </section>
-<table>
-   <thead>
-    <tr>
-        <th style="width: 2em; text-align: center;">id</th>
-        <th style="width: 7em; text-align: center;">json</th>
-        <th style="width: 2em; text-align: center;">checkbox</th>
-    </tr>
-   </thead>
-   <tbody>
-        {{#row}}
-            <tr>            
-            </tr>
-        {{/row}}
-   </tbody>
-</table>
+<section>
+   <div id="overlay">
+     <div id="loading-spinner" class="spinner"></div>
+   </div>
+    <div class="section-title">
+        {{#title}}
+             <h2>{{title}}</h2>
+        {{/title}}
+    </div>
+    <table class="error-summary-table">
+       <thead>
+        <tr class="error-summary-tr">
+            <th class="colum-title">Id</th>
+            <th class="colum-title">Json</th>
+            <th class="colum-title">Response</th>
+            <th class="colum-title">Success</th>
+            <th class="colum-title">Ds error</th>
+            <th class="colum-title">Is sucessful</th>
+            <th class="colum-title">Actions</th>
+        </tr>
+       </thead>
+       <tbody>
+            {{#row}}
+                <tr class="error-summary-tr">
+                    <td class="colum-value id">{{id}}</td>
+                    <td class="colum-value json">{{json}}</td>
+                    <td class="colum-value response">{{response}}</td>
+                    <td class="colum-value success">{{success}}</td>
+                    <td class="colum-value ds_error">{{ds_error}}</td>
+                    <td class="colum-value is_sucessful">{{is_sucessful}}</td>
+                    <td class="colum-value actions"><button class="actions-edit" type="button">EDIT</button></td>
+                </tr>
+            {{/row}}
+       </tbody>
+    </table>
+</section>
+
+<style>
+    .error-summary-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+     .colum-title {
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #ddd;
+         background-color: #f2f2f2;
+     }
+
+     .colum-value {
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #ddd;
+        width: 2em;
+     }
+
+    .error-summary-tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .actions-edit {
+      background-color: #4CAF50;
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .actions-edit:hover {
+      background-color: #45a049;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #3498db;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+</style>

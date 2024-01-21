@@ -25,24 +25,42 @@
         "row": [
             {
                 "id": 1,
+                "num_grades": 0,
+                "num_materials": 0,
+                "num_anouncements": 0,
+                "num_evaluation",
+                "num_grades_err": 0,
+                "num_materials_err": 0,
+                "num_anouncements_err": 0,
+                "num_evaluation_err",
                 "date": 1696273730,
-                "num_grades": 0,
-                "num_materials": 0,
-                "num_anouncements": 0
+                "updated_at": 1696273730
             },
             {
-                "id": 2,
-                "date": 1696273797,
-                "num_grades": 1,
-                "num_materials": 0,
-                "num_anouncements": 0
-            },
-            {
-                "id": 3,
-                "date": 1696273816,
+                "id": 1,
                 "num_grades": 0,
                 "num_materials": 0,
-                "num_anouncements": 0
+                "num_anouncements": 0,
+                "num_evaluation",
+                "num_grades_err": 0,
+                "num_materials_err": 0,
+                "num_anouncements_err": 0,
+                "num_evaluation_err",
+                "date": 1696273730,
+                "updated_at": 1696273730
+            },
+            {
+                "id": 1,
+                "num_grades": 0,
+                "num_materials": 0,
+                "num_anouncements": 0,
+                "num_evaluation",
+                "num_grades_err": 0,
+                "num_materials_err": 0,
+                "num_anouncements_err": 0,
+                "num_evaluation_err",
+                "date": 1696273730,
+                "updated_at": 1696273730
             }
         ].
         "ulItems": [
@@ -56,43 +74,72 @@
 <section>
    <ol>
       {{#ulItems}}
-          <li> <a href="{{url}}"> Summarry Error </a> </li>
+          <li> <a href="{{url}}"> {{label}} </a> </li>
        {{/ulItems}}
    </ol>
 </section>
-<table>
-   <thead>
-    <tr>
-        <th style="width: 2em; text-align: center;">id</th>
-        <th style="width: 7em; text-align: center;">date</th>
-        <th style="width: 2em; text-align: center;">num_grades</th>
-        <th style="width: 2em; text-align: center;">num_materials</th>
-        <th style="width: 2em; text-align: center;">num_anouncements</th>
-        <th style="width: 2em; text-align: center;">num_evaluation</th>
-        <th style="width: 2em; text-align: center;">num_grades_err</th>
-        <th style="width: 2em; text-align: center;">num_materials_err</th>         
-        <th style="width: 2em; text-align: center;">num_anouncements_err</th>     
-        <th style="width: 2em; text-align: center;">num_evaluation_err</th>
-        <th style="width: 2em; text-align: center;">date</th>
-        <th style="width: 2em; text-align: center;">updated_at</th>
-    </tr>
-   </thead>
-   <tbody>
-        {{#row}}
-            <tr>
-                <td style="width: 2em; text-align: center;">{{id}}</td>
-                <td style="width: 7em; text-align: center;">{{date}}</td>
-                <td style="width: 2em; text-align: center;">{{num_grades}}</td>
-                <td style="width: 2em; text-align: center;">{{num_materials}}</td>
-                <td style="width: 2em; text-align: center;">{{num_anouncements}}</td>
-                <td style="width: 2em; text-align: center;">{{num_evaluation}}</td>
-                <td style="width: 2em; text-align: center;">{{num_grades_err}}</td>
-                <td style="width: 2em; text-align: center;">{{num_materials_err}}</td>         
-                <td style="width: 2em; text-align: center;">{{num_anouncements_err}}</td>     
-                <td style="width: 2em; text-align: center;">{{num_evaluation_err}}</td>
-                <td style="width: 2em; text-align: center;">{{date}}</td>
-                <td style="width: 2em; text-align: center;">{{updated_at}}</td>                
-            </tr>
-        {{/row}}
-   </tbody>
-</table>
+<section>
+    <div class="section-title">
+        <h2>Daily Summary</h2>
+    </div>
+    <table class="daily-summary-table">
+       <thead>
+        <tr class="daily-summary-tr">
+            <th class="colum-title">id</th>
+            <th class="colum-title">num_grades</th>
+            <th class="colum-title">num_materials</th>
+            <th class="colum-title">num_anouncements</th>
+            <th class="colum-title">num_evaluation</th>
+            <th class="colum-title">num_grades_err</th>
+            <th class="colum-title">num_materials_err</th>
+            <th class="colum-title">num_anouncements_err</th>
+            <th class="colum-title">num_evaluation_err</th>
+            <th class="colum-title">created_at</th>
+            <th class="colum-title">updated_at</th>
+        </tr>
+       </thead>
+       <tbody>
+            {{#row}}
+                <tr class="daily-summary-tr">
+                    <td class="colum-value">{{id}}</td>
+                    <td class="colum-value">{{num_grades}}</td>
+                    <td class="colum-value">{{num_materials}}</td>
+                    <td class="colum-value">{{num_anouncements}}</td>
+                    <td class="colum-value">{{num_evaluation}}</td>
+                    <td class="colum-value">{{num_grades_err}}</td>
+                    <td class="colum-value">{{num_materials_err}}</td>
+                    <td class="colum-value">{{num_anouncements_err}}</td>
+                    <td class="colum-value">{{num_evaluation_err}}</td>
+                    <td class="colum-value">{{date}}</td>
+                    <td class="colum-value">{{updated_at}}</td>
+                </tr>
+            {{/row}}
+       </tbody>
+    </table>
+</section>
+
+<style>
+    .daily-summary-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+     .colum-title {
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #ddd;
+         background-color: #f2f2f2;
+     }
+
+     .colum-value {
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #ddd;
+        width: 2em;
+     }
+
+    .daily-summary-tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+</style>

@@ -110,3 +110,7 @@ $string['task_rutine_primary_desc'] = 'Ingrese el tiempo de ejecución en segund
 
 // Events.
 $string['uplannerconnect:mod_resource_file'] = "Module Files Uploaded";
+
+// Register
+$string['uplanner_log_processing'] = 'Registro procesado correctamente';
+$string['uplanner_log_dont_processing'] = 'Registro no procesado';

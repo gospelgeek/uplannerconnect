@@ -21,6 +21,7 @@ class plugin_config
     const TABLE_USER_MOODLE = 'user';
 
     // Queries.
+    const QUERY_SELECT_BY_ID = "SELECT * FROM %s WHERE id = :id";
     const QUERY_SELECT_COURSE_GRADES = "SELECT * FROM %s WHERE success = :success LIMIT :max_result OFFSET :offset";
     const QUERY_SHORNAME_COURSE_BY_ID = "SELECT shortname FROM %s WHERE id = :id";
     const QUERY_NAME_CATEGORY_GRADE = "SELECT t2.fullname FROM %s as t1 INNER JOIN %s as t2 ON t1.id = :id AND t2.id = t1.categoryid";
