@@ -7,6 +7,7 @@
 
 namespace local_uplannerconnect\application\repository;
 
+use Exception;
 use local_uplannerconnect\application\messages\messages_resource;
 
 /**
@@ -45,7 +46,7 @@ class messages_status_repository
      *
      * @return void
      */
-    public function process($repository, $rows, $log)
+    public function process($repository, $rows, $log, $updateStatus = true)
     {
         error_log('------------------------------------------  PROCESS START - UPLANNER QUERY ------------------------------------------');
         try {
@@ -79,15 +80,17 @@ class messages_status_repository
                 $log->add_line(' --- UV LOG: ' . json_encode($row));
                 $log->add_line(' --- UP LOG: ' . json_encode($message));
                 $data = [
-                    'success' => $state,
                     'is_sucessful' => $is_successful,
                     'ds_error' => $ds_error,
                     'id' => $row->id
                 ];
+                if ($updateStatus) {
+                    $data['success'] = $state;
+                }
                 $log->add_line(' --- UV UPDATE: ' . json_encode($data));
                 $repository->updateDataBD($data);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             error_log('messages_status_repository->process: ' . $e->getMessage() . PHP_EOL);
         }
     }

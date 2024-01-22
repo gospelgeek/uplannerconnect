@@ -82,20 +82,23 @@ class file
      */
     public function create_csv($headers)
     {
+        $response = false;
         try {
             if (!file_exists($this->directory)) {
                 mkdir($this->directory, 0755, true);
             }
             $csv_file = $this->get_path_file();
             $fp = fopen($csv_file, 'w');
-            fputcsv($fp, $headers);
-            fclose($fp);
-            return true;
+            if ($fp) {
+                fputcsv($fp, $headers);
+                fclose($fp);
+                $response = true;
+            }
         } catch (Exception $e) {
             error_log('create_csv: '. $e->getMessage() . PHP_EOL);
         }
 
-        return false;
+        return $response;
     }
 
     /**
