@@ -21,7 +21,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  *  Maneja los eventos de moodle
 */
-class handle_event_course_notes
+class dispatch_event_handler
 {
    /**
     * Lanza un handle cuando se actualiza un item de calificación

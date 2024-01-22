@@ -38,6 +38,10 @@ $string['syncsendtuplannertask'] = 'Send uPlanner Task';
 $string['synccleanuplannertask'] = 'Clean Log uPlanner Task';
 $string['syncerroruplannertask'] = 'Send registers no processing in uPlanner Task';
 
+// Register
+$string['uplanner_log_processing'] = ' Registration processed successfully';
+$string['uplanner_log_dont_processing'] = 'Registration processed incorrectly';
+
 // Module
 $string['pluginname'] = 'uPlannerConnect';
 $string['welcome'] = 'Welcome';
