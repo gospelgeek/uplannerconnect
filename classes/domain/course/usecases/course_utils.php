@@ -201,7 +201,7 @@ class course_utils
      */
     private function getInstanceCategoryName($gradeItem) : string
     {
-        $categoryFullName = 'NOTACURSO';
+        $categoryFullName = 'NOTA_CURSO';
         // Validate if property exists
         if (property_exists($gradeItem, 'id')) {
             // Ejecutar la consulta.
