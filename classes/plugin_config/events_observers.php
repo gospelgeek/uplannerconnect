@@ -13,7 +13,7 @@ namespace local_uplannerconnect\plugin_config;
 class events_observers
 {
     // Rutas de los eventos.
-    CONST ROUTE_HANDLER_EVENT_1 = 'local_uplannerconnect\infrastructure\event\handle_event_course_notes';
+    CONST ROUTE_HANDLER_EVENT_1 = 'local_uplannerconnect\infrastructure\event\dispatch_event_handler';
     
     const EVENTS_OBSERVERS = [
         [

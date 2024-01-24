@@ -79,7 +79,7 @@ class course_utils
 
             $timestamp =  $this->validator->isIsset(($gradeLoadItem->timecreated));
             $formattedDateCreated = date('Y-m-d', $timestamp);
-            $timestampMod =  $this->validator->isIsset(($gradeLoadItem->timemodified));
+            $timestampMod =  $this->validator->isIsset(strtotime(date("Y/m/d")));
             $formattedDateModified = date('Y-m-d', $timestampMod);
             $weightGrade = $this->validator->isIsset($this->getWeightGrade([
                 'gradeItem' => $gradeLoadItem,
@@ -104,7 +104,7 @@ class course_utils
                     'action' => strtoupper($data['dispatch']),
                     'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($grade->grade_item->courseid))
                 ];
-           }
+            }
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
@@ -201,7 +201,7 @@ class course_utils
      */
     private function getInstanceCategoryName($gradeItem) : string
     {
-        $categoryFullName = 'NIVEL000';
+        $categoryFullName = 'NOTA_CURSO';
         // Validate if property exists
         if (property_exists($gradeItem, 'id')) {
             // Ejecutar la consulta.
