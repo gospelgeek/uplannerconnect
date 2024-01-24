@@ -20,7 +20,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class main_handle_error_uplanner_task extends \core\task\scheduled_task
 {
-    const TASKS_ID = 'error';
+    const TASKS_ID = 'resend';
 
     /**
      * @inerhitdoc
