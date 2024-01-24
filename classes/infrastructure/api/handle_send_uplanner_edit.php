@@ -19,7 +19,6 @@ use local_uplannerconnect\infrastructure\log;
 
 defined('MOODLE_INTERNAL') || die;
 
-
 /**
  * Class handle_send_uplanner_edit, send data to uPlanner
  */
@@ -98,11 +97,12 @@ class handle_send_uplanner_edit
     ){
         $this->create_log($this->prefix . $this->task_id . '_log');
         $this->log->add_line('------------------------------------------  UPLANNER - PROCESS START - RESEND LOG ------------------------------------------');
-        $this->log->add_line('--- DATA REQUEST: ' . json_encode($data));
+        $this->log->add_line('--- UPLANNER DATA REQUEST: ' . json_encode($data));
         $log = $this->getDataRequest($data);
-        $this->log->add_line('--- LOG DATA: ' . json_encode($log));
+        $this->log->add_line('--- UPLANNER LOG DATA: ' . json_encode($log));
         $row = $this->process_request($log);
-        if (intval($row->success) === 1 && intval($row->is_sucessful) === 1) {
+        if (intval($row->success) === repository_type::STATE_UP_ERROR && intval($row->is_sucessful) === 1) {
+            $this->log->add_line('--- UPLANNER REMOVE LOG AFTER QUERY: ' . json_encode($log));
             $condition = [
                 'id' => $row->id,
             ];
@@ -114,9 +114,7 @@ class handle_send_uplanner_edit
             $this->log
         );
         $this->log->add_line('------------------------------------------            UPLANNER - RESET LOG             ------------------------------------------');
-        //$this->log->reset_log();
-        $this->log->add_line('ROW: '. json_encode($row));
-
+        $this->log->reset_log();
 
         return $row;
     }
@@ -135,17 +133,17 @@ class handle_send_uplanner_edit
             switch ($input['name']) {
                 case 'type':
                     $repositoryClass =  repository_type::getClass($input['value']);
-                    $this->log->add_line('CREATE REPOSITORY: ' . $input['value']);
+                    $this->log->add_line('UPLANNER CREATE REPOSITORY: ' . $input['value']);
                     $log['repository'] = new $repositoryClass();
-                    $this->log->add_line('CREATE CLIENT: ' . $input['value']);
+                    $this->log->add_line('UPLANNER CREATE CLIENT: ' . $input['value']);
                     $log['uplanner_client'] = $this->uplanner_client_factory->create($input['value']);
                     break;
                 case 'json':
-                    $this->log->add_line('JSON: ' . $input['value']);
-                    $log['json'] = json_decode($input['value'], true);
+                    $this->log->add_line('UPLANNER JSON: ' . $input['value']);
+                    $log['json'] = $this->getJson($input['value']);
                     break;
                 case 'id':
-                    $this->log->add_line('ID: ' . $input['value']);
+                    $this->log->add_line('UPLANNER ID: ' . $input['value']);
                     $log['id'] = $input['value'];
                     break;
                 default:
@@ -165,31 +163,45 @@ class handle_send_uplanner_edit
     {
         $this->log->add_line('********** UPLANNER - PROCESS REQUEST ');
         $this->log->add_line('UPLANNER - UPDATE JSON ');
-        $dataQuery = [
-            'json' => $log->json,
-            'id' => $log->id
-        ];
-        $log->repository->updateDataBD($dataQuery);
-        $row = $log->repository->get_data_by_id($log->id);
-        $this->log->add_line('UPLANNER - REQUEST: ' . json_encode($row));
-        $response = $this->request($log->uplanner_client, $row);
-        $this->log->add_line('UPLANNER - RESPONSE: ' . json_encode($response));
-        $status = (empty($response) || array_key_exists('error', $response))
-            ? repository_type::STATE_UP_ERROR : repository_type::STATE_SEND;
-        $this->log->add_line('UPLANNER - UPDATE REGISTER STATUS: ' . $status);
-        $dataQuery = [
-            'response' => $response,
-            'id' => $log->id
-        ];
-        $this->log->add_line('UPLANNER - UPDATE RESPONSE: ' . $status);
-        $log->repository->updateDataBD($dataQuery);
-        $row = $log->repository->get_data_by_id($log->id);
-        $fileCreated = $this->create_file($this->prefix . $log->uplanner_client->get_file_name(), $row, $status);
-        $this->log->add_line('UPLANNER - FILE WAS CREATED: ' . $fileCreated);
-        $this->log->add_line('UPLANNER - READ UPLANNER LOG' );
-        $this->message_repository->process($log->repository, $row, $this->log, false);
-        $row = $log->repository->get_data_by_id($log->id);
-        $row = reset($row);
+        if ($log->json){
+            $dataQuery = [
+                'json' => $log->json,
+                'id' => $log->id
+            ];
+            $log->repository->updateDataBD($dataQuery);
+            $row = $log->repository->get_data_by_id($log->id);
+            $this->log->add_line('UPLANNER - REQUEST: ' . json_encode($row));
+            $response = $this->request($log->uplanner_client, $row);
+            $this->log->add_line('UPLANNER - RESPONSE: ' . json_encode($response));
+            $status = (empty($response) || array_key_exists('error', $response))
+                ? repository_type::STATE_UP_ERROR : repository_type::STATE_SEND;
+            $this->log->add_line('UPLANNER - UPDATE REGISTER STATUS: ' . $status);
+            $dataQuery = [
+                'response' => $response,
+                'id' => $log->id
+            ];
+            $this->log->add_line('UPLANNER - UPDATE RESPONSE: ' . $status);
+            $log->repository->updateDataBD($dataQuery);
+            $row = $log->repository->get_data_by_id($log->id);
+            $fileCreated = $this->create_file($this->prefix . $log->uplanner_client->get_file_name(),
+                $row,
+                $status
+            );
+            $this->log->add_line('UPLANNER - FILE WAS CREATED: ' . $fileCreated);
+            $this->log->add_line('UPLANNER - READ UPLANNER LOG' );
+            $this->message_repository->process($log->repository, $row, $this->log, false);
+            $row = $log->repository->get_data_by_id($log->id);
+            $this->log->add_line('UPLANNER - UPDATED LOG AFTER QUERY: ' . json_encode($row) );
+            $row = reset($row);
+        } else {
+            $this->log->add_line('UPLANNER - DATA NO VALID: ' . json_encode($log) );
+            $row = $log->repository->get_data_by_id($log->id);
+            $fileCreated = $this->create_file(
+                $this->prefix . $log->uplanner_client->get_file_name(),
+                $row,
+                repository_type::STATE_UP_ERROR
+            );
+        }
         if ($fileCreated) {
             $data = [
                 $row->json,
@@ -205,6 +217,22 @@ class handle_send_uplanner_edit
         }
 
         return $row;
+    }
+
+    /**
+     * Is valid json
+     *
+     * @param string $json
+     * @return bool|null
+     */
+    function getJson($json)
+    {
+        try {
+            $object = json_decode($json, null, JSON_THROW_ON_ERROR);
+            return is_object($object) ? $object : null;
+        } catch  (Exception $e) {
+            return null;
+        }
     }
 
     /**
