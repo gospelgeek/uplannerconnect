@@ -9,6 +9,7 @@
 namespace local_uplannerconnect\infrastructure\email;
 
 use coding_exception;
+use stdClass;
 
 /**
  * Class email, send email with uPlaner info
@@ -33,7 +34,7 @@ class email
         $attachment_name
     ): bool {
         try {
-            $user = new \stdClass();
+            $user = new stdClass();
             $user->email = $recipient_email;
             $user->id = '000001';
             $user->username = 'univalle';
@@ -57,7 +58,7 @@ class email
                 $attachment_name
             );
         } catch (coding_exception $e) {
-            error_log('send: '. $e->getMessage(). "\n");
+            error_log('send: '. $e->getMessage() . PHP_EOL);
         }
 
         return false;

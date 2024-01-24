@@ -90,17 +90,20 @@ define([
      */
     function updateForm($trParent, data)
     {
-        var $form = $(form),
-            json = JSON.parse(data.json),
-            response = JSON.parse(data.response);
-        $trParent.find('.json').text(JSON.stringify(json));
-        $trParent.find('.response').text(JSON.stringify(response));
-        $trParent.find('.ds_error').text(data.ds_error);
-        $trParent.find('.is_sucessful').text(data.is_sucessful);
-        $form.find('#json').val(formatJson(data.json)).trigger('change');
-        $form.find('#response').val(formatJson(data.response)).trigger('change');
-        $form.find('#ds_error').val(data.ds_error).trigger('change');
-        $form.find('#is_sucessful').val(data.is_sucessful).trigger('change');
+        try {
+            var $form = $(form),
+                dataFormat = JSON.parse(data.data),
+                response = JSON.parse(dataFormat.response);
+            $trParent.find('.response').text(JSON.stringify(response));
+            $trParent.find('.ds_error').text(dataFormat.ds_error);
+            $trParent.find('.is_sucessful').text(dataFormat.is_sucessful);
+            $form.find('#response').val(formatJson(dataFormat.response)).trigger('change');
+            $form.find('#ds_error').val(dataFormat.ds_error).trigger('change');
+            $form.find('#is_sucessful').val(dataFormat.is_sucessful).trigger('change');
+        } catch (error) {
+            return false;
+        }
+
     }
 
     /**
@@ -118,6 +121,52 @@ define([
             ds_error: $trParent.find('.ds_error').text(),
             is_successful: $trParent.find('.is_sucessful').text()
         };
+    }
+
+    /**
+     * Validate form
+     *
+     * @returns {boolean}
+     */
+    function validateForm() {
+        var $form = $(form),
+            json = $form.find('#json').val(),
+            id = $form.find('#id').val();
+        if (!isValidInteger(id)) {
+            showDangerAlert('El campo Id debe ser un número entero.');
+            return false;
+        }
+        if (!isValidJSON(json)) {
+            showDangerAlert('El campo JSON debe ser un JSON válido.');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Validate integer
+     *
+     * @param value
+     * @returns {boolean}
+     */
+    function isValidInteger(value) {
+        return /^\d+$/.test(value);
+    }
+
+    /**
+     * Validate json format
+     *
+     * @param value
+     * @returns {boolean}
+     */
+    function isValidJSON(value) {
+        try {
+            var parsedValue = JSON.parse(value);
+            return (typeof parsedValue === 'object' && parsedValue !== null);
+        } catch (error) {
+            return false;
+        }
     }
 
     /**
@@ -211,32 +260,38 @@ define([
             $(modal.footer).on('click', '.btn.btn-primary', function () {
                 var formData = $(form).serializeArray();
                 showSpinner();
-                Ajax.call([{
-                    methodname: 'local_uplannerconnect_edit_log',
-                    args: {
-                        data: JSON.stringify(formData)
-                    }
-                }])[0].fail(function(reason) {
-                    hideSpinner();
-                    showDangerAlert(reason.message);
-                    modal.show();
-                    hideAlert(4000);
-                }).then(function(response) {
-                    hideSpinner();
-                    if (response.done) {
-                        showSuccessAlert(response.message);
+                if (validateForm()) {
+                    Ajax.call([{
+                        methodname: 'local_uplannerconnect_edit_log',
+                        args: {
+                            data: JSON.stringify(formData)
+                        }
+                    }])[0].fail(function(reason) {
+                        hideSpinner();
+                        showDangerAlert(reason.message);
                         modal.show();
-                        setTimeout(function () {
-                            modal.destroy();
-                            location.reload();
-                        }, 500);
-                        location.reload();
-                    } else {
-                        updateForm($trParent, JSON.parse(response.data));
-                        showDangerAlert(response.message);
+                        //hideAlert(4000);
+                    }).done(function(response) {
+                        hideSpinner();
+                        if (response.done) {
+                            showSuccessAlert(response.message);
+                            modal.show();
+                            setTimeout(function () {
+                                modal.destroy();
+                                location.reload();
+                            }, 4000);
+                        } else {
+                            updateForm($trParent, response.data);
+                            showDangerAlert(response.message);
+                            modal.show();
+                        }
+                    });
+                } else {
+                    setTimeout(function () {
+                        hideSpinner();
                         modal.show();
-                    }
-                });
+                    }, 1000);
+                }
             });
             modal.show();
         });

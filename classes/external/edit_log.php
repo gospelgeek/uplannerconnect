@@ -15,6 +15,7 @@ use external_function_parameters;
 use external_single_structure;
 use external_value;
 use invalid_parameter_exception;
+use local_uplannerconnect\application\repository\repository_type;
 use local_uplannerconnect\infrastructure\api\handle_send_uplanner_edit;
 use local_uplannerconnect\plugin_config\plugin_config;
 use required_capability_exception;
@@ -26,8 +27,8 @@ use stdClass;
  *
  * Trait implementing the external function local_uplannerconnect_edit_log.
  */
-trait edit_log {
-
+trait edit_log
+{
     /**
      * Describes the structure of parameters for the function.
      *
@@ -50,8 +51,7 @@ trait edit_log {
      * @throws coding_exception
      */
     public static function edit_log($data) {
-        global $USER, $PAGE;
-
+        global $USER;
         $context = context_user::instance($USER->id);
         self::validate_context($context);
         require_capability('local/' . plugin_config::PLUGIN_NAME . ':index', $context);
@@ -75,7 +75,7 @@ trait edit_log {
     {
         $message = get_string('uplanner_log_dont_processing', 'local_uplannerconnect');;
         $done = false;
-        if (intval($log->success) === 1 && intval($log->is_sucessful) === 1) {
+        if (intval($log->success) === repository_type::STATE_UP_ERROR && intval($log->is_sucessful) === 1) {
             $message = get_string('uplanner_log_processing', 'local_uplannerconnect');;
             $done = true;
         }

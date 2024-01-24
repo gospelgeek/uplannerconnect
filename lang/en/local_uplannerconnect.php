@@ -32,6 +32,7 @@ $string['clean_uplanner_email_subject_materials'] = 'Clean uPlanner Materials';
 $string['send_send_log'] = 'UPLANNER TASK SEND LOG';
 $string['clean_clean_log'] = 'UPLANNER TASK CLEAN LOG';
 $string['error_error_log'] = 'UPLANNER TASK ERROR LOG';
+$string['resend_resend_log'] = 'UPLANNER TASK RESEND LOG';
 
 // Tasks.
 $string['syncsendtuplannertask'] = 'Send uPlanner Task';
