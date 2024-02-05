@@ -65,7 +65,7 @@ class course_translation_data
      * @param array $data
      * @return array
      */
-    private function createCommonDataEvaluation(array $data) : array
+    public function createCommonDataEvaluation(array $data) : array
     {
         $arraySend = [];
         try {

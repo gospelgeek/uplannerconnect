@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/uplannerconnect/db" VERSION="2024012302" COMMENT="XMLDB file for local/uplannerconnect">
+<XMLDB PATH="local/uplannerconnect/db" VERSION="2024020403" COMMENT="XMLDB file for local/uplannerconnect">
     <TABLES>
         <TABLE NAME="uplanner_grades" COMMENT="Se Guardará la información generada por el evento">
             <FIELDS>
@@ -82,6 +82,18 @@
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="courseid" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="transaction" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="uplanner_dispatch_tmp" COMMENT="Temporaly Course Event">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="courseid" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="itemid" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="action" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="updated_item" TYPE="datetime" NOTNULL="true" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

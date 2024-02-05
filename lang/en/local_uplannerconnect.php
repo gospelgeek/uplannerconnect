@@ -115,4 +115,4 @@ $string['task_rutine_primary'] = 'Primary Task Runtime';
 $string['task_rutine_primary_desc'] = 'Enter the runtime in seconds for the primary task.';
 
 // Events.
-$string['uplannerconnect:mod_resource_file'] = "Module Files Uploaded";
+$string['uplannerconnect:uplanner_dispatch_tmp'] = "Module Files Uploaded";

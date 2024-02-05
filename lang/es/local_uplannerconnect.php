@@ -110,7 +110,7 @@ $string['task_rutine_primary'] = 'Tiempo de ejecución de la tarea principal';
 $string['task_rutine_primary_desc'] = 'Ingrese el tiempo de ejecución en segundos para la tarea principal.';
 
 // Events.
-$string['uplannerconnect:mod_resource_file'] = "Module Files Uploaded";
+$string['uplannerconnect:uplanner_dispatch_tmp'] = "Module Files Uploaded";
 
 // Register
 $string['uplanner_log_processing'] = 'Registro procesado correctamente';

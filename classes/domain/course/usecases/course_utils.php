@@ -201,7 +201,7 @@ class course_utils
      */
     private function getInstanceCategoryName($gradeItem) : string
     {
-        $categoryFullName = 'NOTA_CURSO';
+        $categoryFullName = 'NOTAS';
         // Validate if property exists
         if (property_exists($gradeItem, 'id')) {
             // Ejecutar la consulta.
@@ -244,7 +244,7 @@ class course_utils
      * @param object $gradeItem
      * @return float
      */
-    private function getWeight($gradeItem)
+    public function getWeight($gradeItem)
     {
         $weight = 0;
         if (property_exists($gradeItem, 'aggregationcoef2')) {
