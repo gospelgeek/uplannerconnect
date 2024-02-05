@@ -6,16 +6,16 @@
 */
 
 namespace local_uplannerconnect\event;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Evento que se lanza cuando se inserta un registro
- * en la tabla de mdl_files 
+ * Returns all the grading items of a course
 */
-class resource_file extends \core\event\base
+class course_structure extends \core\event\base
 {
     const LEVEL_TEACHING = 1;
-    const TABLE_NAME = 'files';
+    const TABLE_NAME = 'uplanner_dispatch_tmp';
 
     /**
      * Init method.
@@ -35,7 +35,7 @@ class resource_file extends \core\event\base
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' entered the search course module of the plugin uplannerConnect.";
+        return "Returns all the grading items of a course - uplannerconnect";
     }
 
     /**
@@ -44,6 +44,6 @@ class resource_file extends \core\event\base
      * @return string
      */
     public static function get_name() {
-        return get_string('uplannerconnect:mod_resource_file', 'local_uplannerconnect');
+        return get_string('uplannerconnect:uplanner_dispatch_tmp', 'local_uplannerconnect');
     }
 }

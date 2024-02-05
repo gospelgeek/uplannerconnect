@@ -10,7 +10,7 @@ namespace local_uplannerconnect\application\service;
 use moodle_exception;
 
 /**
- * Encargada de tener todas las validaciones
+ * Class Validator
 */
 class data_validator
 {
@@ -36,7 +36,7 @@ class data_validator
     ];
 
     /**
-      * Ejecuta la verificación acorde al tipo de verificación
+      * Execute the verification according to the type of validation.
       *
       * @param mixed $data El dato a validar.
       * @return bool 
@@ -60,9 +60,9 @@ class data_validator
     }
 
     /**
-      * Validad si un array tiene las keys que se requieren
+      * Validate if an array has the required keys.
       *
-      * @param mixed $data El dato a validar.
+      * @param mixed $data.
       * @return array
     */
     public function verifyArrayKeyExist(array $data): array
@@ -93,8 +93,7 @@ class data_validator
     }
 
     /**
-     * Valida si una consulta tiene resultados
-     * Pero solo un resultado
+     * Validates if a query has results, but only one result.
      * 
      * @param array $data
      * @return array
@@ -118,9 +117,9 @@ class data_validator
     }
 
     /**
-      *  Validad si un objecto tiene un metodo
+      *  Validate if an object has a method
       *
-      * @param mixed $data El dato a validar.
+      * @param mixed $data.
       * @return method or string
     */
     public function propertyExists(array $data): string
@@ -137,7 +136,7 @@ class data_validator
     }
 
     /**
-      *  Valida si un dato esta seteado 
+      * Validate if a data is set. 
       *
       * @param mixed $data El dato a validar.
       * @return data or null
@@ -148,9 +147,9 @@ class data_validator
     }
 
     /**
-      *  Valida si es un array o devielve null
+      * Validate if a data is an array or return null.
       *
-      * @param mixed $data El dato a validar.
+      * @param mixed $data
       * @return data or null
     */
     public function isArrayData($data)
@@ -159,9 +158,9 @@ class data_validator
     }
 
     /**
-      * Valida si un dato es un objecto o devuelve null
+      * Validate if a data is an object or return null.
       *
-      * @param mixed $data El dato a validar.
+      * @param mixed $data
       * @return data or null
     */
     public function isObjectData($data)
@@ -170,9 +169,9 @@ class data_validator
     }
 
     /**
-      *  Valida si en un array o detiene la ejecución
+      *  Validates if an array exists or halts execution.
       *
-      * @param mixed $data El dato a validar.
+      * @param mixed $data.
       * @return void
     */
     public function verifyArrayKeyExistOrDie($data) : void
@@ -184,9 +183,9 @@ class data_validator
     }
 
     /**
-      * Valida si una estructura de datos tiene las keys que se requieren
+      * Validate if a data structure has the required keys.
       *
-      * @param mixed $data El dato a validar.
+      * @param mixed $data
       * @return boolean
     */
     public function verificateKeyArrayBoolean($data) : bool
@@ -212,14 +211,15 @@ class data_validator
        } catch (moodle_exception $e) {
           error_log('Excepción capturada: '. $e->getMessage(). "\n");
        }
+
         return $boolean;
     }
     
     /**
-      *  Valida si una key existe en un array
+      *  Validate if a key exists in an array.
       *
       * @package uPlannerConnect
-      * @param mixed $data El dato a validar.
+      * @param mixed $data.
       *
       * @return boolean
     */
@@ -228,7 +228,7 @@ class data_validator
     }
 
     /**
-     *  Validad si un dato es un string
+     *  Validate if a data is an string
      * 
      *  @package uPlannerConnect
      *  
@@ -239,7 +239,7 @@ class data_validator
     }
     
     /**
-     * Valida si un dato es un entero
+     * Validate if a data is an integer.
      * 
      * @package uPlannerConnect
      * 
@@ -250,7 +250,7 @@ class data_validator
     }
 
     /**
-     * Valida si un dato es un float
+     * Validate if a data is a float.
      *
      * @param $data
      * @return boolean
@@ -261,7 +261,7 @@ class data_validator
     }
 
     /**
-     *  Valida si un dato es un booleano
+     *  Validate if a data is a boolean.
      *
      * @param $data
      * @return boolean
@@ -272,7 +272,7 @@ class data_validator
     }
 
     /**
-     * Valida si un dato es un array
+     * Validate if a data is an array.
      *
      * @param $data
      * @return boolean
@@ -283,7 +283,7 @@ class data_validator
     }
 
     /**
-     *  Valida si un dato es un objecto
+     *  Validate if a data is an object.
      *
      * @param $data
      * @return boolean
@@ -294,7 +294,7 @@ class data_validator
     }
 
     /**
-     *  Valida si un dato es null
+     * Validate if a data is null.
      *
      * @param $data
      * @return boolean
@@ -305,7 +305,7 @@ class data_validator
     }
 
     /**
-     *  Valida si un dato es un numerico
+     *  Output if a data is numeric.
      *
      * @param $data
      * @return boolean
@@ -313,5 +313,27 @@ class data_validator
     public function isNumeric($data) : bool
     {
         return is_numeric($data);
+    }
+
+    /**
+     * Validate if arraya have all keys
+     * 
+     * @return bool 
+    */
+    public function validateKeysArrays(array $data) : bool
+    {
+        $result = false;
+        if (!empty($data))  {
+            $keys = $data['keys'];
+            $array =  $data['data'];
+            $result = true;
+            foreach ($keys as $key) {
+                if (!array_key_exists($key, $array)) {
+                    $result = false;
+                }
+            }
+        }
+
+        return $result;
     }
 }

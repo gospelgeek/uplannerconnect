@@ -8,6 +8,7 @@
 
 namespace local_uplannerconnect\infrastructure\api;
 
+use Exception;
 use local_uplannerconnect\application\repository\repository_type;
 use local_uplannerconnect\infrastructure\api\client\abstract_uplanner_client;
 use local_uplannerconnect\infrastructure\api\factory\uplanner_client_factory;
@@ -186,7 +187,7 @@ class handle_send_uplanner_task
                 $json[] = json_decode($row->json, true);
             }
             $response = $uplanner_client->request($json);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             error_log('handle_send_uplanner_task - request: ' . $e->getMessage() . PHP_EOL);
         }
 

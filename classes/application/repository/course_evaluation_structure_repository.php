@@ -95,4 +95,19 @@ class course_evaluation_structure_repository
             'table' => self::TABLE
         ]);
     }
+
+    /**
+     * Get data by id
+     *
+     * @param $id
+     * @return array
+     */
+    public function get_data_by_id($id = null) : array
+    {
+        return $this->general_repository->get_data_by_id([
+            'id' => $id,
+            'query' => plugin_config::QUERY_SELECT_BY_ID,
+            'table' => self::TABLE
+        ]);
+    }
 }

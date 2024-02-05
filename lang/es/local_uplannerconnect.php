@@ -34,6 +34,7 @@ $string['clean_uplanner_email_subject_materials'] = 'Clean uPlanner Materials';
 $string['send_send_log'] = 'UPLANNER TASK SEND LOG';
 $string['clean_clean_log'] = 'UPLANNER TASK CLEAN LOG';
 $string['error_error_log'] = 'UPLANNER TASK ERROR LOG';
+$string['resend_resend_log'] = 'UPLANNER TASK RESEND LOG';
 
 // Module
 $string['pluginname'] = 'uPlannerConnect';
@@ -109,4 +110,8 @@ $string['task_rutine_primary'] = 'Tiempo de ejecución de la tarea principal';
 $string['task_rutine_primary_desc'] = 'Ingrese el tiempo de ejecución en segundos para la tarea principal.';
 
 // Events.
-$string['uplannerconnect:mod_resource_file'] = "Module Files Uploaded";
+$string['uplannerconnect:uplanner_dispatch_tmp'] = "Module Files Uploaded";
+
+// Register
+$string['uplanner_log_processing'] = 'Registro procesado correctamente';
+$string['uplanner_log_dont_processing'] = 'Registro no procesado';

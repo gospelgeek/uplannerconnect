@@ -121,6 +121,39 @@ class general_repository
         return $dataQuery;
     }
 
+
+    /**
+     * Get data by id
+     *
+     * @param array|null $data
+     * @return array
+     */
+    public function get_data_by_id(array $data = null) : array
+    {
+        $dataQuery = [];
+        try {
+            if (empty($data)) {
+                error_log('get_data_by_id: data is empty ' . PHP_EOL);
+                return $dataQuery;
+            }
+            $tableName = '{'.$data['table'].'}';
+            $dataQuery = $this->moodle_query_handler->executeQuery(
+                sprintf(
+                    $data['query'],
+                    $tableName,
+                ),
+                [
+                    "id" => $data['id'],
+                ]
+            );
+        }
+        catch (moodle_exception $e) {
+            error_log('get_data_by_id exception: ' . $e->getMessage() . PHP_EOL);
+        }
+
+        return $dataQuery;
+    }
+
     /**
      * Delete registers
      *
