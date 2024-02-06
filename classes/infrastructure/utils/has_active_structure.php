@@ -94,7 +94,7 @@ class has_active_structure implements structure_interface
                     array_push($response, $dataItem);
                 }
             }
-        } catch (e) {
+        } catch (moodle_exception $e) {
             error_log('Caught exception: '.  $e->getMessage(). "\n");
         }
 

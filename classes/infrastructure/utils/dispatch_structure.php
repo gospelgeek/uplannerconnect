@@ -68,7 +68,7 @@ class dispatch_structure implements dispatch_structure_interface
                     'itemid' => strval( $isCreate ? $data['itemid'] : '0')
                 ]
             ));
-        } catch (e) {
+        } catch (moodle_exception $e) {
             error_log('Caught exception: '.  $e->getMessage(). "\n");
         }
 
@@ -91,7 +91,7 @@ class dispatch_structure implements dispatch_structure_interface
                     'updated_item' => date("Y/m/d")
                 ]
             ]);
-        } catch(e) {
+        } catch(moodle_exception $e) {
             error_log('Caught exception: '.  $e->getMessage(). "\n");
         }
     }
@@ -111,7 +111,7 @@ class dispatch_structure implements dispatch_structure_interface
                     'itemid' => strval($isCreate ? $data['itemid'] : '0')
                 ]
             );
-        } catch (e) {
+        } catch (moodle_exception $e) {
             error_log('Caught exception: '.  $e->getMessage(). "\n");
         }
     }
