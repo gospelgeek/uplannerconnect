@@ -12,11 +12,11 @@ namespace local_uplannerconnect\infrastructure\utils;
 */
 class utils_events
 {
-    public static function isStructureCourse($event,$action)
+    public static function isStructureCourse($event,$action): void
     {
         $get_grade_item = $event->get_grade_item();
         $dispatchStructure = new dispatch_structure();
-        $isAvailableCoure = $dispatchStructure->executeEventHandler(
+        $dispatchStructure->executeEventHandler(
             [
                 'courseid' => $get_grade_item->courseid,
                 'itemid' => $get_grade_item->id,

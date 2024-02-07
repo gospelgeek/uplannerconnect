@@ -12,5 +12,5 @@ namespace local_uplannerconnect\infrastructure\utils;
 */
 interface dispatch_structure_interface
 {
-    public function executeEventHandler(array $data, $event);
+    public function executeEventHandler(array $data, $event) : void;
 }
