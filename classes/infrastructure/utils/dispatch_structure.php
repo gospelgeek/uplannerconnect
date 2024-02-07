@@ -18,8 +18,10 @@ class dispatch_structure implements dispatch_structure_interface
 {
     const TABLE_NAME = 'uplanner_dispatch_tmp';
     const ACTION = 'create';
-    const QUERY_DISPATCH_COURSE = "SELECT courseid FROM {uplanner_dispatch_tmp} WHERE courseid = :courseid AND action = :action AND itemid = :itemid";
-    const DELETE_DISPATCH_COURSE = "DELETE FROM {uplanner_dispatch_tmp} WHERE courseid = :courseid AND action = :action AND itemid = :itemid";
+    const QUERY_DISPATCH_COURSE = "SELECT action  FROM {uplanner_dispatch_tmp} WHERE courseid = :courseid ORDER BY id ASC LIMIT 1";
+    const DELETE_DISPATCH_COURSE = "DELETE FROM {uplanner_dispatch_tmp} WHERE courseid = :courseid AND action = :action";
+    const LAST_ITEMS_COURSE = "SELECT id FROM {grade_items} WHERE courseid = :courseid AND itemtype NOT IN ('course', 'category') ORDER BY id DESC LIMIT 2";
+    const NOT_AVAILABLE_ITEMS = ['course','category'];
     private $query;
     private $validator;
 
@@ -32,53 +34,72 @@ class dispatch_structure implements dispatch_structure_interface
         $this->validator= new data_validator();
     }
 
-    public function executeEventHandler(array $data , $event)
+    /**
+     * @param array $data
+     * @param $event
+     * @return void
+     */
+    public function executeEventHandler(array $data , $event): void
     {
+        $get_grade_item = $event->get_grade_item();
+        $itemtype = $get_grade_item->itemtype;
+
         if ($this->validator->validateKeysArrays([
             'keys' => ['courseid','itemid', 'action'],
-            'data' => $data,
-        ]))  {
-            $isCourseActive = $this->isCourseActive($data);
-            if ($isCourseActive) {
-                // Insert New Record
-                $this->insertCourseStruture($data);
-                has_active_structure::triggerEvent([
-                    'event' => $event,
-                    'dataCourse' => $data
-                ]);
+            'data' => $data
+            ]) && !in_array($itemtype, self::NOT_AVAILABLE_ITEMS))
+        {
+            $lastItems  = $this->lastItemsCourse($data['courseid']);
+            if (!empty($lastItems)) {
+                // Action Dispatch
+                $isActionCreated = $this->isActionCreated($data);
+                $actionCurrent = array_values(array_slice($isActionCreated, -1))[0] ?? [];
+                $valueAction = $actionCurrent->action ?? $data['action'];
+                $isCreate = $valueAction == self::ACTION;
+
+                // Create Action if is first
+                if (empty($isActionCreated)) {
+                    $this->insertCourseStructure($data);
+                }
+
+                if ($isCreate) {
+                    // Last Item
+                    $lastItem = array_values(array_slice($lastItems, -1))[0] ?? [];
+                    $valueLasItem = $lastItem->id ?? 0;
+
+                    if ($data['itemid'] == $valueLasItem) {
+                        $data['action'] = self::ACTION;
+                        $this->executeTrigger($data,$event);
+                    }
+                }
+
+                if (!$isCreate) {
+                    $this->executeTrigger($data,$event);
+                }
             }
         }
     }
 
     /**
-     * Validate if the course no is in the database.
-     * 
-     * @return bool
-    */
-    private function isCourseActive(array $data) : bool
+     * Validate if the course now is in the database.
+     *
+     * @param array $data
+     * @return array
+     */
+    private function isActionCreated(array $data) : array
     {
-        $haveCourseActive =  false;
-        try {
-            $isCreate = $data['action'] === self::ACTION;
-            $haveCourseActive = empty($this->query->executeQuery(
-                self::QUERY_DISPATCH_COURSE,
-                [
-                    'courseid' => strval($data['courseid']),
-                    'action' => strval($data['action']),
-                    'itemid' => strval( $isCreate ? $data['itemid'] : '0')
-                ]
-            ));
-        } catch (moodle_exception $e) {
-            error_log('Caught exception: '.  $e->getMessage(). "\n");
-        }
-
-        return $haveCourseActive;
+        return $this->getQueryArray([
+            'sql' => self::QUERY_DISPATCH_COURSE,
+            'params' => [
+                'courseid' => $data['courseid']
+            ]
+        ]);
     }
 
     /**
      *  Insert New Record
     */
-    private function insertCourseStruture(array $data)
+    private function insertCourseStructure(array $data): void
     {
         try {
             $isCreate = $data['action'] === self::ACTION;
@@ -107,12 +128,66 @@ class dispatch_structure implements dispatch_structure_interface
                 self::DELETE_DISPATCH_COURSE,
                 [
                     'courseid' => strval($data['courseid']),
-                    'action' => strval($data['action']),
-                    'itemid' => strval($isCreate ? $data['itemid'] : '0')
+                    'action' => strval($data['action'])
                 ]
             );
         } catch (moodle_exception $e) {
             error_log('Caught exception: '.  $e->getMessage(). "\n");
         }
+    }
+
+    /**
+     * @param $courseid
+     * @return array
+     */
+    private function lastItemsCourse($courseid) : array
+    {
+        return $this->getQueryArray([
+            'sql' => self::LAST_ITEMS_COURSE,
+            'params' => [
+                'courseid' => $courseid
+            ]
+        ]);
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    private function getQueryArray(array $data): array
+    {
+        $rest = [];
+        try {
+            if ($this->validator->validateKeysArrays([
+                'keys' => ['sql','params'],
+                'data' => $data,
+            ])) {
+                $response = $this->query->executeQuery(
+                    $data['sql'],
+                    $data['params']
+                );
+
+                if (!empty($response)) {
+                    $rest = $response;
+                }
+            }
+        } catch (moodle_exception $e) {
+            error_log('Caught exception: '.  $e->getMessage(). "\n");
+        }
+
+        return $rest;
+    }
+
+    /**
+     * @param $data
+     * @param $event
+     * @return void
+     */
+    private function executeTrigger($data,$event): void
+    {
+        has_active_structure::triggerEvent([
+            'event' => $event,
+            'dataCourse' => $data
+        ]);
     }
 }

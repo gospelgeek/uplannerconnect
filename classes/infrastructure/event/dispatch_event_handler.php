@@ -130,18 +130,21 @@ class dispatch_event_handler
             $isTotalItem = isTotalItem($event->get_grade_item());
             //Validar el tipo de evento
             if ($IsValidEvent['create'] || $IsValidEvent['delete']) {
-            //valida si la facultad tiene acceso
-            if (!validateAccesFaculty($event)) { return; }
-               if ($isTotalItem) {
-                  utils_events::isStructureCourse($event,'create');
-                  //Instanciar la clase management_factory
-                  // instantiatemanagement_factory([
-                  //    "dataEvent" => $event,
-                  //    "typeEvent" => "grade_item_created",
-                  //    "dispatch" => $IsValidEvent['create']? "create" : "delete",
-                  //    "enum_etities" => 'evaluation_structure'
-                  // ]);
-               }
+                //valida si la facultad tiene acceso
+                if (!validateAccesFaculty($event)) { return; }
+
+                if ($isTotalItem && $IsValidEvent['create']) {
+                    utils_events::isStructureCourse($event,'create');
+                }
+                else if ($isTotalItem) {
+                    //Instanciar la clase management_factory
+                    instantiatemanagement_factory([
+                        "dataEvent" => $event,
+                        "typeEvent" => "grade_item_created",
+                        "dispatch" => "delete",
+                        "enum_etities" => 'evaluation_structure'
+                    ]);
+                }
             }
       } catch (moodle_exception $e) {
          error_log('Excepción capturada: '. $e->getMessage(). "\n");
@@ -494,13 +497,6 @@ function filterRecentUpdate($event)
 
          if ($isFilter) {
             utils_events::isStructureCourse($event,'update');
-            // Instanciar la clase management_factory.
-            // instantiatemanagement_factory([
-            //    "dataEvent" => $event,
-            //    "typeEvent" => "grade_item_created",
-            //    "dispatch" => "update",
-            //    "enum_etities" => 'evaluation_structure'
-            // ]);
          } 
 
    } catch (moodle_exception $e) {
