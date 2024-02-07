@@ -504,5 +504,29 @@ function xmldb_local_uplannerconnect_upgrade($oldversion): bool {
         upgrade_plugin_savepoint(true, 2023120800, 'local', 'uplannerconnect');
     }
 
+    if ($oldversion < 2024020401) {
+
+        // Define table uplanner_dispatch_tmp to be created.
+        $table = new xmldb_table('uplanner_dispatch_tmp');
+
+        // Adding fields to table uplanner_dispatch_tmp.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('courseid', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('itemid', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('action', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
+        $table->add_field('updated_item', XMLDB_TYPE_DATETIME, null, null, XMLDB_NOTNULL, null, null);
+
+        // Adding keys to table uplanner_dispatch_tmp.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        // Conditionally launch create table for uplanner_dispatch_tmp.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Uplannerconnect savepoint reached.
+        upgrade_plugin_savepoint(true, 2024020401, 'local', 'uplannerconnect');
+    }
+
     return true;
 }

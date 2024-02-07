@@ -44,6 +44,7 @@ class course_utils
     /**
      * Retorna los datos del evento user_graded
      *
+     * @param array $data
      * @return array
      */
     public function resourceUserGraded(array $data) : array
@@ -114,6 +115,7 @@ class course_utils
     /**
      * Retorna los datos del evento grade_item_created
      *
+     * @param array $data
      * @return array
      */
     public function resourceGradeItemCreated(array $data) : array
@@ -180,8 +182,9 @@ class course_utils
 
     /**
      * Retorna el nombre de la categoria
-     * 
+     *
      * @param object $gradeItem
+     * @param $gradesGrades
      * @return bool
      */
     private function getApprovedItem($gradeItem , $gradesGrades) : bool
@@ -201,7 +204,7 @@ class course_utils
      */
     private function getInstanceCategoryName($gradeItem) : string
     {
-        $categoryFullName = 'NOTA_CURSO';
+        $categoryFullName = 'NOTAS';
         // Validate if property exists
         if (property_exists($gradeItem, 'id')) {
             // Ejecutar la consulta.
@@ -244,7 +247,7 @@ class course_utils
      * @param object $gradeItem
      * @return float
      */
-    private function getWeight($gradeItem)
+    public function getWeight($gradeItem)
     {
         $weight = 0;
         if (property_exists($gradeItem, 'aggregationcoef2')) {
@@ -257,10 +260,10 @@ class course_utils
         return $weight;
     }
 
-        /**
+    /**
      * Return weight of category
-     * 
-     * @param object $gradeItem
+     *
+     * @param array $data
      * @return float
      */
     private function getWeightGrade(array $data)
@@ -315,8 +318,8 @@ class course_utils
 
     /**
      * Retorna el nombre de la categoria
-     * 
-     * @param object $gradeItem
+     *
+     * @param $queryResult
      * @return string
      */
     private function getNameCategoryItem($queryResult)
@@ -340,7 +343,6 @@ class course_utils
 
     /**
      * Return all data of category
-     * 
      */
     private function getDataCategories($idCategory)
     {

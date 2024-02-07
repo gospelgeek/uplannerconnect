@@ -33,7 +33,7 @@ class events_observers
             'includefile' => self::ROUTE_HANDLER_EVENT_1,
         ],
         [
-            'eventname' => '\local_uplannerconnect\event\resource_file',
+            'eventname' => '\local_uplannerconnect\event\course_structure',
             'isLocal' => true,
             'includefile' => self::ROUTE_HANDLER_EVENT_1,
         ],

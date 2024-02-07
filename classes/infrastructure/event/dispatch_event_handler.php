@@ -14,6 +14,8 @@ use local_uplannerconnect\application\repository\moodle_query_handler;
 use local_uplannerconnect\domain\service\recalculate_item_weight; 
 use local_uplannerconnect\application\service\announcements_utils;
 use local_uplannerconnect\plugin_config\plugin_config;
+use local_uplannerconnect\infrastructure\utils\utils_events;
+use local_uplannerconnect\infrastructure\utils\has_active_structure;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -128,18 +130,21 @@ class dispatch_event_handler
             $isTotalItem = isTotalItem($event->get_grade_item());
             //Validar el tipo de evento
             if ($IsValidEvent['create'] || $IsValidEvent['delete']) {
-            //valida si la facultad tiene acceso
-            if (!validateAccesFaculty($event)) { return; }
-               if ($isTotalItem) {
-                  recalculatesWeight($event);
-                  //Instanciar la clase management_factory
-                  instantiatemanagement_factory([
-                     "dataEvent" => $event,
-                     "typeEvent" => "grade_item_created",
-                     "dispatch" => $IsValidEvent['create']? "create" : "delete",
-                     "enum_etities" => 'evaluation_structure'
-                  ]);
-               }
+                //valida si la facultad tiene acceso
+                if (!validateAccesFaculty($event)) { return; }
+
+                if ($isTotalItem && $IsValidEvent['create']) {
+                    utils_events::isStructureCourse($event,'create');
+                }
+                else if ($isTotalItem) {
+                    //Instanciar la clase management_factory
+                    instantiatemanagement_factory([
+                        "dataEvent" => $event,
+                        "typeEvent" => "grade_item_created",
+                        "dispatch" => "delete",
+                        "enum_etities" => 'evaluation_structure'
+                    ]);
+                }
             }
       } catch (moodle_exception $e) {
          error_log('Excepción capturada: '. $e->getMessage(). "\n");
@@ -164,18 +169,17 @@ class dispatch_event_handler
          }
      } catch (moodle_exception $e) {
          error_log('Excepción capturada: '.  $e->getMessage(). "\n");
-     }  
+     } 
    }
 
    /**
     * Triggers an event when a resource is created.
     */
-   public static function resource_file($events)
+   public static function course_structure($event)
    {
       try {
-         error_log('*******************************************************');
-         error_log('resource_file');
-         error_log('*******************************************************');
+         $instanceUtils = new has_active_structure();
+         $instanceUtils->generateHandler($event->other);
       } catch (moodle_exception $e) {
          error_log('Excepción capturada: '. $e->getMessage(). "\n");
       }
@@ -492,13 +496,7 @@ function filterRecentUpdate($event)
          $isFilter = $filter_evaluation_update->filterRecentUpdate($event);
 
          if ($isFilter) {
-            // Instanciar la clase management_factory.
-            instantiatemanagement_factory([
-               "dataEvent" => $event,
-               "typeEvent" => "grade_item_created",
-               "dispatch" => "update",
-               "enum_etities" => 'evaluation_structure'
-            ]);
+            utils_events::isStructureCourse($event,'update');
          } 
 
    } catch (moodle_exception $e) {
