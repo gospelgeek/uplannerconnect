@@ -27,7 +27,7 @@ class dispatch_event_handler
 {
    /**
     * Lanza un handle cuando se actualiza un item de calificación
-    * 
+    *
     * @return  void
    */
    public static function user_graded($event)
@@ -71,8 +71,8 @@ class dispatch_event_handler
 
    /**
     * Lanza un handle cuando se borra una calificación
-    * 
-    * @return void 
+    *
+    * @return void
    */
    public static function grade_deleted($event)
    {   
@@ -105,12 +105,12 @@ class dispatch_event_handler
 
    /**
     * Lanza un handle cuando se crea un item de calificación
-    * 
+    *
     * @param object $event
     * @return void
    */
    public static function grade_item_created($event)
-   {        
+   {
       try {
             $IsValidEvent = [
                'delete' => validateAccessTypeEvent([
@@ -169,7 +169,7 @@ class dispatch_event_handler
          }
      } catch (moodle_exception $e) {
          error_log('Excepción capturada: '.  $e->getMessage(). "\n");
-     } 
+     }
    }
 
    /**
