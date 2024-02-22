@@ -52,11 +52,10 @@ class has_active_structure implements structure_interface
         ]);
         $dataTranslate['evaluationGroups'] = $allItems;
         $this->repository->saveDataBD($dataTranslate);
-        $this->dispatch_structure->deleteRecord($dataCourse);
     }
     
     /**
-     *  Trigger event resource 
+     *  Trigger event resource
     */
     public static function triggerEvent(array $data)
     {
