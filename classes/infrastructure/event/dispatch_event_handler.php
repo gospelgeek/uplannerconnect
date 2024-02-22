@@ -8,12 +8,6 @@
 namespace local_uplannerconnect\infrastructure\event;
 
 use local_uplannerconnect\domain\management_factory;
-use local_uplannerconnect\application\service\event_access_validator;
-use local_uplannerconnect\application\service\filter_evaluation_update;
-use local_uplannerconnect\application\repository\moodle_query_handler;
-use local_uplannerconnect\domain\service\recalculate_item_weight; 
-use local_uplannerconnect\application\service\announcements_utils;
-use local_uplannerconnect\plugin_config\plugin_config;
 use local_uplannerconnect\infrastructure\utils\utils_events;
 use local_uplannerconnect\infrastructure\utils\has_active_structure;
 use moodle_exception;
@@ -21,12 +15,14 @@ use moodle_exception;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- *  Maneja los eventos de moodle
+ * Manage Moodle events.
 */
 class dispatch_event_handler
 {
+    const TEXT_ERROR = 'Exception caught: ';
+
    /**
-    * Lanza un handle cuando se actualiza un item de calificación
+    * Trigger a handler when a grade item is updated.
     *
     * @return  void
    */
@@ -34,7 +30,7 @@ class dispatch_event_handler
    {
       try {
             //Validar el tipo de evento
-            if (validateAccessTypeEvent([
+            if (utils_events::validateAccessTypeEvent([
                "dataEvent" => $event,
                "typeEvent" => ["\\core\\event\\user_graded"],
                "key" => "eventname",
@@ -46,16 +42,16 @@ class dispatch_event_handler
        
                if ($eventUser !== -1) {
                   //valida si la facultad tiene acceso
-                  if (!validateAccesFaculty($event)) { return; }
+                  if (!utils_events::validateAccessFaculty($event)) { return; }
                      $stateCreated = [
                         'novalue',
                         'unknown'
                      ];
                      $stateDispatch = in_array($agregationState,$stateCreated);
-                     $isTotalItem = isTotalItem($grade-> load_grade_item());
+                     $isTotalItem = utils_events::isTotalItem($grade-> load_grade_item());
                      if ($isTotalItem) {
                          //Instanciar la clase management_factory
-                         instantiatemanagement_factory([
+                         utils_events::instanceFactory([
                             "dataEvent" => $event,
                             "typeEvent" => "user_graded",
                             "dispatch" => ($stateDispatch)? 'create': 'update',
@@ -65,20 +61,20 @@ class dispatch_event_handler
                }
             }
       } catch (moodle_exception $e) {
-         error_log('Excepción capturada: '. $e->getMessage(). "\n");
+         error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
       }
    }
 
    /**
-    * Lanza un handle cuando se borra una calificación
+    * Trigger a handler when a grade is deleted.
     *
     * @return void
    */
    public static function grade_deleted($event)
-   {   
+   {
       try {
             //Validar el tipo de evento
-            if (validateAccessTypeEvent([
+            if (utils_events::validateAccessTypeEvent([
                "dataEvent" => $event,
                "typeEvent" => ["\\core\\event\\grade_deleted"],
                "key" => "eventname",
@@ -88,9 +84,9 @@ class dispatch_event_handler
    
                if ($eventUser !== -1) {
                   //valida si la facultad tiene acceso
-                  if (!validateAccesFaculty($event)) { return; }
+                  if (!utils_events::validateAccessFaculty($event)) { return; }
                      //Instanciar la clase management_factory
-                     instantiatemanagement_factory([
+                     utils_events::instanceFactory([
                         "dataEvent" => $event,
                         "typeEvent" => "user_graded",
                         "dispatch" => 'delete',
@@ -99,12 +95,12 @@ class dispatch_event_handler
                }
             }
       } catch (moodle_exception $e) {
-         error_log('Excepción capturada: '. $e->getMessage(). "\n");
+         error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
       }
    }
 
    /**
-    * Lanza un handle cuando se crea un item de calificación
+    * Trigger a handler when a grade item is created.
     *
     * @param object $event
     * @return void
@@ -113,13 +109,13 @@ class dispatch_event_handler
    {
       try {
             $IsValidEvent = [
-               'delete' => validateAccessTypeEvent([
+               'delete' => utils_events::validateAccessTypeEvent([
                   "dataEvent" => $event,
                   "typeEvent" => ["\\core\\event\\grade_item_deleted"],
                   "key" => "eventname",
                   "methodName" => "get_data"
                ]),
-               'create' => validateAccessTypeEvent([
+               'create' => utils_events::validateAccessTypeEvent([
                   "dataEvent" => $event,
                   "typeEvent" => ["\\core\\event\\grade_item_created"],
                   "key" => "eventname",
@@ -127,18 +123,18 @@ class dispatch_event_handler
                ])
             ];
 
-            $isTotalItem = isTotalItem($event->get_grade_item());
+            $isTotalItem = utils_events::isTotalItem($event->get_grade_item());
             //Validar el tipo de evento
             if ($IsValidEvent['create'] || $IsValidEvent['delete']) {
                 //valida si la facultad tiene acceso
-                if (!validateAccesFaculty($event)) { return; }
+                if (!utils_events::validateAccessFaculty($event)) { return; }
 
                 if ($isTotalItem && $IsValidEvent['create']) {
                     utils_events::isStructureCourse($event,'create');
                 }
                 else if ($isTotalItem) {
                     //Instanciar la clase management_factory
-                    instantiatemanagement_factory([
+                    utils_events::instanceFactory([
                         "dataEvent" => $event,
                         "typeEvent" => "grade_item_created",
                         "dispatch" => "delete",
@@ -147,7 +143,7 @@ class dispatch_event_handler
                 }
             }
       } catch (moodle_exception $e) {
-         error_log('Excepción capturada: '. $e->getMessage(). "\n");
+         error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
       }
    }
 
@@ -157,18 +153,18 @@ class dispatch_event_handler
    public static function grade_item_updated($event)
    {
      try {
-         if (validateAccessTypeEvent([
+         if (utils_events::validateAccessTypeEvent([
             "dataEvent" => $event,
             "typeEvent" => ["\\core\\event\\grade_item_updated"],
             "key" => "eventname",
             "methodName" => "get_data"
          ])) {
-            if (validateAccesFaculty($event)) {
-               filterRecentUpdate($event);
+            if (utils_events::validateAccessFaculty($event)) {
+               utils_events::filterRecentUpdate($event);
             }
          }
      } catch (moodle_exception $e) {
-         error_log('Excepción capturada: '.  $e->getMessage(). "\n");
+         error_log(self::TEXT_ERROR.  $e->getMessage(). "\n");
      }
    }
 
@@ -181,7 +177,7 @@ class dispatch_event_handler
          $instanceUtils = new has_active_structure();
          $instanceUtils->generateHandler($event->other);
       } catch (moodle_exception $e) {
-         error_log('Excepción capturada: '. $e->getMessage(). "\n");
+         error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
       }
    }
 
@@ -191,14 +187,14 @@ class dispatch_event_handler
    public static function course_module_created($event)
    {
       try {
-            if (validateAccessTypeEvent([
+            if (utils_events::validateAccessTypeEvent([
                "dataEvent" => $event,
                "typeEvent" => ["\\core\\event\\course_module_created"],
                "key" => "eventname",
                "methodName" => "get_data"
             ])) {
                $dataEvent = $event->get_data();
-               if(isset($dataEvent['other']['modulename']) && 
+               if(isset($dataEvent['other']['modulename']) &&
                   $dataEvent['objecttable'] === 'course_modules') {
                   $moduleType = $dataEvent['other']['modulename'];
                   
@@ -215,9 +211,9 @@ class dispatch_event_handler
                   ];
 
                   if (in_array($moduleType, $availableModules)) {
-                     if (!validateAccesFaculty($event)) { return; }
+                     if (!utils_events::validateAccessFaculty($event)) { return; }
                      //Instanciar la clase management_factory
-                     instantiatemanagement_factory([
+                     utils_events::instanceFactory([
                         "dataEvent" => $event,
                         "typeEvent" => "resource_created",
                         "dispatch" => 'create',
@@ -227,7 +223,7 @@ class dispatch_event_handler
                }
             }
       } catch (moodle_exception $e) {
-         error_log('Excepción capturada: '. $e->getMessage(). "\n");
+         error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
       }
    }
 
@@ -237,7 +233,7 @@ class dispatch_event_handler
    public static function course_module_updated($event)
    {
       try {
-         if (validateAccessTypeEvent([
+         if (utils_events::validateAccessTypeEvent([
             "dataEvent" => $event,
             "typeEvent" => ["\\core\\event\\course_module_updated"],
             "key" => "eventname",
@@ -261,9 +257,9 @@ class dispatch_event_handler
                ];
 
                if (in_array($moduleType, $availableModules)) {
-                  if (!validateAccesFaculty($event)) { return; }
+                  if (!utils_events::validateAccessFaculty($event)) { return; }
                   //Instanciar la clase management_factory
-                  instantiatemanagement_factory([
+                  utils_events::instanceFactory([
                      "dataEvent" => $event,
                      "typeEvent" => "resource_created",
                      "dispatch" => 'update',
@@ -273,7 +269,7 @@ class dispatch_event_handler
             }
          }
       } catch (moodle_exception $e) {
-         error_log('Excepción capturada: '. $e->getMessage(). "\n");
+         error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
       }
    }
 
@@ -283,7 +279,7 @@ class dispatch_event_handler
    public static function course_module_deleted($event)
    {
       try {
-         if (validateAccessTypeEvent([
+         if (utils_events::validateAccessTypeEvent([
             "dataEvent" => $event,
             "typeEvent" => ["\\core\\event\\course_module_deleted"],
             "key" => "eventname",
@@ -307,9 +303,9 @@ class dispatch_event_handler
                ];
 
                if (in_array($moduleType, $availableModules)) {
-                  if (!validateAccesFaculty($event)) { return; }
+                  if (!utils_events::validateAccessFaculty($event)) { return; }
                   //Instanciar la clase management_factory
-                  instantiatemanagement_factory([
+                  utils_events::instanceFactory([
                      "dataEvent" => $event,
                      "typeEvent" => "resource_created",
                      "dispatch" => 'delete',
@@ -319,7 +315,7 @@ class dispatch_event_handler
             }
          }
       } catch (moodle_exception $e) {
-         error_log('Excepción capturada: '. $e->getMessage(). "\n");
+         error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
       }
    }
 
@@ -329,15 +325,15 @@ class dispatch_event_handler
    public static function discussion_created($event)
    {
       try {
-            if (validateAccessTypeEvent([
+            if (utils_events::validateAccessTypeEvent([
                "dataEvent" => $event,
                "typeEvent" => ["\\mod_forum\\event\\discussion_created"],
                "key" => "eventname",
                "methodName" => "get_data"
             ])) {
-               if (!validateAccesFaculty($event) || !isRolTeacher($event)) { return; }
+               if (!utils_events::validateAccessFaculty($event) || !utils_events::isRolTeacher($event)) { return; }
                //Instanciar la clase management_factory
-               instantiatemanagement_factory([
+               utils_events::instanceFactory([
                   "dataEvent" => $event,
                   "typeEvent" => "created_announcements",
                   "dispatch" => 'create',
@@ -345,7 +341,7 @@ class dispatch_event_handler
                ]);
             }
       } catch (moodle_exception $e) {
-         error_log('Excepción capturada: '. $e->getMessage(). "\n");
+         error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
       }
    }
 
@@ -355,15 +351,15 @@ class dispatch_event_handler
     public static function discussion_deleted($event)
     {
        try {
-             if (validateAccessTypeEvent([
+             if (utils_events::validateAccessTypeEvent([
                 "dataEvent" => $event,
                 "typeEvent" => ["\\mod_forum\\event\\discussion_deleted"],
                 "key" => "eventname",
                 "methodName" => "get_data"
              ])) {
-                if (!validateAccesFaculty($event) || !isRolTeacher($event)) { return; }
+                if (!utils_events::validateAccessFaculty($event) || !utils_events::isRolTeacher($event)) { return; }
                 //Instanciar la clase management_factory
-                instantiatemanagement_factory([
+                utils_events::instanceFactory([
                    "dataEvent" => $event,
                    "typeEvent" => "created_announcements",
                    "dispatch" => 'delete',
@@ -371,7 +367,7 @@ class dispatch_event_handler
                 ]);
              }
        } catch (moodle_exception $e) {
-          error_log('Excepción capturada: '. $e->getMessage(). "\n");
+          error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
        }
     }
 
@@ -381,15 +377,15 @@ class dispatch_event_handler
     public static function discussion_updated($event)
     {
        try {
-             if (validateAccessTypeEvent([
+             if (utils_events::validateAccessTypeEvent([
                 "dataEvent" => $event,
                 "typeEvent" => ["\\mod_forum\\event\\discussion_updated"],
                 "key" => "eventname",
                 "methodName" => "get_data"
              ])) {
-                if (!validateAccesFaculty($event) || !isRolTeacher($event)) { return; }
+                if (!utils_events::validateAccessFaculty($event) || !utils_events::isRolTeacher($event)) { return; }
                 //Instanciar la clase management_factory
-                instantiatemanagement_factory([
+                utils_events::instanceFactory([
                    "dataEvent" => $event,
                    "typeEvent" => "created_announcements",
                    "dispatch" => 'update',
@@ -397,7 +393,7 @@ class dispatch_event_handler
                 ]);
              }
        } catch (moodle_exception $e) {
-          error_log('Excepción capturada: '. $e->getMessage(). "\n");
+          error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
        }
     }
 
@@ -407,15 +403,15 @@ class dispatch_event_handler
     public static function post_created($event)
     {
        try {
-             if (validateAccessTypeEvent([
+             if (utils_events::validateAccessTypeEvent([
                 "dataEvent" => $event,
                 "typeEvent" => ["\\mod_forum\\event\\post_created"],
                 "key" => "eventname",
                 "methodName" => "get_data"
              ])) {
-                if (!validateAccesFaculty($event)) { return; }
+                if (!utils_events::validateAccessFaculty($event)) { return; }
                 //Instanciar la clase management_factory
-                instantiatemanagement_factory([
+                utils_events::instanceFactory([
                    "dataEvent" => $event,
                    "typeEvent" => "created_announcements",
                    "dispatch" => 'create',
@@ -423,7 +419,7 @@ class dispatch_event_handler
                 ]);
              }
        } catch (moodle_exception $e) {
-          error_log('Excepción capturada: '. $e->getMessage(). "\n");
+          error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
        }
      }
 
@@ -433,19 +429,19 @@ class dispatch_event_handler
     public static function post_updated($event)
     {
        try {
-             if (validateAccessTypeEvent([
+             if (utils_events::validateAccessTypeEvent([
                 "dataEvent" => $event,
                 "typeEvent" => ["\\mod_forum\\event\\post_updated"],
                 "key" => "eventname",
                 "methodName" => "get_data"
              ])) {
-                if (!validateAccesFaculty($event) || !isRolTeacher($event)) { return; }
+                if (!utils_events::validateAccessFaculty($event) || !utils_events::isRolTeacher($event)) { return; }
                   $dataEvent = $event->get_data();
                   $post = $dataEvent['objectid'];
         
-                  if (isForumPostParent($post)) {
+                  if (utils_events::isForumPostParent($post)) {
                      //Instanciar la clase management_factory
-                     instantiatemanagement_factory([
+                     utils_events::instanceFactory([
                         "dataEvent" => $event,
                         "typeEvent" => "created_announcements",
                         "dispatch" => 'update',
@@ -454,7 +450,7 @@ class dispatch_event_handler
                   }
              }
        } catch (moodle_exception $e) {
-          error_log('Excepción capturada: '. $e->getMessage(). "\n");
+          error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
        }
     }
 
@@ -464,15 +460,15 @@ class dispatch_event_handler
     public static function post_deleted($event)
     {
        try {
-             if (validateAccessTypeEvent([
+             if (utils_events::validateAccessTypeEvent([
                 "dataEvent" => $event,
                 "typeEvent" => ["\\mod_forum\\event\\post_deleted"],
                 "key" => "eventname",
                 "methodName" => "get_data"
              ])) {
-                if (!validateAccesFaculty($event)) { return; }
+                if (!utils_events::validateAccessFaculty($event)) { return; }
                 //Instanciar la clase management_factory
-                instantiatemanagement_factory([
+                utils_events::instanceFactory([
                    "dataEvent" => $event,
                    "typeEvent" => "created_announcements",
                    "dispatch" => 'delete',
@@ -480,201 +476,7 @@ class dispatch_event_handler
                 ]);
              }
        } catch (moodle_exception $e) {
-          error_log('Excepción capturada: '. $e->getMessage(). "\n");
+          error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
        }
     }
-}
-
-/**
- * Filter recent update
- */
-function filterRecentUpdate($event) 
-{
-   try {
-         // Instance filter_evaluation_update.
-         $filter_evaluation_update = new filter_evaluation_update();
-         $isFilter = $filter_evaluation_update->filterRecentUpdate($event);
-
-         if ($isFilter) {
-            utils_events::isStructureCourse($event,'update');
-         } 
-
-   } catch (moodle_exception $e) {
-      error_log('Excepción capturada: '. $e->getMessage(). "\n");
-   }
-}
-
-/**
- *  Validate if the grade item is total
- */
-function isTotalItem($grade_item)
-{
-   $filter_evaluation_update = new filter_evaluation_update();
-   return $filter_evaluation_update->isTotalItem($grade_item);
-}  
-
-/** 
- * Instancia el factory   
- *
- * @return void
-*/
-function instantiatemanagement_factory(array $data)
-{
-   try {  
-         // Verificar si se proporcionan datos válidos
-         if (empty($data['dataEvent']) || empty($data['typeEvent']) || 
-               empty($data['dispatch'])  || empty($data['enum_etities'])) 
-         {
-            error_log("Error en los datos proporcionados: algunos campos están vacíos.");
-            return;
-         }
-
-         // Instanciar la clase management_factory
-         $ManageEntity = new management_factory();
-
-         // Verificar si existe el método
-         if (method_exists($ManageEntity, 'create')) {
-            // Llamar al método create
-            $ManageEntity->create([
-                  "dataEvent" => $data['dataEvent'],
-                  "typeEvent" => $data['typeEvent'],
-                  "dispatch" => $data['dispatch'],
-                  "enum_etities" => $data['enum_etities']
-            ]);
-         } else {
-            error_log("El método 'create' no existe en la clase management_factory.");
-         }
-   } catch (moodle_exception $e) {
-      error_log('Excepción capturada: ' . $e->getMessage() . "\n");
-   }
-}
-
-/** 
- *  Instancia el factory
- * 
- * @return bool
-*/
-function validateAccessTypeEvent(array $data) : bool
-{
-   try {
-        $event_access_validator = new event_access_validator();
-        return $event_access_validator->validateTypeEvent($data);
-   }
-   catch (moodle_exception $e) {
-      error_log('Excepción capturada: '. $e->getMessage(). "\n");
-   }
-}
-
-/**
- *  Valida si la facultad tiene acceso
- * 
- *  @return bool 
-*/
-function validateAccesFaculty($data) : bool
-{
-   try {
-         //Instanciar la clase event_access_validator
-         $event_access_validator = new event_access_validator();
-         //Obtener los datos del evento
-         $eventData = $data->get_data();
-
-         //validar si el evento tiene el campo courseid
-         if (!array_key_exists('courseid', $eventData)) { return false; }
-
-         //validar si la facultad tiene acceso
-         return $event_access_validator->validateAccessByFaculty($eventData['courseid']);
-   }
-   catch (moodle_exception $e) {
-      error_log('Excepción capturada: '. $e->getMessage(). "\n");
-   }
-   return false;
-}
-
-/**
- * Recalculate weight
- */
-function recalculatesWeight($data) : void
-{
-   try {
-         $dataItem = $data->get_data();
-         $idCourse = $dataItem['courseid'];
-         $recalculate_aggreations = [11 , 6];
-         $aggregationCategory = getAggreationCategory($idCourse);
-         $get_grade_item = ($data->get_grade_item());
-
-         if (in_array($aggregationCategory, $recalculate_aggreations) &&
-            $get_grade_item->itemtype !== 'category'
-         ) {
-            $recalculate_item_weight = new recalculate_item_weight();
-            $recalculate_item_weight->recalculate_weight_evaluation([
-               "event" => $data,
-               "aggregationCategory" => $aggregationCategory,
-            ]);
-         }
-   }
-   catch (moodle_exception $e) {
-      error_log('Excepción capturada: '. $e->getMessage(). "\n");
-   }
-}
-
-/**
- * Return aggregation category
-   */
-function getAggreationCategory($idCourse)
-{
-   $aggregationCategory = 0;
-   try {
-      if (!empty($idCourse)) {
-            // Ejecutar la consulta.
-            $moodle_query_handler = new moodle_query_handler();
-            $queryResult = $moodle_query_handler->executeQuery(
-               plugin_config::AGGREGATION_CATEGORY_FATHER, 
-               [
-                  "courseid" => $idCourse
-               ]
-            );
-            // Obtener el primer elemento del resultado utilizando reset()
-            $firstResult = reset($queryResult);
-            $aggregationCategory = $firstResult->aggregation ?? 0;
-      }
-   } catch (moodle_exception $e) {
-      error_log('Excepción capturada: '. $e->getMessage(). "\n");
-   }
-   return $aggregationCategory;
-}
-
-/**
- * Validate if the user is teacher
- */
-function isRolTeacher($event)
-{
-   $isRolTeacher = false;
-   try {
-      if (!empty($event)) {
-         $dataEvent = $event->get_data();
-         $userId = $dataEvent['userid'];
-         $announcements_utils = new announcements_utils();
-         $isRolTeacher = $announcements_utils->isRolTeacher($userId);
-      }
-   } catch (moodle_exception $e) {
-      error_log('Excepción capturada: '. $e->getMessage(). "\n");
-   }
-   return $isRolTeacher;
-}
-
-/**
- * Is Forum Post Parent
- */
-function isForumPostParent($idPost)
-{
-   $isParent = false;
-   try {
-      if (!empty($idPost)) {
-         $announcements_utils = new announcements_utils();
-         $isParent = $announcements_utils->isParentFormPost($idPost);
-      }
-   } catch (moodle_exception $e) {
-      error_log('Excepción capturada: '. $e->getMessage(). "\n");
-   }
-   return $isParent;
 }

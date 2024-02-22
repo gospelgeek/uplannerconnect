@@ -13,7 +13,7 @@ use local_uplannerconnect\application\repository\material_repository;
 use local_uplannerconnect\application\general\data_manager;
 
 /**
- * Orquest the process of materials 
+ * Orquest the process of materials
  */
 class material_resource extends data_manager
 {

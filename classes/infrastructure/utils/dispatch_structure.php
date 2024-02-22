@@ -18,9 +18,9 @@ class dispatch_structure implements dispatch_structure_interface
 {
     const TABLE_NAME = 'uplanner_dispatch_tmp';
     const ACTION = 'create';
-    const QUERY_DISPATCH_COURSE = "SELECT id, action, updated_item   FROM {uplanner_dispatch_tmp} WHERE courseid = :courseid ORDER BY id ASC LIMIT 1";
-    const DELETE_DISPATCH_COURSE = "DELETE FROM {uplanner_dispatch_tmp} WHERE courseid = :courseid AND action = :action AND updated_item = :updated_item ";
-    const LAST_ITEMS_COURSE = "SELECT id, action, updated_item   FROM {uplanner_dispatch_tmp} WHERE courseid = :courseid AND NOW() > (updated_item + INTERVAL '1 seconds') ORDER BY id ASC LIMIT 1";
+    const QUERY_DISPATCH_COURSE = "SELECT id, action, updated_item FROM {uplanner_dispatch_tmp} WHERE courseid = :courseid ORDER BY id ASC LIMIT 1";
+    const DELETE_DISPATCH_COURSE = "DELETE FROM {uplanner_dispatch_tmp} WHERE courseid = :courseid AND updated_item = :updated_item ";
+    const LAST_ITEMS_COURSE = "SELECT id, action, updated_item FROM {uplanner_dispatch_tmp} WHERE courseid = :courseid AND NOW() > (updated_item + INTERVAL '1 seconds') ORDER BY id ASC LIMIT 1";
     const NOT_AVAILABLE_ITEMS = ['course','category'];
     private $query;
     private $validator;
@@ -50,28 +50,22 @@ class dispatch_structure implements dispatch_structure_interface
             ]) && !in_array($itemtype, self::NOT_AVAILABLE_ITEMS))
         {
             $lastItems  = $this->lastItemsCourse($data['courseid']);
-//            if (!empty($lastItems)) {
-//                // Action Dispatch
-                $isActionCreated = $this->isActionCreated($data);
-                $actionCurrent = array_values(array_slice($lastItems, -1))[0] ?? [];
 
-                // Create Action if is first
-                if (empty($isActionCreated)) {
-                    $this->insertCourseStructure($data);
-                    error_log("PRIMERA VEZ 1116: " );
-                }
+            $isActionCreated = $this->isActionCreated($data);
+            $actionCurrent = array_values(array_slice($lastItems, -1))[0] ?? [];
 
-                if (!empty($lastItems)) {
-                    error_log("UPDATE2 55: " .  strtotime($actionCurrent->updated_item ?? ''));
-                    ///$data['action'] = self::ACTION;
-                    $this->deleteRecord([
-                        'courseid' => $data['courseid'],
-                        'action' => $actionCurrent->action ?? $data['action'],
-                        'updated_item' => $actionCurrent->updated_item ?? ''
-                    ]);
-                    //$this->executeTrigger($data,$event);
-                }
-            //}
+            // Create Action if is first
+            if (empty($isActionCreated)) {
+                $this->insertCourseStructure($data);
+                $this->executeTrigger($data,$event);
+            }
+            else if (!empty($lastItems)) {
+                $this->deleteRecord([
+                    'courseid' => $data['courseid'],
+                    'updated_item' => $actionCurrent->updated_item ?? ''
+                ]);
+                $this->executeTrigger($data,$event);
+            }
         }
     }
 
@@ -122,7 +116,6 @@ class dispatch_structure implements dispatch_structure_interface
                 self::DELETE_DISPATCH_COURSE,
                 [
                     'courseid' => strval($data['courseid']),
-                    'action' => strval($data['action']),
                     'updated_item' => $data['updated_item']
                 ]
             );

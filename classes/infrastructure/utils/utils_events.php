@@ -7,11 +7,25 @@
 
 namespace local_uplannerconnect\infrastructure\utils;
 
+use local_uplannerconnect\application\service\announcements_utils;
+use local_uplannerconnect\application\service\event_access_validator;
+use local_uplannerconnect\application\service\filter_evaluation_update;
+use local_uplannerconnect\domain\management_factory;
+use moodle_exception;
+
 /**
   * Class Utils Events
 */
 class utils_events
 {
+    const FIELD_COURSE = 'courseid';
+    const TEXT_ERROR = 'Exception caught: ';
+
+    /**
+     * @param $event
+     * @param $action
+     * @return void
+     */
     public static function isStructureCourse($event,$action): void
     {
         $get_grade_item = $event->get_grade_item();
@@ -24,5 +38,143 @@ class utils_events
             ],
             $event
         );
+    }
+
+    /**
+     * Validate if the faculty has access
+     *
+     * @param $data
+     * @return bool
+     */
+    public static function validateAccessFaculty($data) : bool
+    {
+        $response = false;
+        try {
+            $event_access_validator = new event_access_validator();
+            $eventData = $data->get_data();
+
+            if (array_key_exists(self::FIELD_COURSE, $eventData)) {
+                $response = $event_access_validator->validateAccessByFaculty($eventData[self::FIELD_COURSE]);
+            }
+        }
+        catch (moodle_exception $e) {
+            error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
+        }
+        return $response;
+    }
+
+    /**
+     * Filter recent update
+     */
+    public static function filterRecentUpdate($event)
+    {
+        try {
+            $filter_evaluation_update = new filter_evaluation_update();
+            $isFilter = $filter_evaluation_update->filterRecentUpdate($event);
+
+            if ($isFilter) {
+                self::isStructureCourse($event,'update');
+            }
+        } catch (moodle_exception $e) {
+            error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
+        }
+    }
+
+    /**
+     *  Validate if the grade item is total
+     */
+    public static function isTotalItem($grade_item)
+    {
+        $filter_evaluation_update = new filter_evaluation_update();
+        return $filter_evaluation_update->isTotalItem($grade_item);
+    }
+
+    /**
+     * Instantiate the factory.
+     *
+     * @param array $data
+     * @return void
+     */
+    public static function instanceFactory(array $data) : void
+    {
+        try {
+            if (empty($data['dataEvent']) || empty($data['typeEvent']) ||
+                empty($data['dispatch'])  || empty($data['enum_etities']))
+            {
+                error_log("Error in provided data: some fields are empty.");
+                return;
+            }
+
+            $ManageEntity = new management_factory();
+
+            if (method_exists($ManageEntity, 'create')) {
+                // Llamar al método create
+                $ManageEntity->create([
+                    "dataEvent" => $data['dataEvent'],
+                    "typeEvent" => $data['typeEvent'],
+                    "dispatch" => $data['dispatch'],
+                    "enum_etities" => $data['enum_etities']
+                ]);
+            } else {
+                error_log("Error in provided data: some fields are empty.");
+            }
+        } catch (moodle_exception $e) {
+            error_log(self::TEXT_ERROR . $e->getMessage() . "\n");
+        }
+    }
+
+    /**
+     * Instantiate the factory
+     *
+     * @param array $data
+     * @return bool
+     */
+    public static function validateAccessTypeEvent(array $data) : bool
+    {
+        $response = false;
+        try {
+            $event_access_validator = new event_access_validator();
+            $response = $event_access_validator->validateTypeEvent($data);
+        }
+        catch (moodle_exception $e) {
+            error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
+        }
+        return $response;
+    }
+
+    /**
+     * Validate if the user is teacher
+     */
+    public static function isRolTeacher($event)
+    {
+        $isRolTeacher = false;
+        try {
+            if (!empty($event)) {
+                $dataEvent = $event->get_data();
+                $userId = $dataEvent['userid'];
+                $announcements_utils = new announcements_utils();
+                $isRolTeacher = $announcements_utils->isRolTeacher($userId);
+            }
+        } catch (moodle_exception $e) {
+            error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
+        }
+        return $isRolTeacher;
+    }
+
+    /**
+     * Is Forum Post Parent
+     */
+    public static function isForumPostParent($idPost)
+    {
+        $isParent = false;
+        try {
+            if (!empty($idPost)) {
+                $announcements_utils = new announcements_utils();
+                $isParent = $announcements_utils->isParentFormPost($idPost);
+            }
+        } catch (moodle_exception $e) {
+            error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
+        }
+        return $isParent;
     }
 }
