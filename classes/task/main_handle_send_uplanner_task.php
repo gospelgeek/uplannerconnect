@@ -39,7 +39,7 @@ class main_handle_send_uplanner_task extends \core\task\scheduled_task
         $start_time = microtime();
         mtrace('Update cron started at: ' . date('r', $time_now) . PHP_EOL);
         try {
-            $handle_task = new handle_send_uplanner_task(self::TASKS_ID);
+            $handle_task = new handle_send_uplanner_task(self::TASKS_ID, false);
             $handle_task->process(repository_type::STATE_DEFAULT, 1, 200);
         } catch (Exception $e) {
             error_log('main_handle_send_uplanner_task - execute: ' . $e->getMessage() . PHP_EOL);

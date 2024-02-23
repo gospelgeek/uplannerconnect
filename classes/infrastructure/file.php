@@ -39,15 +39,25 @@ class file
     private $virtual_name;
 
     /**
+     *  Send create file or no
+     *
+     * @var bool $create_file
+     */
+    private $create_file;
+
+    /**
      * Construct
      *
      * @param $filename
      * @param $virtual_name
+     * @param $create_file
      */
     public function __construct(
         $filename,
-        $virtual_name
+        $virtual_name,
+        $create_file = true
     ) {
+        $this->create_file = $create_file;
         $millis = round(microtime(true) * 1000);
         $this->filename = sprintf(self::BASE_NAME, $filename);
         $this->virtual_name = str_replace("date", $millis, $virtual_name);
@@ -83,19 +93,21 @@ class file
     public function create_csv($headers)
     {
         $response = false;
-        try {
-            if (!file_exists($this->directory)) {
-                mkdir($this->directory, 0755, true);
+        if ($this->create_file) {
+            try {
+                if (!file_exists($this->directory)) {
+                    mkdir($this->directory, 0755, true);
+                }
+                $csv_file = $this->get_path_file();
+                $fp = fopen($csv_file, 'w');
+                if ($fp) {
+                    fputcsv($fp, $headers);
+                    fclose($fp);
+                    $response = true;
+                }
+            } catch (Exception $e) {
+                error_log('create_csv: '. $e->getMessage() . PHP_EOL);
             }
-            $csv_file = $this->get_path_file();
-            $fp = fopen($csv_file, 'w');
-            if ($fp) {
-                fputcsv($fp, $headers);
-                fclose($fp);
-                $response = true;
-            }
-        } catch (Exception $e) {
-            error_log('create_csv: '. $e->getMessage() . PHP_EOL);
         }
 
         return $response;
@@ -109,16 +121,18 @@ class file
      */
     public function add_row($data)
     {
-        try {
-            $csv_file = $this->get_path_file();
-            if (file_exists($csv_file)) {
-                $fp = fopen($csv_file, 'a');
-                fputcsv($fp, $data);
-                fclose($fp);
-                return true;
+        if ($this->create_file) {
+            try {
+                $csv_file = $this->get_path_file();
+                if (file_exists($csv_file)) {
+                    $fp = fopen($csv_file, 'a');
+                    fputcsv($fp, $data);
+                    fclose($fp);
+                    return true;
+                }
+            } catch (Exception $e) {
+                error_log('add_row: '. $e->getMessage() . PHP_EOL);
             }
-        } catch (Exception $e) {
-            error_log('add_row: '. $e->getMessage() . PHP_EOL);
         }
 
         return false;
@@ -132,16 +146,18 @@ class file
      */
     public function reset_csv($headers)
     {
-        try {
-            $csv_file = $this->get_path_file();
-            if (file_exists($csv_file)) {
-                $fp = fopen($csv_file, 'w');
-                fputcsv($fp, $headers);
-                fclose($fp);
+        if ($this->create_file) {
+            try {
+                $csv_file = $this->get_path_file();
+                if (file_exists($csv_file)) {
+                    $fp = fopen($csv_file, 'w');
+                    fputcsv($fp, $headers);
+                    fclose($fp);
+                }
+                return true;
+            } catch (Exception $e) {
+                error_log('reset_csv: ' . $e->getMessage() . PHP_EOL);
             }
-            return true;
-        } catch (Exception $e) {
-            error_log('reset_csv: '.  $e->getMessage() . PHP_EOL);
         }
 
         return false;
@@ -154,13 +170,15 @@ class file
      */
     public function delete_csv()
     {
-        try {
-            $csv_file = $this->get_path_file();
-            if (file_exists($csv_file)) {
-                unlink($csv_file);
+        if ($this->create_file) {
+            try {
+                $csv_file = $this->get_path_file();
+                if (file_exists($csv_file)) {
+                    unlink($csv_file);
+                }
+            } catch (Exception $e) {
+                error_log('delete_csv: '.  $e->getMessage() . PHP_EOL);
             }
-        } catch (Exception $e) {
-            error_log('delete_csv: '.  $e->getMessage() . PHP_EOL);
         }
     }
 }

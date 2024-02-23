@@ -39,15 +39,25 @@ class log
     private $virtual_name;
 
     /**
+     * Create file or no
+     *
+     * @var bool $create_file
+     */
+    private $create_file;
+
+    /**
      * Construct
      *
      * @param $filename
      * @param $virtual_name
+     * @param $create_file
      */
     public function __construct(
         $filename,
-        $virtual_name
+        $virtual_name,
+        $create_file = true
     ) {
+        $this->create_file = $create_file;
         $millis = round(microtime(true) * 1000);
         $this->filename = sprintf(self::BASE_NAME, $filename);
         $this->virtual_name = str_replace("date", $millis, $virtual_name);
@@ -82,15 +92,17 @@ class log
      */
     public function create_log($title)
     {
-        try {
-            if (!file_exists($this->directory)) {
-                mkdir($this->directory, 0755, true);
+        if ($this->create_file) {
+            try {
+                if (!file_exists($this->directory)) {
+                    mkdir($this->directory, 0755, true);
+                }
+                $text_file = $this->get_path_file();
+                file_put_contents($text_file, PHP_EOL . $title . PHP_EOL);
+                return true;
+            } catch (Exception $e) {
+                error_log('create_log: ' . $e->getMessage() . PHP_EOL);
             }
-            $text_file = $this->get_path_file();
-            file_put_contents($text_file, PHP_EOL . $title . PHP_EOL);
-            return true;
-        } catch (Exception $e) {
-            error_log('create_log: ' . $e->getMessage() . PHP_EOL);
         }
 
         return false;
@@ -104,14 +116,17 @@ class log
      */
     public function add_line($line)
     {
-        try {
-            error_log($line . PHP_EOL);
-            $text_file = $this->get_path_file();
-            file_put_contents($text_file, $line . PHP_EOL, FILE_APPEND);
-            return true;
-        } catch (Exception $e) {
-            error_log('add_line: ' . $e->getMessage() . PHP_EOL);
+        if ($this->create_file) {
+            try {
+                error_log($line . PHP_EOL);
+                $text_file = $this->get_path_file();
+                file_put_contents($text_file, $line . PHP_EOL, FILE_APPEND);
+                return true;
+            } catch (Exception $e) {
+                error_log('add_line: ' . $e->getMessage() . PHP_EOL);
+            }
         }
+
 
         return false;
     }
@@ -124,13 +139,15 @@ class log
      */
     public function add_lines(array $lines)
     {
-        try {
-            error_log(implode(PHP_EOL, $lines) . PHP_EOL);
-            $text_file = $this->get_path_file();
-            file_put_contents($text_file, implode(PHP_EOL, $lines) . PHP_EOL, FILE_APPEND);
-            return true;
-        } catch (Exception $e) {
-            error_log('add_lines: ' . $e->getMessage() . PHP_EOL);
+        if ($this->create_file) {
+            try {
+                error_log(implode(PHP_EOL, $lines) . PHP_EOL);
+                $text_file = $this->get_path_file();
+                file_put_contents($text_file, implode(PHP_EOL, $lines) . PHP_EOL, FILE_APPEND);
+                return true;
+            } catch (Exception $e) {
+                error_log('add_lines: ' . $e->getMessage() . PHP_EOL);
+            }
         }
 
         return false;
@@ -143,12 +160,14 @@ class log
      */
     public function reset_log()
     {
-        try {
-            $text_file = $this->get_path_file();
-            file_put_contents($text_file, '');
-            return true;
-        } catch (Exception $e) {
-            error_log('reset_log: ' . $e->getMessage() . PHP_EOL);
+        if ($this->create_file) {
+            try {
+                $text_file = $this->get_path_file();
+                file_put_contents($text_file, '');
+                return true;
+            } catch (Exception $e) {
+                error_log('reset_log: ' . $e->getMessage() . PHP_EOL);
+            }
         }
 
         return false;
@@ -161,13 +180,15 @@ class log
      */
     public function delete_log()
     {
-        try {
-            $text_file = $this->get_path_file();
-            if (file_exists($text_file)) {
-                unlink($text_file);
+        if ($this->create_file) {
+            try {
+                $text_file = $this->get_path_file();
+                if (file_exists($text_file)) {
+                    unlink($text_file);
+                }
+            } catch (Exception $e) {
+                error_log('delete_log: ' . $e->getMessage() . PHP_EOL);
             }
-        } catch (Exception $e) {
-            error_log('delete_log: ' . $e->getMessage() . PHP_EOL);
         }
     }
 }
