@@ -20,9 +20,9 @@ class data_manager
      * Transform the data
      * Save the data
      *
-     * @param array $data
+     * @param array $params
      * @return void
-    */
+     */
     public function process(array $params) : void
     {
         try {
@@ -59,7 +59,6 @@ class data_manager
     }
 
     /**
-     * 
      * Save the data
      *
      * @param array $data
