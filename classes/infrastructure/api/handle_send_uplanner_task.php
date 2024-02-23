@@ -60,14 +60,22 @@ class handle_send_uplanner_task
     private $prefix = '';
 
     /**
+     * @var bool
+     */
+    private $send_emails;
+
+    /**
      * Construct
      *
      * @param $tasks_id
+     * @param $send_emails
      */
     public function __construct(
-        $tasks_id
+        $tasks_id,
+        $send_emails = true
     ) {
         $this->task_id = $tasks_id;
+        $this->send_emails = $send_emails;
         $this->prefix = $this->task_id . '_';
         $this->current_date = date("F j, Y, g:i:s a");
         $this->uplanner_client_factory = new uplanner_client_factory();
@@ -204,7 +212,7 @@ class handle_send_uplanner_task
      */
     private function create_file($file_name, $rows, $status)
     {
-        $this->file = new file($this->task_id, $file_name);
+        $this->file = new file($this->task_id, $file_name, $this->send_emails);
         $fileCreated = $this->file->create_csv(abstract_uplanner_client::FILE_HEADERS);
         if ($fileCreated) {
             foreach ($rows as $row) {
@@ -227,7 +235,7 @@ class handle_send_uplanner_task
      */
     private function create_log($file_name)
     {
-        $this->log = new log($this->task_id, $file_name . '_date');
+        $this->log = new log($this->task_id, $file_name . '_date', $this->send_emails);
         $this->log->create_log(
             'TASK ' . strtoupper($this->task_id) . ' ' . $this->current_date
         );
@@ -242,13 +250,17 @@ class handle_send_uplanner_task
      */
     private function send_email($subject, $file)
     {
-        $recipient_email = 'samuel.ramirez@correounivalle.edu.co';
-        return $this->email->send(
-            $recipient_email,
-            $subject,
-            $this->current_date,
-            $file->get_path_file(),
-            $file->get_virtual_name()
-        );
+        if ($this->send_emails) {
+            $recipient_email = 'samuel.ramirez@correounivalle.edu.co';
+            return $this->email->send(
+                $recipient_email,
+                $subject,
+                $this->current_date,
+                $file->get_path_file(),
+                $file->get_virtual_name()
+            );
+        }
+
+        return false;
     }
 }
