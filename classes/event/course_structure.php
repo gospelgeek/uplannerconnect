@@ -7,12 +7,14 @@
 
 namespace local_uplannerconnect\event;
 
+use core\event\base;
+
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Returns all the grading items of a course
 */
-class course_structure extends \core\event\base
+class course_structure extends base
 {
     const LEVEL_TEACHING = 1;
     const TABLE_NAME = 'uplanner_dispatch_tmp';

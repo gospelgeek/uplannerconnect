@@ -177,4 +177,19 @@ class utils_events
         }
         return $isParent;
     }
+
+    /**
+     *
+     */
+     public static function isGradeEvent(array $data , $event): void
+     {
+         try {
+             if (isset($data['iduser'], $data['action'])) {
+                 $dispatchGrade = new dispatch_grades();
+                 $dispatchGrade->executeEventHandler($data,$event);
+             }
+         } catch (moodle_exception $e) {
+             error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
+         }
+     }
 }

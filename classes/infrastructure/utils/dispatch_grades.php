@@ -7,8 +7,6 @@
 
 namespace local_uplannerconnect\infrastructure\utils;
 
-use local_uplannerconnect\application\repository\moodle_query_handler;
-use local_uplannerconnect\application\service\data_validator;
 use moodle_exception;
 
 /**
@@ -16,17 +14,11 @@ use moodle_exception;
  */
 class dispatch_grades implements dispatch_structure_interface
 {
-    private $query;
-    private $validator;
-
     /**
      * Construct
      */
     public function __construct()
-    {
-        $this->query = new moodle_query_handler();
-        $this->validator= new data_validator();
-    }
+    {}
 
     /**
      * @param array $data
@@ -35,35 +27,11 @@ class dispatch_grades implements dispatch_structure_interface
      */
     public function executeEventHandler(array $data , $event): void
     {
-
-    }
-
-    /**
-     * @param array $data
-     * @return array
-     */
-    private function getQueryArray(array $data): array
-    {
-        $rest = [];
-        try {
-            if ($this->validator->validateKeysArrays([
-                'keys' => ['sql','params'],
-                'data' => $data,
-            ])) {
-                $response = $this->query->executeQuery(
-                    $data['sql'],
-                    $data['params']
-                );
-
-                if (!empty($response)) {
-                    $rest = $response;
-                }
-            }
-        } catch (moodle_exception $e) {
-            error_log('Caught exception: '.  $e->getMessage(). "\n");
-        }
-
-        return $rest;
+       try {
+           $this->executeTrigger($data,$event);
+       } catch (moodle_exception $e) {
+           error_log('Caught exception: '.  $e->getMessage(). "\n");
+       }
     }
 
     /**
@@ -73,9 +41,9 @@ class dispatch_grades implements dispatch_structure_interface
      */
     private function executeTrigger($data,$event): void
     {
-        has_active_structure::triggerEvent([
+        has_active_grades::triggerEvent([
             'event' => $event,
-            'dataCourse' => $data
+            'dataGrades' => $data
         ]);
     }
 }

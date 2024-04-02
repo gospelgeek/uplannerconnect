@@ -112,9 +112,9 @@ class course_translation_data
     {
         $arraySend = [];
         try {
-            $dataSend = $this->validator->verifyArrayKeyExist([ 
+            $dataSend = $this->validator->verifyArrayKeyExist([
                 'array_verification' => estruture_types::UPLANNER_GRADES,
-                'data' => $data 
+                'data' => $data
             ]);
             
             //Sacar la información del evento
