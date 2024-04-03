@@ -118,7 +118,7 @@ class has_active_structure implements structure_interface
      * @param string $categoryFullName
      * @return string
      */
-    private function transformNameCategory(string $categoryFullName) : string
+    public function transformNameCategory(string $categoryFullName) : string
     {
         $short = $categoryFullName;
         if ($categoryFullName == '?' ||
@@ -133,7 +133,7 @@ class has_active_structure implements structure_interface
      * @param string $categoryFullName
      * @return string
      */
-    private function shortCategoryName(string $categoryFullName) : string
+    public function shortCategoryName(string $categoryFullName) : string
     {
         $noSpaces = str_replace(' ', '', $categoryFullName);
         return substr($noSpaces, 0, 10);
