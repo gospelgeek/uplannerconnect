@@ -55,13 +55,6 @@ class dispatch_event_handler
                              'iduser' => $eventUser],
                              $event
                          );
-                         //Instanciar la clase management_factory
-                     //     utils_events::instanceFactory([
-                     //        "dataEvent" => $event,
-                     //        "typeEvent" => "user_graded",
-                     //        "dispatch" => ($stateDispatch)? 'create': 'update',
-                     //        "enum_etities" => 'course_notes'
-                     //     ]);
                      }
                }
             }

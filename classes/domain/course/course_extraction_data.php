@@ -88,7 +88,7 @@ class course_extraction_data
 
     /**
      * Formato de datos para enviar a uPlanner
-     * 
+     *
      * @param array $data
      * @return array
      */

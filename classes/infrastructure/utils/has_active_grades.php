@@ -9,9 +9,9 @@ namespace local_uplannerconnect\infrastructure\utils;
 
 use local_uplannerconnect\application\repository\moodle_query_handler;
 use local_uplannerconnect\domain\course\usecases\course_utils;
-use local_uplannerconnect\event\course_grades;
 use local_uplannerconnect\domain\course\course_translation_data;
 use local_uplannerconnect\application\repository\course_notes_repository;
+use local_uplannerconnect\event\course_grades;
 use moodle_exception;
 use \stdClass;
 
@@ -21,18 +21,19 @@ use \stdClass;
 class has_active_grades implements structure_interface
 {
     const CATEGORY_FATHER_DEFAULT = "NOTAS";
-    const GET_ALL_GRADES_USER = "SELECT t1.id, t2.fullname , t1.itemname , t3.finalgrade 
+    const GET_ALL_GRADES_USER = "SELECT t1.id, t2.fullname , t1.itemname , t3.finalgrade, t1.timecreated
                                  FROM {grade_items} AS t1 
                                  INNER JOIN {grade_categories} AS t2 ON t2.id = t1.categoryid 
                                  INNER JOIN  {grade_grades} AS t3 ON t3.itemid = t1.id 
                                  WHERE t1.courseid = :courseid AND 
                                  t1.itemtype NOT IN ('course', 'category') 
-                                 AND t3.aggregationstatus IN ('used') AND 
+                                 AND t3.aggregationstatus IN ('used','unknown') AND 
                                  t3.userid = :userid ORDER BY t1.id DESC";
     private $courseUtils;
     private $courseTraslate;
     private $_query;
     private $has_structure;
+    private $repository;
 
     /**
      * Construct
@@ -43,6 +44,7 @@ class has_active_grades implements structure_interface
         $this->courseTraslate =  new course_translation_data();
         $this->_query =  new moodle_query_handler();
         $this->has_structure = new has_active_structure();
+        $this->repository = new course_notes_repository();
     }
 
     /**
@@ -69,15 +71,28 @@ class has_active_grades implements structure_interface
                 'data' => $courseData,
                 'typeEvent' => 'user_graded'
             ]);
-            $allItems[] = [
-                'id' => $courseData['evaluationId'],
-                'itemname' => $courseData['evaluationName'],
-                'finalgrade' => $courseData['value'],
-                'fullname' => $courseData['evaluationGroupCode']
-            ];
+
+            if ($dataEventGrade['action'] == 'update') {
+                $nameCategoryCreated = $courseData['evaluationGroupCode'] !== self::CATEGORY_FATHER_DEFAULT;
+                $allItems[] = (object) [
+                    'id' => $courseData['evaluationId'],
+                    'itemname' => $courseData['evaluationName'],
+                    'finalgrade' => $courseData['value'],
+                    'fullname' => $nameCategoryCreated? $courseData['evaluationGroupCode'] : '?'
+                ];
+            }
+
             $allCategory = $this->generateCategoryGroups([
                 'allitems' => $allItems
             ]);
+            $allGrades = $this->gradesByCategorys([
+                'allItems' => $allItems,
+                'uniqueCategory' => $allCategory
+            ]);
+            // traslated data
+            $dataTraslated['evaluationGroups'] = $allGrades;
+            // save json
+            $this->repository->saveDataBD($dataTraslated);
         }
     }
 
@@ -110,5 +125,43 @@ class has_active_grades implements structure_interface
         ];
         $event = course_grades::create($params);
         $event->trigger();
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    private function gradesByCategorys(array $data) : array
+    {
+        $allItems = $data['allItems'];
+        $uniqueCategory = $data['uniqueCategory'];
+        $categoryArray = [];
+        $allGrades = [];
+
+        foreach ($uniqueCategory as $categoty) {
+            $categoryArray[$categoty] = [];
+        }
+
+        foreach ($allItems as $item) {
+            $categoryArray[$item->fullname][] = [
+                "evaluationId" => intval($item->id),
+                "value" => $item->finalgrade,
+                "evaluationName" => $item->itemname,
+                "date" => date('Y-m-d' , $item->timecreated),
+                "isApproved" => $item->finalgrade > 3,
+            ];
+        }
+
+        foreach ($uniqueCategory as $category) {
+            $name_ = $this->has_structure->transformNameCategory($category);
+            $nameCode = $this->has_structure->shortCategoryName($name_);
+            $allGrades[] = [
+                "evaluationGroupCode" => strtoupper($nameCode),
+                "average" => "0",
+                "grades" => $categoryArray[$category]
+            ];
+        }
+
+        return $allGrades;
     }
 }

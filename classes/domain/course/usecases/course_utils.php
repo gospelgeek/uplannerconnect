@@ -88,7 +88,7 @@ class course_utils
                 'student' => $grade->userid
             ]));
 
-            //if ($studentCode !== '') {
+            if ($studentCode !== '') {
                 //información a guardar
                 $dataToSave = [
                     'sectionId' => $this->validator->isIsset($this->utils_service->convertFormatUplanner($queryCourse->shortname)),
@@ -104,7 +104,7 @@ class course_utils
                     'action' => strtoupper($data['dispatch']),
                     'transactionId' => $this->validator->isIsset($this->transition_endpoint->getLastRowTransaction($grade->grade_item->courseid))
                 ];
-            //}
+            }
         } catch (moodle_exception $e) {
             error_log('Excepción capturada: '. $e->getMessage(). "\n");
         }
