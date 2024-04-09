@@ -7,7 +7,7 @@
 
 namespace local_uplannerconnect\infrastructure\event;
 
-use local_uplannerconnect\domain\management_factory;
+use local_uplannerconnect\infrastructure\utils\has_active_grades;
 use local_uplannerconnect\infrastructure\utils\utils_events;
 use local_uplannerconnect\infrastructure\utils\has_active_structure;
 use moodle_exception;
@@ -50,13 +50,11 @@ class dispatch_event_handler
                      $stateDispatch = in_array($agregationState,$stateCreated);
                      $isTotalItem = utils_events::isTotalItem($grade-> load_grade_item());
                      if ($isTotalItem) {
-                         //Instanciar la clase management_factory
-                         utils_events::instanceFactory([
-                            "dataEvent" => $event,
-                            "typeEvent" => "user_graded",
-                            "dispatch" => ($stateDispatch)? 'create': 'update',
-                            "enum_etities" => 'course_notes'
-                         ]);
+                         utils_events::isGradeEvent(
+                             ['action' => ($stateDispatch)? 'create': 'update',
+                             'iduser' => $eventUser],
+                             $event
+                         );
                      }
                }
             }
@@ -179,6 +177,20 @@ class dispatch_event_handler
       } catch (moodle_exception $e) {
          error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
       }
+   }
+
+    /**
+     * @param $event
+     * @return void
+     */
+   public static function course_grades($event)
+   {
+       try {
+           $instanceUtils = new has_active_grades();
+           $instanceUtils->generateHandler($event->other);
+       } catch (moodle_exception $e) {
+           error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
+       }
    }
 
    /**

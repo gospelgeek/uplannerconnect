@@ -3,7 +3,7 @@
  * @package     local_uplannerconnect
  * @copyright   Cristian Machado Mosquera <cristian.machado@correounivalle.edu.co>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ */
 
 namespace local_uplannerconnect\event;
 
@@ -12,12 +12,12 @@ use core\event\base;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Returns all the grading items of a course
-*/
-class course_structure extends base
+ * Returns all the grades of course
+ */
+class course_grades extends base
 {
     const LEVEL_TEACHING = 1;
-    const TABLE_NAME = 'uplanner_dispatch_tmp';
+    const TABLE_NAME = 'uplanner_evaluation';
 
     /**
      * Init method.
@@ -37,7 +37,7 @@ class course_structure extends base
      * @return string
      */
     public function get_description() {
-        return "Returns all the grading items of a course - uplannerconnect";
+        return "Returns all the grades of a course - uplannerconnect";
     }
 
     /**
@@ -46,6 +46,6 @@ class course_structure extends base
      * @return string
      */
     public static function get_name() {
-        return get_string('uplannerconnect:uplanner_dispatch_tmp', 'local_uplannerconnect');
+        return get_string('uplannerconnect:uplanner_grades', 'local_uplannerconnect');
     }
 }

@@ -60,14 +60,13 @@ class course_utils
             $event = $data['dataEvent'];
             $getData = $this->validator->isArrayData($event->get_data());
             $grade = $this->validator->isObjectData($event->get_grade());
-            $gradeRecordData = $this->validator->isObjectData($grade->get_record_data());
             $gradeLoadItem = $this->validator->isObjectData($grade->load_grade_item());
             $categoryItem = $this->getInstanceCategoryName($gradeLoadItem);
             $categoryFullName = $this->shortCategoryName($categoryItem); 
             $approved = $this->getApprovedItem($gradeLoadItem, $grade);
             $studentCode = $this->utils_service->getIdentificationUser($this->validator->isIsset($grade->userid));
              
-            $queryCourse = ($this->validator->verifyQueryResult([                        
+            $queryCourse = ($this->validator->verifyQueryResult([
                 'data' => $this->moodle_query_handler->extract_data_db([
                     'table' => plugin_config::TABLE_COURSE,
                     'conditions' => [
@@ -113,7 +112,7 @@ class course_utils
     }
 
     /**
-     * Retorna los datos del evento grade_item_created
+     * Returns the data of the grade_item_created event
      *
      * @param array $data
      * @return array
@@ -134,7 +133,7 @@ class course_utils
             $grade = null;
 
             if (key_exists('userid', $dataEvent)) {
-                $grade = $this->validator->isObjectData($get_grade_item->get_grade($dataEvent['userid'], false));    
+                $grade = $this->validator->isObjectData($get_grade_item->get_grade($dataEvent['userid'], false));
             }
             
             //category info
@@ -153,7 +152,7 @@ class course_utils
             }
             $weight = $this->validator->isIsset($this->getWeight($get_grade_item)) ?? 0;
 
-            $queryCourse = ($this->validator->verifyQueryResult([                        
+            $queryCourse = ($this->validator->verifyQueryResult([
                 'data' => $this->moodle_query_handler->extract_data_db([
                     'table' => plugin_config::TABLE_COURSE,
                     'conditions' => [
