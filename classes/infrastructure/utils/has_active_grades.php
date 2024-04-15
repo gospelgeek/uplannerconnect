@@ -72,7 +72,7 @@ class has_active_grades implements structure_interface
                 'typeEvent' => 'user_graded'
             ]);
 
-            if ($dataEventGrade['action'] == 'update') {
+            if ($dataEventGrade['action'] == 'create') {
                 $nameCategoryCreated = $courseData['evaluationGroupCode'] !== self::CATEGORY_FATHER_DEFAULT;
                 $allItems[] = (object) [
                     'id' => $courseData['evaluationId'],
@@ -147,7 +147,7 @@ class has_active_grades implements structure_interface
                 "evaluationId" => intval($item->id),
                 "value" => $item->finalgrade,
                 "evaluationName" => $item->itemname,
-                "date" => date('Y-m-d' , $item->timecreated),
+                "date" => date('Y-m-d' , ($item->timecreated ?? time())),
                 "isApproved" => $item->finalgrade > 3,
             ];
         }
