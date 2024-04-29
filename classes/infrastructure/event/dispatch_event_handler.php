@@ -205,11 +205,14 @@ class dispatch_event_handler
                "key" => "eventname",
                "methodName" => "get_data"
             ])) {
+               error_log("******************************************************************************");
+               error_log(" 1 --- PASO");
                $dataEvent = $event->get_data();
+               error_log("Condicion".print_r(isset($dataEvent['other']['modulename']), true));
                if(isset($dataEvent['other']['modulename']) &&
                   $dataEvent['objecttable'] === 'course_modules') {
                   $moduleType = $dataEvent['other']['modulename'];
-                  
+                  error_log(" 2 --- PASO");
                   //course_modules
                   $availableModules = [
                      'folder',
@@ -223,7 +226,9 @@ class dispatch_event_handler
                   ];
 
                   if (in_array($moduleType, $availableModules)) {
+                     error_log("Condicion del curso" .  print_r(!utils_events::validateAccessFaculty($event), true));
                      if (!utils_events::validateAccessFaculty($event)) { return; }
+                     error_log("APARTIR DE AHORA DEBE DE GUARDAR");
                      //Instanciar la clase management_factory
                      utils_events::instanceFactory([
                         "dataEvent" => $event,
