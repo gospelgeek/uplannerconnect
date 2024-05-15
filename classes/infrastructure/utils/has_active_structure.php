@@ -24,7 +24,8 @@ class has_active_structure implements structure_interface
     private $dispatch_structure;
     const CATEGORY_FATHER_DEFAULT = "NOTAS";
     const QUERY_CATEGORYS_ITEMS = "SELECT t1.id, t2.fullname , t1.itemname, t1.itemtype, t1.categoryid FROM {grade_items} AS t1 INNER JOIN {grade_categories} AS t2 ON t2.id = t1.categoryid WHERE t1.courseid = :courseid AND t1.itemtype NOT IN ('course', 'category') ORDER BY t1.id DESC";
-
+    const QUERY_IS_JSON_REPEAT = "SELECT id FROM {uplanner_evaluation} WHERE  json::jsonb->'evaluationGroups' @> :json::jsonb ORDER BY id DESC LIMIT 1";
+    
     /**
      * Construct
     */
@@ -51,7 +52,16 @@ class has_active_structure implements structure_interface
             'gradeItem' => $event->get_grade_item()
         ]);
         $dataTranslate['evaluationGroups'] = $allItems;
-        $this->repository->saveDataBD($dataTranslate);
+
+        // Validate if no repeat json
+        $isRepeatJson = $this->_query->executeQuery(
+            self::QUERY_IS_JSON_REPEAT,
+            [
+                "json" => json_encode($allItems)
+            ]
+        );
+        
+        if (empty($isRepeatJson)) $this->repository->saveDataBD($dataTranslate);
     }
     
     /**

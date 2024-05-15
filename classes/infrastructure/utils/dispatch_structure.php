@@ -49,23 +49,7 @@ class dispatch_structure implements dispatch_structure_interface
             'data' => $data
             ]) && !in_array($itemtype, self::NOT_AVAILABLE_ITEMS))
         {
-            $lastItems  = $this->lastItemsCourse($data['courseid']);
-
-            $isActionCreated = $this->isActionCreated($data);
-            $actionCurrent = array_values(array_slice($lastItems, -1))[0] ?? [];
-
-            // Create Action if is first
-            if (empty($isActionCreated)) {
-                $this->insertCourseStructure($data);
-                $this->executeTrigger($data,$event);
-            }
-            else if (!empty($lastItems)) {
-                $this->deleteRecord([
-                    'courseid' => $data['courseid'],
-                    'updated_item' => $actionCurrent->updated_item ?? ''
-                ]);
-                $this->executeTrigger($data,$event);
-            }
+            $this->executeTrigger($data,$event);
         }
     }
 
