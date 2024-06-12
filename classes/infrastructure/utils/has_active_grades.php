@@ -27,7 +27,8 @@ class has_active_grades implements structure_interface
                                  INNER JOIN  {grade_grades} AS t3 ON t3.itemid = t1.id 
                                  WHERE t1.courseid = :courseid AND 
                                  t1.itemtype NOT IN ('course', 'category') 
-                                 AND t3.aggregationstatus IN ('used','unknown') AND 
+                                 AND t3.aggregationstatus IN ('used','unknown') AND
+                                 t3.finalgrade is not NULL AND 
                                  t3.userid = :userid ORDER BY t1.id DESC";
     private $courseUtils;
     private $courseTraslate;
@@ -74,12 +75,17 @@ class has_active_grades implements structure_interface
 
             if ($dataEventGrade['action'] == 'create') {
                 $nameCategoryCreated = $courseData['evaluationGroupCode'] !== self::CATEGORY_FATHER_DEFAULT;
-                $allItems[] = (object) [
-                    'id' => $courseData['evaluationId'],
-                    'itemname' => $courseData['evaluationName'],
-                    'finalgrade' => $courseData['value'],
-                    'fullname' => $nameCategoryCreated? $courseData['evaluationGroupCode'] : '?'
-                ];
+                if ($allItems) {
+                    $firstItem = reset($allItems);
+                    if ($firstItem && (int)$firstItem->id !== (int)$courseData['evaluationId']) {
+                        $allItems[] = (object) [
+                            'id' => $courseData['evaluationId'],
+                            'itemname' => $courseData['evaluationName'],
+                            'finalgrade' => $courseData['value'],
+                            'fullname' => $nameCategoryCreated? $courseData['evaluationGroupCode'] : '?'
+                        ];
+                    }
+                }
             }
 
             $allCategory = $this->generateCategoryGroups([
@@ -148,7 +154,7 @@ class has_active_grades implements structure_interface
                 "value" => $item->finalgrade,
                 "evaluationName" => $item->itemname,
                 "date" => date('Y-m-d' , ($item->timecreated ?? time())),
-                "isApproved" => $item->finalgrade > 3,
+                "isApproved" => $item->finalgrade >= 3,
             ];
         }
 
