@@ -25,7 +25,8 @@ class has_active_structure implements structure_interface
     const CATEGORY_FATHER_DEFAULT = "NOTAS";
     const QUERY_CATEGORYS_ITEMS = "SELECT t1.id, t2.fullname , t1.itemname, t1.itemtype, t1.categoryid FROM {grade_items} AS t1 INNER JOIN {grade_categories} AS t2 ON t2.id = t1.categoryid WHERE t1.courseid = :courseid AND t1.itemtype NOT IN ('course', 'category') ORDER BY t1.id DESC";
     const QUERY_IS_JSON_REPEAT = "SELECT id FROM {uplanner_evaluation} WHERE  json::jsonb->'evaluationGroups' @> :json::jsonb ORDER BY id DESC LIMIT 1";
-    
+    const QUERY_WEIGHT_GRADES = "SELECT t1.id AS category_id, t1.fullname AS category_name, COUNT(t2.id) AS item_count, SUM(t3.finalgrade) AS total_grade, MAX(t3.finalgrade) AS max_grade, t1.aggregation FROM {grade_categories} AS t1 INNER JOIN {grade_items} AS t2 ON t2.categoryid = t1.id INNER JOIN  {grade_grades} AS t3 ON t3.itemid = t2.id WHERE t1.courseid = :courseid AND t2.itemtype NOT IN ('course', 'category') AND t3.userid = :userid GROUP BY t1.id, t1.fullname";
+
     /**
      * Construct
     */
@@ -49,7 +50,8 @@ class has_active_structure implements structure_interface
         $dataTranslate = $this->translationData->createCommonDataEvaluation($dataStructure);
         $allItems = $this->generateCategoryItems([
             'courseid' =>  $dataCourse['courseid'],
-            'gradeItem' => $event->get_grade_item()
+            'gradeItem' => $event->get_grade_item(),
+            'event' => $event
         ]);
         $dataTranslate['evaluationGroups'] = $allItems;
 
@@ -90,6 +92,7 @@ class has_active_structure implements structure_interface
         try {
             $courseid = $data['courseid'];
             $gradeItem = $data['gradeItem'];
+            $event =  $data['event'];
             $allCategorys = [];
 
             $allItems = $this->_query->executeQuery(
@@ -111,7 +114,8 @@ class has_active_structure implements structure_interface
                         "evaluations" => $this->generateAllItems([
                             'allItems' => $allItems,
                             'gradeItem' => $gradeItem,
-                            'category' => $category
+                            'category' => $category,
+                            'event' => $event
                         ])
                     ];
                     array_push($response, $dataCategory);
@@ -160,6 +164,7 @@ class has_active_structure implements structure_interface
             $allItems = $data['allItems'];
             $gradeItem = $data['gradeItem'];
             $categoryName = $data['category'];
+            $event = $data['event'];
 
             if (!empty($allItems)) {
                 foreach ($allItems as $item) {
@@ -167,7 +172,7 @@ class has_active_structure implements structure_interface
                         $dataItem = [
                             "evaluationId" => intval($item->id),
                             "evaluationName" => strval($item->itemname ?? ''),
-                            "weight" => floatval($this->course_utils->getWeight($gradeItem) ?? 0)
+                            "weight" => $this->getWeight($event,$item)
                         ];
                         array_push($response, $dataItem);
                     }
@@ -178,5 +183,65 @@ class has_active_structure implements structure_interface
         }
 
         return $response;
+    }
+
+    /**
+     * 
+     * Return weight of category based on aggregation type
+     * 
+     * @param object $gradeItem
+     * @return float
+     */
+    private function getWeight($event,$item)
+    {
+        $weight = 0.0;
+        // $gradeItem = $event->get_grade_item();
+        // $courseId = $gradeItem->courseid;
+        // $categoryId = $gradeItem->categoryid;
+        // $userid = $item->userid;
+        // $categoryName = $item->fullname ?? '?';
+
+        // if (!isset($userid)) {
+        //     return $weight;
+        // }
+
+        // $allWeight = $this->_query->executeQuery(
+        //     self::QUERY_WEIGHT_GRADES,
+        //     [
+        //         'courseid' => $courseId,
+        //         'userid' => $userid
+        //     ]
+        // );
+
+        // if (!empty($allWeight)) {
+        //     $filterByName = function($weight) use ($categoryName) {
+        //         return $weight->category_name == $categoryName;
+        //     };
+        
+        //     $filteredWeights = array_filter($allWeight, $filterByName);
+        //     $firstWeight = reset($filteredWeights);
+
+        //     if ($firstWeight !== false) {
+           
+        //         if ($firstWeight->item_count <= 0 ||
+        //             $firstWeight->total_grade <= 0) {
+        //             return $weight;
+        //         }
+
+        //         if ($firstWeight->aggregation == 11) {
+        //             $weight = $firstWeight->total_grade / $firstWeight->item_count;
+        //         }
+
+        //         if ($firstWeight->aggregation == 10) {
+        //             if (property_exists($gradeItem, 'aggregationcoef2') && $gradeItem->aggregationcoef2 != 0) {
+        //                 $weight = $gradeItem->aggregationcoef2;
+        //             } elseif (property_exists($gradeItem, 'aggregationcoef')) {
+        //                 $weight = $gradeItem->aggregationcoef;
+        //             }
+        //         }
+        //     }
+        // }
+                
+        return (float)$weight;
     }
 }
