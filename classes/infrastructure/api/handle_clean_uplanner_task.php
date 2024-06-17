@@ -101,6 +101,7 @@ class handle_clean_uplanner_task
                 $this->create_log($this->prefix . $this->task_id . '_log');
                 $this->log->add_line("------------------------------------------  UPLANNER - PROCESS START - FOREACH REPOSITORIES ------------------------------------------ ");
                 $log_id = $this->general_repository->add_log_data();
+                $this->send_error_per_repository($page_size);
                 foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
                     $this->log->add_line('------- CREATE REPOSITORY OBJECT: ' . $type . ' - ' . $repository_class  . PHP_EOL);
                     $repository = new $repository_class($type);
@@ -270,5 +271,61 @@ class handle_clean_uplanner_task
             $file->get_path_file(),
             $file->get_virtual_name()
         );
+    }
+
+    /**
+     * Send error json to uplanner
+     *
+     * @return void
+     */
+    private function send_error_per_repository($page_size)
+    {
+        foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
+            $repository = new $repository_class($type);
+            $this->start_process_error_send(
+                $repository,
+                $uplanner_client,
+                $page_size
+            );
+        }
+    }
+
+    /**
+     * Send error json to uplanner
+     *
+     * @param $subject
+     * @param $file
+     * @return void
+     */
+    private function start_process_error_send(
+        $repository,
+        $uplanner_client,
+        $page_size
+    ) {
+        try {
+            if ($page_size <= 0) {
+                return;
+            }
+            $offset = 0;
+            while (true) {
+                $data = [
+                    'state' => repository_type::STATE_UP_ERROR,
+                    'limit' => $page_size,
+                    'offset' => $offset,
+                ];
+
+                $rows = $repository->getDataBD($data);
+
+                if (!$rows) {
+                    break;
+                }
+                
+                $this->message_repository->process_error_state($repository, $rows);
+                $rows = $repository->getDataBD($data);
+                $offset += count($rows);
+            }
+        } catch (moodle_exception $e) {
+            error_log('handle_re_send_fail_uplanner_task - process: ' . $e->getMessage() . PHP_EOL);
+        }
     }
 }
