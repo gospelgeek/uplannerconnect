@@ -12,6 +12,7 @@ use local_uplannerconnect\domain\course\usecases\course_utils;
 use local_uplannerconnect\domain\course\course_translation_data;
 use local_uplannerconnect\application\repository\course_notes_repository;
 use local_uplannerconnect\event\course_grades;
+use local_uplannerconnect\plugin_config\plugin_config;
 use moodle_exception;
 use \stdClass;
 
@@ -82,7 +83,7 @@ class has_active_grades implements structure_interface
                             'id' => $courseData['evaluationId'],
                             'itemname' => $courseData['evaluationName'],
                             'finalgrade' => $courseData['value'],
-                            'fullname' => $nameCategoryCreated? $courseData['evaluationGroupCode'] : '?'
+                            'fullname' => $this->getCategoryName($courseData['evaluationId'])
                         ];
                     }
                 }
@@ -222,5 +223,38 @@ class has_active_grades implements structure_interface
         }
 
         return (string)$weight;
+    }
+
+        /**
+     * Return name of category
+     * 
+     * @param object $gradeItem
+     * @return string
+     */
+    private function getCategoryName($evaluationId) : string
+    {
+        $categoryFullName = '?';
+
+        if (!isset($evaluationId) || $evaluationId <= 0) {
+            return $categoryFullName;
+        }
+
+        try {
+            $queryResult = $this->_query->executeQuery(
+                plugin_config::QUERY_GET_CATEGORY_NAME,
+                ['id' => $evaluationId]
+            );
+            // Get first result.
+            $firstResult = reset($queryResult);
+            if (isset($firstResult->fullname) && 
+                strlen($firstResult->fullname) !== 0 && 
+                $firstResult->fullname !== '?')
+            {
+                $categoryFullName = $firstResult->fullname;
+            }
+        } catch (moodle_exception $e) {
+            error_log('Excepción capturada: '. $e->getMessage(). "\n");
+        }
+        return $categoryFullName;
     }
 }

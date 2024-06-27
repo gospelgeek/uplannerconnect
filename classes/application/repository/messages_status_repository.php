@@ -122,7 +122,7 @@ class messages_status_repository
         } catch (Exception $e) {
             error_log('messages_status_repository->process: ' . $e->getMessage() . PHP_EOL);
         }
-    } 
+    }
 
     /**
      * Return list transactions

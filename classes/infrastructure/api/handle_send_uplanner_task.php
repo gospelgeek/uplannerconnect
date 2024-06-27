@@ -12,6 +12,7 @@ use Exception;
 use local_uplannerconnect\application\repository\repository_type;
 use local_uplannerconnect\infrastructure\api\client\abstract_uplanner_client;
 use local_uplannerconnect\infrastructure\api\factory\uplanner_client_factory;
+use local_uplannerconnect\application\repository\messages_status_repository;
 use local_uplannerconnect\infrastructure\email\email;
 use local_uplannerconnect\infrastructure\file;
 use local_uplannerconnect\infrastructure\log;
@@ -65,6 +66,11 @@ class handle_send_uplanner_task
     private $send_emails;
 
     /**
+     * @var messages_status_repository
+     */
+    private $message_repository;
+
+    /**
      * Construct
      *
      * @param $tasks_id
@@ -79,6 +85,7 @@ class handle_send_uplanner_task
         $this->prefix = $this->task_id . '_';
         $this->current_date = date("F j, Y, g:i:s a");
         $this->uplanner_client_factory = new uplanner_client_factory();
+        $this->message_repository = new messages_status_repository();
         $this->email = new email();
     }
 
@@ -97,6 +104,9 @@ class handle_send_uplanner_task
     ) {
         $this->create_log($this->prefix . $this->task_id . '_log');
         $this->log->add_line('------------------------------------------  UPLANNER - PROCESS START - FOREACH REPOSITORIES ------------------------------------------');
+        if ($state == repository_type::STATE_ERROR) {
+            $this->send_error_per_repository($page_size = 1000);
+        }
         foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
             $this->log->add_line('------- CREATE REPOSITORY OBJECT: ' . $type . ' - ' . $repository_class);
             $repository = new $repository_class();
@@ -262,5 +272,58 @@ class handle_send_uplanner_task
         }
 
         return false;
+    }
+
+    /**
+     * Send error json to uplanner
+     *
+     * @return void
+     */
+    private function send_error_per_repository($page_size)
+    {
+        foreach (repository_type::ACTIVE_REPOSITORY_TYPES as $type => $repository_class) {
+            $repository = new $repository_class($type);
+            $this->start_process_error_send(
+                $repository,
+                $page_size
+            );
+        }
+    }
+
+    /**
+     * Send error json to uplanner
+     *
+     * @param $subject
+     * @param $file
+     * @return void
+     */
+    private function start_process_error_send(
+        $repository,
+        $page_size
+    ) {
+        try {
+            if ($page_size <= 0) {
+                return;
+            }
+            $offset = 0;
+            while (true) {
+                $data = [
+                    'state' => repository_type::STATE_UP_ERROR,
+                    'limit' => $page_size,
+                    'offset' => $offset,
+                ];
+
+                $rows = $repository->getDataBD($data);
+                if (!$rows) {
+                    break;
+                }
+                
+                $this->message_repository->process_error_state($repository, $rows);
+                $rows = $repository->getDataBD($data);
+                $offset += count($rows);
+            }
+        } catch (moodle_exception $e) {
+            error_log('handle_re_send_fail_uplanner_task - process: ' . $e->getMessage() . PHP_EOL);
+        }
     }
 }
