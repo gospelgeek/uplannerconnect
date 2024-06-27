@@ -100,6 +100,31 @@ class messages_status_repository
     }
 
     /**
+     * Re sending error menssages to upplaner
+     *
+     * @return void
+     */
+    public function process_error_state($repository,$rows)
+    {
+        error_log('------------------------------------------  PROCESS START RE SENDING - UPLANNER QUERY ------------------------------------------');
+        try {
+            foreach ($rows as $row) {
+                $data = [
+                    'is_sucessful' => 0,
+                    'success' => 0,
+                    "response" => "re sending to uplanner",
+                    'ds_error' => "",
+                    'id' => $row->id
+                ];
+               
+                $repository->updateDataBD($data);
+            }
+        } catch (Exception $e) {
+            error_log('messages_status_repository->process: ' . $e->getMessage() . PHP_EOL);
+        }
+    }
+
+    /**
      * Return list transactions
      *
      * @param $rows

@@ -29,4 +29,5 @@ class plugin_config
     const MAX_ITEM_COURSE = "SELECT DISTINCT COUNT(t2.id) as count FROM {grade_items} as t2 WHERE t2.courseid = :courseid AND t2.itemtype NOT IN ('course', 'category') AND t2.hidden = 0";
     const SUM_TOTAL_GRADE = "SELECT SUM(t1.finalgrade) AS total FROM {grade_grades} AS t1 INNER JOIN {grade_items} AS t2 ON t1.itemid = t2.id WHERE t2.courseid = :courseid AND t2.itemtype NOT IN ('course', 'category') AND t2.hidden = 0 AND t1.userid = :userid AND t1.finalgrade IS NOT NULL";
     const MAX_STUDENT_GRADE = "SELECT MAX(t1.finalgrade) AS nota_maxima FROM {grade_grades} AS t1 INNER JOIN {grade_items} AS t2 ON t1.itemid = t2.id WHERE t2.courseid = :courseid AND t2.itemtype NOT IN ('course', 'category') AND t2.hidden = 0 AND t1.userid = userid AND t1.finalgrade IS NOT NULL";
+    const QUERY_GET_CATEGORY_NAME = "SELECT t2.fullname FROM {grade_items} as t1 INNER JOIN {grade_categories} as t2 ON t1.id = :id AND t2.id = t1.categoryid";
 }

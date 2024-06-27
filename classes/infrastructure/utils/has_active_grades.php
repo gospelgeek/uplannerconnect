@@ -12,6 +12,7 @@ use local_uplannerconnect\domain\course\usecases\course_utils;
 use local_uplannerconnect\domain\course\course_translation_data;
 use local_uplannerconnect\application\repository\course_notes_repository;
 use local_uplannerconnect\event\course_grades;
+use local_uplannerconnect\plugin_config\plugin_config;
 use moodle_exception;
 use \stdClass;
 
@@ -21,7 +22,7 @@ use \stdClass;
 class has_active_grades implements structure_interface
 {
     const CATEGORY_FATHER_DEFAULT = "NOTAS";
-    const GET_ALL_GRADES_USER = "SELECT t1.id, t2.fullname , t1.itemname , t3.finalgrade, t1.timecreated
+    const GET_ALL_GRADES_USER = "SELECT t1.id, t2.fullname , t1.itemname , t3.finalgrade, t1.timecreated, t2.aggregation, t2.depth
                                  FROM {grade_items} AS t1 
                                  INNER JOIN {grade_categories} AS t2 ON t2.id = t1.categoryid 
                                  INNER JOIN  {grade_grades} AS t3 ON t3.itemid = t1.id 
@@ -82,7 +83,7 @@ class has_active_grades implements structure_interface
                             'id' => $courseData['evaluationId'],
                             'itemname' => $courseData['evaluationName'],
                             'finalgrade' => $courseData['value'],
-                            'fullname' => $nameCategoryCreated? $courseData['evaluationGroupCode'] : '?'
+                            'fullname' => $this->getCategoryName($courseData['evaluationId'])
                         ];
                     }
                 }
@@ -115,6 +116,29 @@ class has_active_grades implements structure_interface
         }
         $uniqueCategory = array_unique($uniqueCategory);
         return $uniqueCategory;
+    }
+
+    /**
+     * @param array $data
+     * @return int
+     */
+    private function getAggregationFather(array $data): int
+    {
+        $allItems = $data['allitems'];
+        $categoryDepth = 1;
+        $aggregation = 11;
+
+        $filterByName = function($item) use ($categoryDepth) {
+            return isset($item->depth) && $item->depth == $categoryDepth;
+        };
+        $filter = array_filter($allItems, $filterByName);
+
+        if (count($filter) > 0) {
+            $firstItem = reset($filter);
+            $aggregation = $firstItem->aggregation ?? 11;
+        }
+
+        return intval($aggregation);
     }
 
     /**
@@ -158,16 +182,79 @@ class has_active_grades implements structure_interface
             ];
         }
 
+        $aggregation = $this->getAggregationFather([
+            'allitems' => $allItems
+        ]);
+
         foreach ($uniqueCategory as $category) {
             $name_ = $this->has_structure->transformNameCategory($category);
             $nameCode = $this->has_structure->shortCategoryName($name_);
             $allGrades[] = [
                 "evaluationGroupCode" => strtoupper($nameCode),
-                "average" => "0",
+                "average" => $this->getWeight($aggregation,count($uniqueCategory)),
                 "grades" => $categoryArray[$category]
             ];
         }
 
         return $allGrades;
+    }
+
+    /**
+     * 
+     * Return weight of category based on aggregation type
+     * 
+     * @param object $gradeItem
+     * @return string
+     */
+    private function getWeight($category,$sizeItems)
+    {
+        $weight = "0";
+        
+        if (!isset($category) || 
+            $category <= 0
+        ) {
+            return $weight;
+        }
+
+        if ($sizeItems > 0 && 
+            $category == 11
+        ) {
+            $weight = (string)(1 / $sizeItems);
+        }
+
+        return (string)$weight;
+    }
+
+        /**
+     * Return name of category
+     * 
+     * @param object $gradeItem
+     * @return string
+     */
+    private function getCategoryName($evaluationId) : string
+    {
+        $categoryFullName = '?';
+
+        if (!isset($evaluationId) || $evaluationId <= 0) {
+            return $categoryFullName;
+        }
+
+        try {
+            $queryResult = $this->_query->executeQuery(
+                plugin_config::QUERY_GET_CATEGORY_NAME,
+                ['id' => $evaluationId]
+            );
+            // Get first result.
+            $firstResult = reset($queryResult);
+            if (isset($firstResult->fullname) && 
+                strlen($firstResult->fullname) !== 0 && 
+                $firstResult->fullname !== '?')
+            {
+                $categoryFullName = $firstResult->fullname;
+            }
+        } catch (moodle_exception $e) {
+            error_log('Excepción capturada: '. $e->getMessage(). "\n");
+        }
+        return $categoryFullName;
     }
 }
