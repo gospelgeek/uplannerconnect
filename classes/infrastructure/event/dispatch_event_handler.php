@@ -205,10 +205,56 @@ class dispatch_event_handler
                "key" => "eventname",
                "methodName" => "get_data"
             ])) {
+                  $dataEvent = $event->get_data();
+                  if(isset($dataEvent['other']['modulename']) &&
+                     $dataEvent['objecttable'] === 'course_modules') {
+                     $moduleType = $dataEvent['other']['modulename'];
+                     //course_modules
+                     $availableModules = [
+                        'folder',
+                        'resource',
+                        'label',
+                        'lightboxgallery',
+                        'book',
+                        'page',
+                        'url',
+                        'imscp'
+                     ];
+
+                     if (in_array($moduleType, $availableModules)) {
+                        if (!utils_events::validateAccessFaculty($event)) { return; }
+                        //Instanciar la clase management_factory
+                        utils_events::instanceFactory([
+                           "dataEvent" => $event,
+                           "typeEvent" => "resource_created",
+                           "dispatch" => 'create',
+                           "enum_etities" => 'material_created'
+                        ]);
+                     }
+                  }
+            }
+      } catch (moodle_exception $e) {
+         error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
+      }
+   }
+
+   /**
+    * Resource updated
+    */
+   public static function course_module_updated($event)
+   {
+      try {
+            if (utils_events::validateAccessTypeEvent([
+               "dataEvent" => $event,
+               "typeEvent" => ["\\core\\event\\course_module_updated"],
+               "key" => "eventname",
+               "methodName" => "get_data"
+            ])) {
                $dataEvent = $event->get_data();
-               if(isset($dataEvent['other']['modulename']) &&
+               if(isset($dataEvent['other']['modulename']) && 
                   $dataEvent['objecttable'] === 'course_modules') {
                   $moduleType = $dataEvent['other']['modulename'];
+                  
                   //course_modules
                   $availableModules = [
                      'folder',
@@ -227,58 +273,12 @@ class dispatch_event_handler
                      utils_events::instanceFactory([
                         "dataEvent" => $event,
                         "typeEvent" => "resource_created",
-                        "dispatch" => 'create',
+                        "dispatch" => 'update',
                         "enum_etities" => 'material_created'
                      ]);
                   }
                }
             }
-      } catch (moodle_exception $e) {
-         error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
-      }
-   }
-
-   /**
-    * Resource updated
-    */
-   public static function course_module_updated($event)
-   {
-      try {
-         if (utils_events::validateAccessTypeEvent([
-            "dataEvent" => $event,
-            "typeEvent" => ["\\core\\event\\course_module_updated"],
-            "key" => "eventname",
-            "methodName" => "get_data"
-         ])) {
-            $dataEvent = $event->get_data();
-            if(isset($dataEvent['other']['modulename']) && 
-               $dataEvent['objecttable'] === 'course_modules') {
-               $moduleType = $dataEvent['other']['modulename'];
-               
-               //course_modules
-               $availableModules = [
-                  'folder',
-                  'resource',
-                  'label',
-                  'lightboxgallery',
-                  'book',
-                  'page',
-                  'url',
-                  'imscp'
-               ];
-
-               if (in_array($moduleType, $availableModules)) {
-                  if (!utils_events::validateAccessFaculty($event)) { return; }
-                  //Instanciar la clase management_factory
-                  utils_events::instanceFactory([
-                     "dataEvent" => $event,
-                     "typeEvent" => "resource_created",
-                     "dispatch" => 'update',
-                     "enum_etities" => 'material_created'
-                  ]);
-               }
-            }
-         }
       } catch (moodle_exception $e) {
          error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
       }

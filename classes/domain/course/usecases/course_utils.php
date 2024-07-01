@@ -88,6 +88,10 @@ class course_utils
                 'student' => $grade->userid
             ]));
 
+            if ($data['dispatch'] == 'delete' && 
+                ($getData['other'])['finalgrade'] == null
+            ) { return $dataToSave; }
+
             if ($studentCode !== '') {
                 //información a guardar
                 $dataToSave = [

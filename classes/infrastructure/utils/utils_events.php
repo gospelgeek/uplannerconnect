@@ -10,6 +10,7 @@ namespace local_uplannerconnect\infrastructure\utils;
 use local_uplannerconnect\application\service\announcements_utils;
 use local_uplannerconnect\application\service\event_access_validator;
 use local_uplannerconnect\application\service\filter_evaluation_update;
+use local_uplannerconnect\application\repository\moodle_query_handler;
 use local_uplannerconnect\domain\management_factory;
 use moodle_exception;
 
@@ -20,6 +21,7 @@ class utils_events
 {
     const FIELD_COURSE = 'courseid';
     const TEXT_ERROR = 'Exception caught: ';
+    const QUERY_IS_JSON_REPEAT = "SELECT id FROM {uplanner_materials} WHERE json::jsonb->>'id' = :id AND json::jsonb->>'name' = :name AND json::jsonb->>'url' = :url ORDER BY id DESC LIMIT 1";
 
     /**
      * @param $event
@@ -181,9 +183,9 @@ class utils_events
     /**
      *
      */
-     public static function isGradeEvent(array $data , $event): void
-     {
-         try {
+    public static function isGradeEvent(array $data , $event): void
+    {
+        try {
              $grade = $event->get_grade();
              if (isset($data['iduser'], $data['action'])) {
                  $dispatchGrade = new dispatch_grades();
@@ -191,8 +193,27 @@ class utils_events
                  $data['iduser'] = $grade->userid;
                  $dispatchGrade->executeEventHandler($data,$event);
              }
-         } catch (moodle_exception $e) {
+        } catch (moodle_exception $e) {
              error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
-         }
-     }
+        }
+    }
+
+    public static function isRepeatJsonResource(array $data): bool {
+        $result = false;
+        try {
+            $_query = new moodle_query_handler();
+            $isRepeatQury = $_query->executeQuery(
+                self::QUERY_IS_JSON_REPEAT,
+                [
+                    'id'=> $data['id'],
+                    'name' => $data['name'],
+                    'url' => $data['url']
+                ]
+            );
+            $result = !empty($isRepeatQury);
+        } catch(moodle_exception $e) {
+            error_log(self::TEXT_ERROR. $e->getMessage(). "\n");
+        }
+        return $result;
+    }
 }

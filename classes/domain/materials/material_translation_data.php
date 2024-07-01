@@ -44,7 +44,7 @@ class material_translation_data
                 //Traer la información
                 $typeTransform = $this->typeTransform[$data['typeEvent']];
                 //verificar si existe el método
-                if (method_exists($this, $typeTransform)) {
+                if (method_exists($this, $typeTransform) && count($data['data']) > 0) {
                     $arraySend = $this->$typeTransform($data['data']);
                 }
             }
